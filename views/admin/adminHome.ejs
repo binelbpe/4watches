@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Admin</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="all,follow" />
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome CSS-->
+    <link
+      rel="stylesheet"
+      href="vendor/font-awesome/css/font-awesome.min.css"
+    />
+    <!-- Custom Font Icons CSS-->
+    <link rel="stylesheet" href="css/font.css" />
+    <!-- Google fonts - Muli-->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Muli:300,400,700"
+    />
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet" />
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="css/custom.css" />
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/favicon.ico" />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      h3,h1 {
+        color: white;
+      }
+      .chart-container {
+        width: 100%;
+        height: 400px;
+      }
+      .fade-in {
+        animation: fadeIn 2s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
+    <!-- Tweaks for older IEs-->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script
+    ><![endif]-->
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navbar navbar-expand-lg">
+        <div class="search-panel">
+          <div
+            class="search-inner d-flex align-items-center justify-content-center"
+          >
+            <div class="close-btn">Close <i class="fa fa-close"></i></div>
+            <form id="searchForm" action="#">
+              <div class="form-group">
+                <input
+                  type="search"
+                  name="search"
+                  placeholder="What are you searching for..."
+                />
+                <button type="submit" class="submit">Search</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div
+          class="container-fluid d-flex align-items-center justify-content-between"
+        >
+          <div class="navbar-header">
+            <!-- Navbar Header--><a href="/" class="navbar-brand">
+              <div class="brand-text brand-big visible text-uppercase">
+                <strong class="text-primary">4WATCHES</strong
+                ><strong>Admin</strong>
+              </div>
+              <div class="brand-text brand-sm">
+                <strong class="text-primary">D</strong><strong>A</strong>
+              </div>
+            </a>
+
+            <!-- Languages dropdown    -->
+            <div class="list-inline-item dropdown">
+              <a
+                id="languages"
+                rel="nofollow"
+                data-target="#"
+                href="#"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                class="nav-link language dropdown-toggle"
+                ><img src="img/flags/16/GB.png" alt="English" /><span
+                  class="d-none d-sm-inline-block"
+                  >English</span
+                ></a
+              >
+              <div aria-labelledby="languages" class="dropdown-menu">
+                <a rel="nofollow" href="#" class="dropdown-item">
+                  <img
+                    src="img/flags/16/DE.png"
+                    alt="English"
+                    class="mr-2"
+                  /><span>German</span></a
+                ><a rel="nofollow" href="#" class="dropdown-item">
+                  <img
+                    src="img/flags/16/FR.png"
+                    alt="English"
+                    class="mr-2"
+                  /><span>French </span></a
+                >
+              </div>
+            </div>
+            <!-- Log out               -->
+            <div class="list-inline-item logout">
+              <a id="logout" href="/admin/logout" class="nav-link"
+                >Logout <i class="icon-logout"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div class="d-flex align-items-stretch">
+      <!-- Sidebar Navigation-->
+      <nav id="sidebar">
+        <!-- Sidebar Header-->
+        <div class="sidebar-header d-flex align-items-center">
+          <div class="avatar">
+            <img
+              src="/images/logo.png"
+              alt="..."
+              class="img-fluid rounded-circle"
+            />
+          </div>
+          <div class="title">
+            <h1 class="h5">Binel</h1>
+            <p>Web Designer</p>
+          </div>
+        </div>
+        <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
+        <ul class="list-unstyled">
+          <li class="active">
+            <a href="/admin/adminHome"> <i class="icon-home"></i>Dashboard</a>
+          </li>
+          <li>
+            <a href="/admin/Product"> <i class="icon-grid"></i>Product</a>
+          </li>
+          <li>
+            <a href="/admin/User"> <i class="fa fa-bar-chart"></i>user</a>
+          </li>
+          <li>
+            <a href="/admin/Category"> <i class="icon-padnote"></i>Category</a>
+          </li>
+          <li>
+            <a href="/admin/order">
+              <i class="icon-paper-and-pencil"></i>Order</a
+            >
+          </li>
+          <li>
+            <a href="/admin/coupons">
+              <i class="icon-three-cells"></i>Coupons</a
+            >
+          </li>
+          <li>
+            <a href="/admin/sales"> <i class="icon-info"></i>Sales Report</a>
+          </li>
+        </ul>
+      </nav>
+      <!-- Sidebar Navigation end-->
+      <div class="page-content">
+        <div class="page-header">
+          <div class="container-fluid">
+            <h2 class="h5 no-margin-bottom">Dashboard</h2>
+          </div>
+        </div>
+        <div class="container mt-5">
+          <h1 class="text-center">Admin Dashboard</h1>
+          <div class="row mt-4">
+            <div class="col-md-4 fade-in">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Total Users</h5>
+                  <p class="card-text"><%= userCount %></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 fade-in">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Total Products</h5>
+                  <p class="card-text"><%= productCount %></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 fade-in">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Total Orders</h5>
+                  <p class="card-text"><%= orderCount %></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 fade-in">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Cash on Delivery Orders</h5>
+                  <p class="card-text"><%= cashOnDeliveryOrderCount %></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 fade-in">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Online Payment Orders</h5>
+                  <p class="card-text"><%= onlinePaymentOrderCount %></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 fade-in">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Wallet Payment Orders</h5>
+                  <p class="card-text"><%= walletPaymentOrderCount %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <form action="/admin/adminHome" method="get">
+              <select name="period" class="form-control" onchange="this.form.submit()">
+                <option value="daily" <%= period === 'daily' ? 'selected' : '' %>>Daily</option>
+                <option value="weekly" <%= period === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                <option value="monthly" <%= period === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                <option value="yearly" <%= period === 'yearly' ? 'selected' : '' %>>Yearly</option>
+              </select>
+            </form>
+            <div class="col-md-4 fade-in">
+             
+              <h3>Best Selling Products</h3>
+             
+              <ul class="list-group">
+                <% bestSellingProducts.forEach(product => { %>
+                <li class="list-group-item">
+                  <%= product.product %> - Sold: <%= product.quantitySold %>
+                </li>
+                <% }) %>
+              </ul>
+            </div>
+            <div class="col-md-4 fade-in">
+              <h3>Best Selling Categories</h3>
+              <ul class="list-group">
+                <% bestSellingCategories.forEach(category => { %>
+                <li class="list-group-item">
+                  <%= category.category %> - Sold: <%= category.quantitySold %>
+                </li>
+                <% }) %>
+              </ul>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <div class="chart-container">
+                <canvas id="productChart"></canvas>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="footer">
+          <div class="footer__block block no-margin-bottom"></div>
+        </footer>
+      </div>
+      <!-- JavaScript files-->
+      <script src="vendor/jquery/jquery.min.js"></script>
+      <script src="vendor/popper.js/umd/popper.min.js"></script>
+      <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+      <script src="vendor/jquery.cookie/jquery.cookie.js"></script>
+      <script src="vendor/chart.js/Chart.min.js"></script>
+      <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+      <script src="js/charts-home.js"></script>
+      <script src="js/front.js"></script>
+      
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const productChartCtx = document
+            .getElementById("productChart")
+            .getContext("2d");
+          const categoryChartCtx = document
+            .getElementById("categoryChart")
+            .getContext("2d");
+      
+          const productChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Quantity Sold",
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: "Product",
+                },
+              },
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: "Best Selling Products",
+              },
+            },
+            barPercentage: 0.8,
+            categoryPercentage: 0.6,
+          };
+      
+          const categoryChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Quantity Sold",
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: "Category",
+                },
+              },
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: "Best Selling Categories",
+              },
+            },
+            barPercentage: 0.8,
+            categoryPercentage: 0.6,
+          };
+      
+          new Chart(productChartCtx, {
+            type: "bar",
+            data: {
+              labels: "<%= JSON.stringify(bestSellingProducts.map(product => product.product)) %>",
+              datasets: [
+                {
+                  label: "Quantity Sold",
+                  data: "<%= JSON.stringify(bestSellingProducts.map(product => product.quantitySold)) %>",
+                  backgroundColor: "rgba(75, 192, 192, 0.6)",
+                  borderColor: "rgba(75, 192, 192, 1)",
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: productChartOptions,
+          });
+      
+          new Chart(categoryChartCtx, {
+            type: "bar",
+            data: {
+              labels: "<%= JSON.stringify(bestSellingCategories.map(category => category.category)) %>",
+              datasets: [
+                {
+                  label: "Quantity Sold",
+                  data: "<%= JSON.stringify(bestSellingCategories.map(category => category.quantitySold)) %>",
+                  backgroundColor: "rgba(153, 102, 255, 0.6)",
+                  borderColor: "rgba(153, 102, 255, 1)",
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: categoryChartOptions,
+          });
+        });
+      </script>
+      </body>
+      </html>

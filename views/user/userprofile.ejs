@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4Watch Store</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <!-- Logo -->
+      <a class="navbar-brand" href="/">
+        <img src="/images/logo.png" alt="Logo" />
+      </a>
+
+      <!-- Nav Links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/men">MEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/women">WOMEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/kids">KIDS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/collection">COLLECTION</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">ABOUT US</a>
+          </li>
+        </ul>
+      </div>
+
+      <% if (fullName) { %>
+      <div class="user-info">
+        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+        <a href="/logout" class="nav-link logout nav-linklogout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+      <% } %>
+
+      <!-- Hamburger Menu Toggle Button -->
+      <button
+        class="navbar-toggler ml-auto"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon">&#9776;</span>
+      </button>
+    </nav>
+
+    <main class="container mt-5">
+      <div class="profile-box p-4 mb-4">
+        <h1 class="mb-4">User Profile</h1>
+        <div class="profile-details mb-4">
+          <!-- Display user details here -->
+          <p>Name: <%= user.fullname %></p>
+          <p>Email: <%= user.email %></p>
+          <p>Phone Number: <%= user.phone %></p>
+          <!-- Added phone number field -->
+        </div>
+      </div>
+      <div class="profile-box p-4 mb-4">
+        <h2 class="mb-4">Address</h2>
+        <div class="profile-address mb-4">
+          <!-- Display user addresses -->
+          <% if (user.addresses.length > 0) { %> <%
+          user.addresses.forEach((addr) => { %>
+          <div class="card addcard mb-3">
+            <div class="card-body">
+              <div class="row">
+              <!-- Inside the card-body -->
+<!-- Inside the card-body -->
+<div class="row">
+  <div class="col-md-12">
+    <p class="card-text"><span style="font-weight: bold;">Address:</span></p>
+    <p class="card-text"><%= addr.address %></p>
+    <p class="card-text"><%= addr.addressline2 %></p>
+    <p class="card-text"><%= addr.city %>, <%= addr.state %><br><br> PIN CODE:<%= addr.pincode %></p>
+  </div>
+</div>
+
+
+            </div>
+          </div>
+          <% }); %> <% } else { %>
+          <p>No address found. <a href="/add-address">Add Address</a></p>
+          <% } %>
+        </div>
+        <!-- Buttons for managing addresses -->
+        <div class="btn-group">
+          <!-- Add new address -->
+          <a href="/add-address" class="btn btn-primary">Add Address</a>
+          <!-- View addresses -->
+          <a href="/view-addresses" class="btn btn-secondary">
+            <i class="fas fa-eye"></i> View Addresses
+          </a>
+        </div>
+      </div>
+      <div class="profile-box p-4 mb-4">
+        <div class="profile-orders mb-4">
+          <!-- Display user orders here -->
+          <h2 class="mb-4">Orders</h2>
+          <!-- Add logic to display user orders -->
+        </div>
+        <div class="profile-options">
+          <!-- Edit Profile -->
+          <a href="/edit-profile" class="btn btn-primary mr-2">Edit Profile</a>
+          <!-- Cancel Orders -->
+          <a href="/orders" class="btn btn-danger mr-2">Orders</a>
+          <!-- Forgot Password -->
+          <a href="/change-password" class="btn btn-warning">Change Password</a>
+          <!-- Inside the .profile-options div -->
+          <a href="/wallet" class="btn btn-success">Wallet</a>
+        </div>
+      </div>
+    </main>
+
+    <footer class="main-footer mt-5">
+      <!-- Footer content -->
+    </footer>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  </body>
+</html>

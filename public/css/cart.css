@@ -1,0 +1,209 @@
+
+.navbar-light .navbar-nav .nav-link  {
+  color: #bca374 !important;
+}
+
+.navbar {
+  padding: 0% 2%;
+  background-color: #f0f1f0 !important;
+  justify-content: space-between; /* Ensure items are spread out */
+  align-items: center; /* Center items vertically */
+  border-bottom: 1px solid #ccc; /* Add a border at the bottom of the navbar */
+}
+
+.navbar-brand img {
+  height: 5vw; /* Adjust as needed */
+  width: auto; /* Allow image to scale */
+}
+h1{
+  color: #bca374 !important;
+}
+
+.navbar .nav-link {
+  color: #bca374;
+  font-weight: bold;
+  font-size: 1.3vw;
+}
+
+.navbar .login {
+  color: #bca374;
+  font-weight: bold;
+  font-size: 1.3vw;
+  margin-left: 10px; /* Add margin to separate from other links */
+}
+
+.navbar-toggler {
+  color: #bca374;
+  font-size: 1.3vw;
+}
+
+.wishlist-icon,
+.cart-icon {
+  color: #bca374;
+  font-size: 1.5vw;
+  margin-right: 10px;
+}
+.search-form {
+  flex-grow: 1; /* Expand to fill the remaining space */
+  display: flex;
+  justify-content: center; /* Center the search bar */
+  align-items: center;
+  margin-left: auto;
+}
+
+
+
+
+
+.quantity-error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.product-image {
+  float: left;
+  width: 20%;
+}
+
+.product-details {
+  float: left;
+  width: 15%;
+}
+
+.product-stock {
+  float: left;
+  width: 10%;
+}
+
+.product-price {
+  float: left;
+  width: 10%;
+}
+
+.product-quantity {
+  float: left;
+  width: 20%;
+}
+
+.product-removal {
+  float: left;
+  width: 10%;
+}
+
+.product-line-price {
+  float: left;
+  width: 15%;
+  text-align: left;
+  line-height: 0;
+}
+
+.shopping-cart,
+.column-labels,
+.product,
+.totals-item {
+  display: group;
+}
+
+.product .product-price:before,
+.product .product-line-price:before,
+.totals-value:before {
+  content: "₹";
+}
+
+.shopping-cart {
+  margin-top: -45px;
+}
+
+.column-labels label {
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+}
+
+.column-labels .product-image,
+.column-labels .product-details,
+.column-labels .product-removal {
+  text-indent: -9999px;
+}
+
+.product {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.product .product-image {
+  text-align: center;
+}
+
+.product .product-image img {
+  width: 100px;
+}
+
+.product .product-details .product-title {
+  margin-right: 20px;
+  font-weight: bold;
+}
+
+.product .product-details .product-description {
+  margin: 5px 20px 5px 0;
+  line-height: 1.4em;
+}
+
+.product .product-quantity input {
+  width: 40px;
+}
+
+.product .remove-product {
+  border: 0;
+  padding: 4px 8px;
+  background-color: #c66;
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.product .remove-product:hover {
+  background-color: #a44;
+}
+
+.totals .totals-item {
+  float: right;
+  clear: both;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.totals .totals-item label {
+  float: left;
+  clear: both;
+  width: 79%;
+  text-align: right;
+}
+
+.totals .totals-item .totals-value {
+  float: right;
+  width: 21%;
+  text-align: right;
+}
+
+.totals .totals-item-total {
+  font-weight: bold;
+}
+
+.checkout {
+  float: right;
+  border: 0;
+  margin-top: 20px;
+  padding: 6px 25px;
+  background-color: #6b6;
+  color: #fff;
+  font-size: 25px;
+  border-radius: 3px;
+}
+
+.checkout:hover {
+  background-color: #494;
+}

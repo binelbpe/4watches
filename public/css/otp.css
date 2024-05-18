@@ -1,0 +1,38 @@
+.otpbody {
+  background-color: #f0f1f0; /* Light grey background for the entire page */
+  color: #000000; /* Black text for readability */
+}
+
+.otpcontainer {
+  background-color: #bca374; /* Warm brown background for the form area */
+  padding: 20px;
+  border-radius: 10px; /* Rounded corners for the form container */
+  box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  max-width: 400px; /* Limiting width for better aesthetics */
+  margin: auto; /* Center the box */
+}
+
+.otp-input {
+  width: 50px; /* Fixed width for OTP inputs */
+  height: 50px; /* Increased height for better clickability */
+  text-align: center; /* Center text inside inputs */
+  margin: 0 5px; /* Space between inputs */
+  font-size: 1.5rem; /* Larger font size for better visibility */
+  border: 2px solid #ccc; /* Subtle border */
+}
+
+.otp-timer {
+  color: #dc3545; /* Red color to highlight timer urgency */
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.resend-link {
+  color: #343a40; /* Dark grey color for default state */
+  text-decoration: underline; /* Underline to indicate link */
+  cursor: pointer; /* Cursor to indicate clickable */
+}
+
+.resend-link:hover {
+  color: #212529; /* Darken color on hover for feedback */
+}

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4Watch Store</title>
+  <link rel="stylesheet" href="/css/style.css">
+ 
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+  <!-- Medium Zoom CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/0.3.1/medium-zoom.min.css" rel="stylesheet">
+<style>
+  .add-to-cart{
+    background-color: #bca374;
+  }
+</style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Logo -->
+    <a class="navbar-brand" href="/">
+      <img src="/images/logo.png" alt="Logo">
+    </a>
+
+    <!-- Nav Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">HOME</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/men">MEN</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/women">WOMEN</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kids">KIDS</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/collection">COLLECTION</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">ABOUT-US</a>
+        </li>
+      </ul>
+    </div>
+
+   
+    <% if (fullName) { %>
+      <div class="user-info">
+        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+        <a href="/logout" class="nav-link logout nav-linklogout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+      <% } else { %>
+      <!-- If user is not logged in, display login/signup -->
+      <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
+      <% } %>
+    <!-- Hamburger Menu Toggle Button -->
+    <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon">&#9776;</span>
+    </button>
+  </nav>
+
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/<%= product.category %>"><%= product.category %></a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= product.product %></li>
+    </ol>
+  </nav>
+
+  <div class="container mt-5">
+    <div class="row">
+      <!-- Carousel -->
+      <div id="productCarousel" class="carousel slide col-md-6" data-ride="carousel">
+        <ol class="carousel-indicators">
+          <% for(let i = 0; i < product.image.length; i++) { %>
+          <li data-target="#productCarousel" data-slide-to="<%= i %>" <% if(i === 0) { %>class="active"<% } %>></li>
+          <% } %>
+        </ol>
+        <div class="carousel-inner">
+          <% product.image.forEach((image, index) => { %>
+          <div class="carousel-item <% if(index === 0) { %>active<% } %>">
+            <img id="productImage<%= index %>" src="<%= image.path %>" class="d-block w-100 product-image"
+              alt="Product Image">
+          </div>
+          <% }) %>
+        </div>
+        <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+
+      <!-- Product Info -->
+      <div class="col-md-6">
+        <h2><%= product.product %></h2>
+        <div class="ratings">
+          <!-- Ratings display -->
+        </div>
+        <p><strong>Price:</strong> <% if (product.offerPrice && product.offerPrice <
+          product.price) { %>
+          <h6 class="original-price" style="color: red">
+            <s><%= product.price %></s>
+          </h6>
+          <h6 class="offer-price" style="color: green">
+            offer price: <%= product.offerPrice%>
+          </h6>
+          <% } else { %>
+          <h6><%= product.price %></h6>
+          <% } %></p>
+        <p><strong>Discounts/Coupons:</strong> <%= product.discounts %> <!-- Add logic to display applied discounts or coupons --></p>
+        <p><strong>Description:</strong> <%= product.description %></p>
+        <p><strong>Category:</strong> <%= product.category %></p>
+        <p><strong>Stock:</strong> <%= product.stock %> <!-- Display stock information --></p>
+        <div class="reviews">
+          <!-- Reviews display -->
+        </div>
+
+        <form
+        action="/add-to-cart/<%= product._id %>"
+        method="POST"
+        class="add-to-cart-form"
+        style="border-color: none"
+      >
+        <button
+          type="submit"
+          class="add-to-cart cart-icon"
+          style="border: none; background-color: transparent"
+        >
+          <i class="fas fa-shopping-cart"></i>
+        </button>
+      </form>
+      <form
+        action="/add-to-wishlist/<%= product._id %>"
+        method="POST"
+        class="wishlist-form"
+        style="border-color: none"
+      >
+        <button
+          type="submit"
+          class="wishlist-icon"
+          style="border: none; background-color: transparent"
+        >
+          <i class="fas fa-heart"></i>
+        </button>
+      </form>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Similar Products Section -->
+  <div class="col-md-12 mt-5">
+    <h3>Similar Products</h3>
+    <div class="row">
+      <% similarProducts.forEach(similarProduct => { %>
+      <div class="col-md-3 mb-4"> <!-- Adjusted column size -->
+        <div class="card similar-product-card">
+          <img src="<%= similarProduct.image[0].path %>" class="card-img-top" alt="Product Image">
+          <div class="card-body">
+            <h5 class="card-title"><%= similarProduct.product %></h5>
+            <p class="card-text">Price: <%= similarProduct.price %></p>
+            <a href="/product/<%= similarProduct._id %>" class="btn" style="background-color: #bca374;">View
+              Product</a>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- Small separation between footers -->
+  <div class="footer-separation"></div>
+
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="footer-section">
+          <h5>POLICIES AND ORDER</h5>
+          <ul>
+            <li>Authenticity Guarantee</li>
+            <li>Privacy Policy</li>
+            <li>Return, Exchange & Refund Policy</li>
+            <li>Terms and Conditions</li>
+            <li>Warranty Information</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="footer-section">
+          <h5>HELP</h5>
+          <ul>
+            <li>FAQ's</li>
+            <li>My Account</li>
+            <li>Track my order</li>
+            <li>Sitemap</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="footer-section">
+          <h5>FOLLOW US ON</h5>
+          <div class="social-media-icons">
+            <a href="#">INSTAGRAM</a>
+            <a href="#">FACEBOOK</a>
+            <a href="#">TWITTER</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS and jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ 
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/0.3.1/medium-zoom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/0.4.0/medium-zoom.min.js"></script>
+
+  <script>
+    function initializeMediumZoom() {
+      const images = document.querySelectorAll('.product-image');
+      const zoom = mediumZoom(images, {
+        background: '#bca374', // Customize the background color of the zoomed image
+      });
+    }
+  
+    document.addEventListener('DOMContentLoaded', initializeMediumZoom);
+  </script>
+  
+</body>
+</html>

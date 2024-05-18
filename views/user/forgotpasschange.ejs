@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forgot Password Change</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/css/login.css" />
+  </head>
+  <body class="loginbody">
+    <div class="container logincontainer mt-5">
+      <h2 class="text-center mb-4">Forgot Password Change</h2>
+      <!-- Forgot Password Change form -->
+      <form
+        id="forgotPasswordChangeForm"
+        action="/forgot-password/change"
+        method="POST"
+      >
+        <div class="mb-3">
+          <label for="newPassword" class="form-label">New Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="newPassword"
+            name="newPassword"
+            required
+          />
+          <div id="newPasswordError" class="invalid-feedback"></div>
+        </div>
+        <div class="mb-3">
+          <label for="confirmNewPassword" class="form-label"
+            >Confirm New Password</label
+          >
+          <input
+            type="password"
+            class="form-control"
+            id="confirmNewPassword"
+            name="confirmNewPassword"
+            required
+          />
+          <div id="confirmNewPasswordError" class="invalid-feedback"></div>
+        </div>
+        <div class="d-grid mb-3">
+          <button class="btn btn-primary btn-lg btn-submit" type="submit">
+            Change Password
+          </button>
+        </div>
+      </form>
+      <!-- Back to Login link -->
+      <p class="text-center mb-0">
+        <a href="/login" class="back-to-login-link">Back to Login</a>
+      </p>
+      <% if(errorMessage) { %>
+      <!-- Error message display -->
+      <div class="alert alert-danger mt-3" role="alert">
+        <%= errorMessage %>
+      </div>
+      <% } %>
+    </div>
+    <!-- JavaScript includes -->
+    <script>
+      function validateForm() {
+        const newPassword = document.getElementById("newPassword");
+        const confirmNewPassword =
+          document.getElementById("confirmNewPassword");
+        const newPasswordError = document.getElementById("newPasswordError");
+        const confirmNewPasswordError = document.getElementById(
+          "confirmNewPasswordError"
+        );
+
+        let isValid = true;
+
+        // Validate New Password
+        const passwordRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!newPassword.value.match(passwordRegex)) {
+          newPassword.classList.add("is-invalid");
+          newPasswordError.textContent =
+            "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one digit.";
+          newPasswordError.style.display = "block";
+          isValid = false;
+        } else {
+          newPassword.classList.remove("is-invalid");
+          newPasswordError.style.display = "none";
+        }
+
+        // Validate Confirm New Password
+        if (confirmNewPassword.value !== newPassword.value) {
+          confirmNewPassword.classList.add("is-invalid");
+          confirmNewPasswordError.textContent = "Passwords do not match.";
+          confirmNewPasswordError.style.display = "block";
+          isValid = false;
+        } else {
+          confirmNewPassword.classList.remove("is-invalid");
+          confirmNewPasswordError.style.display = "none";
+        }
+
+        return isValid;
+      }
+
+      // Attach form validation function to form submission event
+      const form = document.getElementById("forgotPasswordChangeForm");
+      form.addEventListener("submit", function (event) {
+        if (!validateForm()) {
+          event.preventDefault(); // Prevent form submission if validation fails
+        }
+      });
+    </script>
+  </body>
+</html>

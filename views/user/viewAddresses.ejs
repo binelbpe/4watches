@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4Watch Store</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <!-- Logo -->
+      <a class="navbar-brand" href="/">
+        <img src="/images/logo.png" alt="Logo" />
+      </a>
+
+      <!-- Nav Links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/men">MEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/women">WOMEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/kids">KIDS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/collection">COLLECTION</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">ABOUT US</a>
+          </li>
+        </ul>
+      </div>
+
+      <% if (fullName) { %>
+      <div class="user-info">
+        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+        <a href="/logout" class="nav-link logout nav-linklogout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+      <% } %>
+
+      <!-- Hamburger Menu Toggle Button -->
+      <button
+        class="navbar-toggler ml-auto"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon">&#9776;</span>
+      </button>
+    </nav>
+    <div class="container">
+      <h1 class="mb-4">View Addresses</h1>
+      <% if (addresses.length > 0) { %> <% addresses.forEach((address) => { %>
+      <!-- Inside the address card loop -->
+      <div class="address-card <%= address.active ? 'active' : '' %>">
+        <div class="row">
+          <div class="col-md-9">
+            <p><strong>Address:</strong> <%= address.address %></p>
+            <p><strong>Street:</strong> <%= address.addressline2 %></p>
+            <p><strong>City:</strong> <%= address.city %></p>
+            <p><strong>State:</strong> <%= address.state %></p>
+            <p><strong>Pincode:</strong> <%= address.pincode %></p>
+          </div>
+          <div class="col-md-3">
+            <div class="btn-group">
+              <a
+                href="/edit-address/<%= address._id %>"
+                class="btn btn-primary"
+              >
+                <i class="fas fa-edit"></i> Edit
+              </a>
+              <a
+                href="#"
+                class="btn btn-danger"
+                onclick="confirmDelete('<%= address._id %>')"
+              >
+                <i class="fas fa-trash-alt"></i> Delete
+              </a>
+              <% if (address.status) { %>
+              <a
+                href="/set-active/<%= address._id %>?status=inactive"
+                class="btn btn-success"
+              >
+                <i class="fas fa-check"></i> Default
+              </a>
+              <% } else { %>
+              <a
+                href="/set-active/<%= address._id %>?status=active"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-times"></i> Make Default
+              </a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br />
+      <br />
+
+      <% }); %> <% } else { %>
+      <p>No addresses found.</p>
+      <% } %>
+      <!-- Link to add new address -->
+      <a href="/add-address" class="btn btn-success"
+        ><i class="fas fa-plus"></i> Add New Address</a
+      >
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      function confirmDelete(addressId) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover this address!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = `/delete-address/${addressId}`;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

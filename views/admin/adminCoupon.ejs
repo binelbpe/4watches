@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Admin</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="all,follow" />
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome CSS-->
+    <link
+      rel="stylesheet"
+      href="vendor/font-awesome/css/font-awesome.min.css"
+    />
+    <!-- Custom Font Icons CSS-->
+    <link rel="stylesheet" href="css/font.css" />
+    <!-- Google fonts - Muli-->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Muli:300,400,700"
+    />
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet" />
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="css/custom.css" />
+  </head>
+
+  <body>
+    <header class="header">
+      <nav class="navbar navbar-expand-lg">
+        <div class="search-panel">
+          <div
+            class="search-inner d-flex align-items-center justify-content-center"
+          >
+            <div class="close-btn">Close <i class="fa fa-close"></i></div>
+            <form id="searchForm" action="#">
+              <div class="form-group">
+                <input
+                  type="search"
+                  name="search"
+                  placeholder="What are you searching for..."
+                />
+                <button type="submit" class="submit">Search</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div
+          class="container-fluid d-flex align-items-center justify-content-between"
+        >
+          <div class="navbar-header">
+            <!-- Navbar Header--><a href="/admin" class="navbar-brand">
+              <div class="brand-text brand-big visible text-uppercase">
+                <strong class="text-primary">4WATCHES</strong
+                ><strong>Admin</strong>
+              </div>
+              <div class="brand-text brand-sm">
+                <strong class="text-primary">D</strong><strong>A</strong>
+              </div>
+            </a>
+
+            <!-- Languages dropdown    -->
+            <div class="list-inline-item dropdown">
+              <a
+                id="languages"
+                rel="nofollow"
+                data-target="#"
+                href="#"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                class="nav-link language dropdown-toggle"
+                ><img src="img/flags/16/GB.png" alt="English" /><span
+                  class="d-none d-sm-inline-block"
+                  >English</span
+                ></a
+              >
+              <div aria-labelledby="languages" class="dropdown-menu">
+                <a rel="nofollow" href="#" class="dropdown-item"
+                  ><img
+                    src="img/flags/16/DE.png"
+                    alt="English"
+                    class="mr-2"
+                  /><span>German</span></a
+                ><a rel="nofollow" href="#" class="dropdown-item">
+                  <img
+                    src="img/flags/16/FR.png"
+                    alt="English"
+                    class="mr-2"
+                  /><span>French </span></a
+                >
+              </div>
+            </div>
+            <!-- Log out               -->
+            <div class="list-inline-item logout">
+              <a id="logout" href="/admin/logout" class="nav-link"
+                >Logout <i class="icon-logout"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div class="d-flex align-items-stretch">
+      <!-- Sidebar Navigation-->
+      <nav id="sidebar">
+        <!-- Sidebar Header-->
+        <div class="sidebar-header d-flex align-items-center">
+          <div class="avatar">
+            <img
+              src="/images/logo.png"
+              alt="..."
+              class="img-fluid rounded-circle"
+            />
+          </div>
+          <div class="title">
+            <h1 class="h5">Binel</h1>
+            <p>Web Designer</p>
+          </div>
+        </div>
+        <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
+        <ul class="list-unstyled">
+          <li class="active">
+            <a href="/admin/adminHome"> <i class="icon-home"></i>Dashboard</a>
+          </li>
+          <li>
+            <a href="/admin/Product"> <i class="icon-grid"></i>Product</a>
+          </li>
+          <li>
+            <a href="/admin/User"> <i class="fa fa-bar-chart"></i>User</a>
+          </li>
+          <li>
+            <a href="/admin/Category"> <i class="icon-padnote"></i>Category</a>
+          </li>
+          <li>
+            <a href="/admin/order">
+              <i class="icon-paper-and-pencil"></i>Order</a
+            >
+          </li>
+          <li>
+            <a href="/admin/coupons">
+              <i class="icon-three-cells"></i>Coupons</a
+            >
+          </li>
+          <li>
+            <a href="/admin/sales">
+              <i class="icon-info"></i>Sales Report</a
+            >
+            </li>
+        </ul>
+      </nav>
+
+      <div class="page-content">
+        <div class="page-header">
+          <div class="container-fluid">
+            <h2 class="h5 no-margin-bottom">Admin Dashboard</h2>
+          </div>
+        </div>
+        <div class="container mb-4">
+          <button id="createCouponBtn" class="btn btn-primary">Create New Coupon</button>
+        </div>
+        <!-- Add a form to create a new coupon -->
+        <div id="createCouponSection" class="container" style="display: none">
+          <h2 class="h3 mb-4">Create New Coupon</h2>
+          <form id="createCouponForm" action="/admin/coupons" method="POST" onsubmit="return validateCreateCouponForm(event)">
+            <div class="mb-3">
+              <label for="code" class="form-label">Coupon Code</label>
+              <input type="text" class="form-control" id="code" name="code" />
+              <small id="code-error" class="text-danger"></small>
+            </div>
+            <div class="mb-3">
+              <label for="discountAmount" class="form-label">Discount Amount</label>
+              <input type="number" class="form-control" id="discountAmount" name="discountAmount" />
+              <small id="discountAmount-error" class="text-danger"></small>
+            </div>
+            <div class="mb-3">
+              <label for="minPurchaseAmount" class="form-label">Minimum Purchase Amount</label>
+              <input type="number" class="form-control" id="minPurchaseAmount" name="minPurchaseAmount" />
+              <small id="minPurchaseAmount-error" class="text-danger"></small>
+            </div>
+            <div class="mb-3">
+              <label for="validFrom" class="form-label">Valid From</label>
+              <input type="date" class="form-control" id="validFrom" name="validFrom" />
+              <small id="validFrom-error" class="text-danger"></small>
+            </div>
+            <div class="mb-3">
+              <label for="validTo" class="form-label">Valid To</label>
+              <input type="date" class="form-control" id="validTo" name="validTo" />
+              <small id="validTo-error" class="text-danger"></small>
+            </div>
+            <div class="mb-3">
+              <label for="oncePerUser" class="form-label">Once Per User?</label>
+              <select class="form-select" id="oncePerUser" name="oncePerUser">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+              <small id="oncePerUser-error" class="text-danger"></small>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Coupon</button>
+          </form>
+        </div>
+        <!-- Display existing coupons -->
+       <!-- Display existing coupons -->
+<div class="container mt-5">
+  <h2 class="h3 mb-4">Existing Coupons</h2>
+  <!-- Pagination -->
+<div class="d-flex justify-content-center">
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+      <% if (currentPage > 1) { %>
+      <li class="page-item"><a class="page-link" href="/admin/coupons?page=<%= currentPage - 1 %>">Previous</a></li>
+      <% } %>
+      <% for (let i = 1; i <= totalPages; i++) { %>
+      <li class="page-item <%= currentPage == i ? 'active' : '' %>"><a class="page-link" href="/admin/coupons?page=<%= i %>"><%= i %></a></li>
+      <% } %>
+      <% if (currentPage < totalPages) { %>
+      <li class="page-item"><a class="page-link" href="/admin/coupons?page=<%= currentPage + 1 %>">Next</a></li>
+      <% } %>
+    </ul>
+  </nav>
+</div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Coupon Code</th>
+        <th scope="col">Discount Type</th>
+        <th scope="col">Discount Amount/Percentage</th>
+        <th scope="col">Minimum Purchase Amount</th>
+        <th scope="col">Valid From</th>
+        <th scope="col">Valid To</th>
+        <th scope="col">Once Per User</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% coupons.forEach(coupon => { %>
+      <tr>
+        <td><%= coupon.code %></td>
+        <td><%= coupon.discountType %></td>
+        <td><%= coupon.discountAmount %></td>
+        <td><%= coupon.minPurchaseAmount %></td>
+        <td><%= coupon.validFrom %></td>
+        <td><%= coupon.validTo %></td>
+        <td><%= coupon.oncePerUser ? 'Yes' : 'No' %></td>
+        <td>
+          <button id="editCouponBtn_<%= coupon._id %>" class="btn btn-danger">Edit</button>
+        </td>
+        <td>
+          <a href="#" class="btn btn-danger" onclick="confirmDelete('<%= coupon._id %>')">
+            <i class="fas fa-trash-alt"></i> Delete
+          </a>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+              <br>
+              <!-- Edit Coupon Section -->
+              <% coupons.forEach(coupon => { %>
+<div class="modal fade" id="editCouponModal_<%= coupon._id %>" tabindex="-1" aria-labelledby="editCouponModalLabel_<%= coupon._id %>" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editCouponModalLabel_<%= coupon._id %>">Edit Coupon</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editCouponForm_<%= coupon._id %>" action="/admin/coupons/<%= coupon._id %>" method="POST" onsubmit="return validateEditCouponForm('<%= coupon._id %>')">
+          <!-- Existing form fields -->
+          <div class="mb-3">
+            <label for="editCode_<%= coupon._id %>" class="form-label">Coupon Code</label>
+            <input type="text" class="form-control" id="editCode_<%= coupon._id %>" name="code" value="<%= coupon.code %>"  />
+            <small id="editCode-error_<%= coupon._id %>" class="text-danger"></small>
+          </div>
+          <div class="mb-3">
+            <label for="editDiscountAmount_<%= coupon._id %>" class="form-label">Discount Amount/Percentage</label>
+            <input type="number" class="form-control" id="editDiscountAmount_<%= coupon._id %>" name="discountAmount" min="0" value="<%= coupon.discountAmount %>"  />
+            <small id="editDiscountAmount-error_<%= coupon._id %>" class="text-danger"></small>
+          </div>
+          <div class="mb-3">
+            <label for="editMinPurchaseAmount_<%= coupon._id %>" class="form-label">Minimum Purchase Amount</label>
+            <input type="number" class="form-control" id="editMinPurchaseAmount_<%= coupon._id %>" name="minPurchaseAmount" min="0" value="<%= coupon.minPurchaseAmount %>"  />
+            <small id="editMinPurchaseAmount-error_<%= coupon._id %>" class="text-danger"></small>
+          </div>
+          <div class="mb-3">
+            <label for="editValidFrom_<%= coupon._id %>" class="form-label">Valid From</label>
+            <input type="date" class="form-control" id="editValidFrom_<%= coupon._id %>" name="validFrom" value="<%= coupon.validFrom.toISOString().split('T')[0] %>"  />
+            <small id="editValidFrom-error_<%= coupon._id %>" class="text-danger"></small>
+          </div>
+          <div class="mb-3">
+            <label for="editValidTo_<%= coupon._id %>" class="form-label">Valid To</label>
+            <input type="date" class="form-control" id="editValidTo_<%= coupon._id %>" name="validTo" value="<%= coupon.validTo.toISOString().split('T')[0] %>"  />
+            <small id="editValidTo-error_<%= coupon._id %>" class="text-danger"></small>
+          </div>
+          <div class="mb-3">
+            <label for="editOncePerUser_<%= coupon._id %>" class="form-label">Once Per User?</label>
+            <select class="form-select" id="editOncePerUser_<%= coupon._id %>" name="oncePerUser" >
+              <option value="">Select Option</option>
+              <option value="false" <%= coupon.oncePerUser === false ? 'selected' : '' %>>No</option>
+              <option value="true" <%= coupon.oncePerUser === true ? 'selected' : '' %>>Yes</option>
+            </select>
+            <small id="editOncePerUser-error_<%= coupon._id %>" class="text-danger"></small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" form="editCouponForm_<%= coupon._id %>">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<% }) %>
+<footer class="footer">
+  <div class="footer__block block no-margin-bottom"></div>
+</footer>
+                  
+           
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      function confirmDelete(couponId) {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'You will not be able to recover this coupon!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = `/admin/deletecoupons/${couponId}`;
+          }
+        });
+      }
+    </script>
+    <script>
+ 
+
+ document.addEventListener("DOMContentLoaded", function () {
+  // Get the button and section elements for creating a new coupon
+  const createCouponBtn = document.getElementById("createCouponBtn");
+  const createCouponSection = document.getElementById("createCouponSection");
+
+  // Add click event listener to the button for creating a new coupon
+  createCouponBtn.addEventListener("click", function () {
+    // Toggle the display of the Create New Coupon section
+    createCouponSection.style.display = createCouponSection.style.display === "none" || createCouponSection.style.display === "" ? "block" : "none";
+  });
+
+  // Add click event listener to each edit button
+  const editCouponBtns = document.querySelectorAll("[id^='editCouponBtn_']");
+  editCouponBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const couponId = btn.id.split("_")[1];
+      const editCouponModal = new bootstrap.Modal(
+        document.getElementById(`editCouponModal_${couponId}`)
+      );
+      editCouponModal.show();
+
+      // Populate modal with coupon details
+      populateEditCouponForm(couponId);
+    });
+  });
+
+  
+
+  // Function to populate the edit coupon form
+  function populateEditCouponForm(couponId) {
+    // Fetch coupon details using AJAX
+    fetch(`/admin/coupons/${couponId}`)
+      .then((response) => response.json())
+      .then((coupon) => {
+        // Populate form fields with coupon details
+        document.getElementById(
+          `editCode_${couponId}`
+        ).value = coupon.code;
+        document.getElementById(
+          `editDiscountAmount_${couponId}`
+        ).value = coupon.discountAmount;
+        document.getElementById(
+          `editMinPurchaseAmount_${couponId}`
+        ).value = coupon.minPurchaseAmount;
+        document.getElementById(
+          `editValidFrom_${couponId}`
+        ).value = coupon.validFrom;
+        document.getElementById(
+          `editValidTo_${couponId}`
+        ).value = coupon.validTo;
+        document.getElementById(
+          `editOncePerUser_${couponId}`
+        ).value = coupon.oncePerUser.toString();
+      })
+      .catch((error) =>
+        console.error("Error fetching coupon details:", error)
+      );
+  }
+
+  const createCouponForm = document.getElementById("createCouponForm");
+
+createCouponForm.addEventListener("submit", function (event) {
+  event.preventDefault(); // Prevent the form from being submitted
+
+  // Call the validateCreateCouponForm function
+  if (validateCreateCouponForm()) {
+    // If the form is valid, submit it
+    createCouponForm.submit();
+  }
+});
+
+function validateCreateCouponForm() {
+    // Reset error messages
+    document.getElementById("code-error").textContent = "";
+    document.getElementById("discountAmount-error").textContent = "";
+    document.getElementById("minPurchaseAmount-error").textContent = "";
+    document.getElementById("validFrom-error").textContent = "";
+    document.getElementById("validTo-error").textContent = "";
+
+    // Get form inputs
+    var code = document.getElementById("code").value;
+    var discountAmount = document.getElementById("discountAmount").value;
+    var minPurchaseAmount = document.getElementById("minPurchaseAmount").value;
+    var validFrom = document.getElementById("validFrom").value;
+    var validTo = document.getElementById("validTo").value;
+
+    // Validation
+    var isValid = true;
+    if (code.trim() === "") {
+      document.getElementById("code-error").textContent = "Coupon code is required";
+      isValid = false;
+    }
+   
+    if (discountAmount.trim() === "" || isNaN(discountAmount)) {
+      document.getElementById("discountAmount-error").textContent = "Discount amount must be a number";
+      isValid = false;
+    }
+    if (minPurchaseAmount.trim() === "" || isNaN(minPurchaseAmount)||parseFloat(minPurchaseAmount)<0||parseFloat(minPurchaseAmount)<parseFloat(discountAmount)) {
+      document.getElementById("minPurchaseAmount-error").textContent = "Minimum purchase amount must be a number greater than discount amount ";
+      isValid = false;
+    }
+    if (parseFloat(minPurchaseAmount) < parseFloat(discountAmount)) {
+  document.getElementById("minPurchaseAmount-error").textContent = "Minimum purchase amount must be greater than the discount amount";
+  isValid = false;
+}
+    
+    if (validFrom.trim() === "") {
+      document.getElementById("validFrom-error").textContent = "Valid from date is required";
+      isValid = false;
+    }
+    if (validTo.trim() === "") {
+      document.getElementById("validTo-error").textContent = "Valid to date is required";
+      isValid = false;
+    }
+
+    return isValid;
+  }
+    function validateEditCouponForm(couponId) {
+  // Reset error messages
+  const errorFields = [
+    "editCode",
+    "editDiscountAmount",
+    "editMinPurchaseAmount",
+    "editValidFrom",
+    "editValidTo",
+    "editOncePerUser",
+  ];
+  errorFields.forEach((field) => {
+    document.getElementById(`${field}-error_${couponId}`).textContent = "";
+  });
+
+  // Get form inputs
+  const code = document.getElementById(`editCode_${couponId}`).value.trim();
+  const discountAmount = document.getElementById(`editDiscountAmount_${couponId}`).value;
+  const minPurchaseAmount = document.getElementById(`editMinPurchaseAmount_${couponId}`).value;
+  const validFrom = document.getElementById(`editValidFrom_${couponId}`).value;
+  const validTo = document.getElementById(`editValidTo_${couponId}`).value;
+  const oncePerUser = document.getElementById(`editOncePerUser_${couponId}`).value;
+
+  // Validation
+  let isValid = true;
+  if (!code) {
+    document.getElementById(`editCode-error_${couponId}`).textContent = "Coupon code is required";
+    isValid = false;
+  }
+  if (!discountAmount || isNaN(discountAmount) || parseFloat(discountAmount) < 0) {
+    document.getElementById(`editDiscountAmount-error_${couponId}`).textContent = "Discount amount must be a positive number";
+    isValid = false;
+  }
+  if (!minPurchaseAmount || isNaN(minPurchaseAmount) || parseFloat(minPurchaseAmount) < 0) {
+    document.getElementById(`editMinPurchaseAmount-error_${couponId}`).textContent = "Minimum purchase amount must be a positive number";
+    isValid = false;
+  }
+  if (parseFloat(minPurchaseAmount) < parseFloat(discountAmount)) {
+  document.getElementById(`editMinPurchaseAmount-error_${couponId}`).textContent = "Minimum purchase amount must be greater than the discount amount";
+  isValid = false;
+}
+  if (!validFrom) {
+    document.getElementById(`editValidFrom-error_${couponId}`).textContent = "Valid from date is required";
+    isValid = false;
+  }
+  if (!validTo) {
+    document.getElementById(`editValidTo-error_${couponId}`).textContent = "Valid to date is required";
+    isValid = false;
+  }
+  if (!oncePerUser) {
+    document.getElementById(`editOncePerUser-error_${couponId}`).textContent = "Once per user option is required";
+    isValid = false;
+  }
+
+  return isValid;
+}
+  // Add event listeners for edit coupon forms
+  const editCouponForms = document.querySelectorAll("[id^='editCouponForm_']");
+  editCouponForms.forEach((form) => {
+    form.addEventListener("submit", function (event) {
+      const couponId = form.id.split("_")[1];
+      // Validate edit coupon form before submission
+      if (!validateEditCouponForm(couponId)) {
+        event.preventDefault();
+      }
+    });
+  });
+});
+
+
+</script>
+
+  </body>
+</html>

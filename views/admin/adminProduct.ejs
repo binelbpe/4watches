@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Admin</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <!-- Bootstrap CSS-->
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome CSS-->
+  <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
+  <!-- Custom Font Icons CSS-->
+  <link rel="stylesheet" href="css/font.css">
+  <!-- Google fonts - Muli-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:300,400,700">
+  <!-- theme stylesheet-->
+  <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
+  <!-- Custom stylesheet - for your changes-->
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+
+  
+  <style>
+    .table img {
+      max-width: 100px;
+      height: auto;
+    }
+
+    .table td {
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <nav class="navbar navbar-expand-lg">
+      <div class="search-panel">
+        <div class="search-inner d-flex align-items-center justify-content-center">
+          <div class="close-btn">Close <i class="fa fa-close"></i></div>
+          <form id="searchForm" action="#">
+            <div class="form-group">
+              <input type="search" name="search" placeholder="What are you searching for...">
+              <button type="submit" class="submit">Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="container-fluid d-flex align-items-center justify-content-between">
+        <div class="navbar-header">
+          <!-- Navbar Header--><a href="/admin" class="navbar-brand">
+            <div class="brand-text brand-big visible text-uppercase"><strong class="text-primary">4WATCHES</strong><strong>Admin</strong></div>
+          </a>
+          
+          <!-- Languages dropdown    -->
+          <div class="list-inline-item dropdown"><a id="languages" rel="nofollow" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link language dropdown-toggle"><img src="img/flags/16/GB.png" alt="English"><span class="d-none d-sm-inline-block">English</span></a>
+            <div aria-labelledby="languages" class="dropdown-menu"><a rel="nofollow" href="#" class="dropdown-item"><img src="img/flags/16/DE.png" alt="English" class="mr-2"><span>German</span></a><a rel="nofollow" href="#" class="dropdown-item"> <img src="img/flags/16/FR.png" alt="English" class="mr-2"><span>French </span></a></div>
+          </div>
+          <!-- Log out               -->
+          <div class="list-inline-item logout"> <a id="logout" href="/admin/logout" class="nav-link">Logout <i class="icon-logout"></i></a></div>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="d-flex align-items-stretch">
+    <!-- Sidebar Navigation-->
+    <nav id="sidebar">
+      <!-- Sidebar Header-->
+      <div class="sidebar-header d-flex align-items-center">
+        <div class="avatar"><img src="/images/logo.png" alt="..." class="img-fluid rounded-circle"></div>
+        <div class="title">
+          <h1 class="h5">Binel</h1>
+          <p>Web Designer</p>
+        </div>
+      </div>
+      <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
+      <ul class="list-unstyled">
+        <li class="active"><a href="/admin/adminHome"> <i class="icon-home"></i>Dashboard</a></li>
+        <li><a href="/admin/Product"> <i class="icon-grid"></i>Product</a></li>
+        <li><a href="/admin/User"> <i class="fa fa-bar-chart"></i>user</a></li>
+        <li><a href="/admin/Category"> <i class="icon-padnote"></i>Category</a></li>
+        <li><a href="/admin/order"> <i class="icon-paper-and-pencil"></i>Order</a></li>
+        <li><a href="/admin/coupons"> <i class="icon-three-cells"></i>Coupons</a></li>
+        <li>
+          <a href="/admin/sales">
+            <i class="icon-info"></i>Sales Report</a
+          >
+          </li>
+      </ul>
+    </nav>
+    <!-- Sidebar Navigation end-->
+    <div class="page-content">
+      <div class="page-header">
+        <div class="container-fluid">
+          <h2 class="h5 no-margin-bottom">Product Details</h2>
+        </div>
+      </div>
+      <div class="title" style="margin-left: 80%;">
+        <button class="btn btn-danger"><a href="/admin/Product-add" style="text-decoration: none;color: white;">Add New Product</a></button>
+      </div>
+      <div class="table-responsive" style="padding: 5%;">
+        <!-- Add pagination section below the table -->
+        <ul class="pagination justify-content-center">
+          <% if (totalPages > 1) { %>
+          <% if (currentPage > 1) { %>
+          <li class="page-item">
+              <a class="page-link" href="/admin/product?page=<%= currentPage - 1 %>" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                  <span class="sr-only">Previous</span>
+              </a>
+          </li>
+          <% } %>
+          <% let startPage = Math.max(1, currentPage - 2); %>
+          <% let endPage = Math.min(startPage + 3, totalPages); %>
+          <% for(let i = startPage; i <= endPage; i++) { %>
+          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+              <a class="page-link" href="/admin/product?page=<%= i %>"><%= i %></a>
+          </li>
+          <% } %>
+          <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+              <a class="page-link" href="/admin/product?page=<%= currentPage + 1 %>" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+              </a>
+          </li>
+          <% } %>
+          <% } %>
+      </ul>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Image</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Offer Price</th>
+              <th>Stock</th>
+              <th>Description</th>
+              <th>Edit</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(let i=0; i< data.length ; i++) { %>
+              <tr>
+                <td>
+                  <%= data[i].product %>
+                </td>
+    
+                  <td>
+                    <% if (data[i].image && data[i].image.length > 0 && data[i].image[0] && data[i].image[0].path) { %>
+                      <img src="<%= data[i].image[0].path %>" alt="image of the product" style="height: 75px;width: 120%;">
+                    <% } else { %>
+                      <!-- Provide a placeholder image or some alternative content -->
+                      <span>No image available</span>
+                    <% } %>
+                  </td>
+                  
+              
+                <td>
+                  <%= data[i].category %>
+                </td>
+                <td>
+                  <%= data[i].price %>
+                </td>
+                <td>
+                  <%= data[i].offerPrice %>
+                </td>
+                <td>
+                  <%= data[i].stock %>
+                </td>
+                <td>
+                  <%= data[i].description %>
+                </td>
+                <td>
+                  <!-- Button trigger modal -->
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal<%= i %>">
+                    Edit
+                  </button>
+
+                  <!-- Modal -->
+                  <div class="modal fade" id="exampleModal<%= i %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel<%= i %>" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel<%= i %>">Edit Product Details</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form id="editProductForm<%= i %>" class="form-horizontal" action="/admin/editProduct/<%= data[i]._id %>" method="post" enctype="multipart/form-data" onsubmit="return validateForm(event, 'editProductForm<%= i %>')">
+                          
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Name</label>
+                              <div class="col-sm-9">
+                                <input type="text" id="productName<%= i %>" class="form-control" name="productName" value="<%= data[i].product %>" oninput="validateField('productName<%= i %>')">
+                              </div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Category</label>
+                              <div class="col-sm-9">
+                                <select name="category" id="category<%= i %>" class="form-control" onchange="validateField('category<%= i %>')" required>
+                                  <% CatData.forEach(function(cat) { %>
+                                    <option value="<%= cat.category %>" <%= data[i].category === cat.category ? 'selected' : '' %>><%= cat.category %></option>
+                                  <% }); %>
+                                </select>
+                                
+                              </div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Description</label>
+                              <div class="col-sm-9">
+                                <textarea cols="30" rows="4" id="description<%= i %>" name="description" class="form-control" oninput="validateField('description<%= i %>')"><%= data[i].description %></textarea>
+                              </div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">About Product</label>
+                              <div class="col-sm-9">
+                                <textarea cols="30" id="about<%= i %>" rows="4" name="about" class="form-control" oninput="validateField('about<%= i %>')"><%= data[i].about %></textarea>
+                              </div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Price</label>
+                              <div class="col-sm-9">
+                                <input type="number" id="price<%= i %>" class="form-control" name="price" min="1" oninput="validateField('price<%= i %>')" value="<%= data[i].price %>">
+                              </div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Stock</label>
+                              <div class="col-sm-9">
+                                <input type="number" id="price<%= i %>" name="stock" class="form-control" min="1" oninput="validateField('stock<%= i %>')" value="<%= data[i].stock %>">
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                        
+                              <% for(let j = 0; j < data[i].image.length; j++) { %>
+                                <div style="margin-left: 15%;">
+                                    <img id="existingImage" src="<%= data[i].image[j].path %>" alt="productImage" style="height: 80px; width: 80px;">
+                                    <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-image-id="<%= data[i].image[j].originalname %>">&times;</button>
+
+                                </div>
+                            <% } %>
+                            
+                            <!-- Move the removeImages input field outside of the loop -->
+                            <input type="hidden" id="removeImages" name="removeImages" value="">
+                            
+
+                            </div>
+                            <!-- Add this form group for selecting an image to crop -->
+<div class="form-group row">
+  <label class="col-sm-3 form-control-label">Select Image to Crop</label>
+  <div class="col-sm-9">
+    <div id="crop-image-select-<%= i %>" class="d-flex flex-wrap">
+      <% for(let j = 0; j < data[i].image.length; j++) { %>
+        <div class="position-relative mr-2 mb-2">
+          <img src="<%= data[i].image[j].path %>" alt="productImage" class="img-thumbnail crop-image-select" style="height: 100px; width: 100px; cursor: pointer;">
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+
+<!-- Hidden input field to store the cropped image data -->
+<input type="hidden" id="croppedImage-<%= i %>" name="croppedImage" value="">
+                            <div class="line"></div>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Upload Images</label>
+                              <div class="col-sm-9">
+                                <div id="image-preview-container" class="d-flex flex-wrap"></div>
+                                <input type="file" name="image" class="form-control" multiple  onchange="validateField('image')">
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Crop Images</label>
+                              <div class="col-sm-9">
+                                <div>
+                                  <img id="image-<%= i %>" src="<%= data[i].image[0].path %>" alt="Product Image" style="max-width: 100%;">
+                                </div>
+                                <div>
+                                  <button id="crop-btn-<%= i %>" type="button" class="btn btn-primary">Crop Image</button>
+                                  <div id="cropped-image-preview-<%= i %>" style="margin-top: 10px;"></div>
+                                </div>
+                              </div>
+                            </div>
+                
+                            <!-- Hidden input field to store the cropped image data -->
+                            <input type="hidden" id="croppedImage-<%= i %>" name="croppedImage" value="">
+                
+                
+                            <div class="line"></div>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Offer Price</label>
+                              <div class="col-sm-9">
+                                <input type="number" id="offerPrice<%= i %>" class="form-control" name="offerPrice" min="0" oninput="validateField('offerPrice<%= i %>')" value="<%= data[i].offerPrice %>">
+                              </div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="form-group row">
+                              <div class="col-sm-9 ml-auto">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <% if(data[i].status) { %>
+                    <a href="#" class="btn btn-danger" onclick="confirmAndRedirect('<%= data[i]._id %>', event)">Unlist</a>
+                  <% } else { %>
+                    <a href="#" class="btn btn-success" onclick="confirmAndRedirect('<%= data[i]._id %>', event)">List</a>
+                  <% } %>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+      
+    </div>
+  </div>
+  <footer class="footer">
+    <div class="footer__block block no-margin-bottom">
+     
+    </div>
+  </footer>
+  </div>
+  </div>
+   <!-- JavaScript files-->
+   <script src="vendor/jquery/jquery.min.js"></script>
+   <script src="vendor/popper.js/umd/popper.min.js"></script>
+   <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+   <script src="vendor/jquery.cookie/jquery.cookie.js"></script>
+   <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+   <script src="js/front.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  
+  <script>
+document.addEventListener("click", function(event) {
+    if (event.target.classList.contains("remove-image-btn")) {
+        console.log("Remove button clicked");
+        const imageId = event.target.dataset.imageId;
+        console.log(event.target.dataset.imageId);
+        const modal = event.target.closest(".modal"); 
+        console.log("Image ID:", imageId);
+
+        // Remove the corresponding image preview
+        event.target.parentNode.remove();
+
+        // Mark the image for removal by adding its ID to a hidden input field
+        const removeImagesInput = modal.querySelector("#removeImages");
+        console.log("Before update - removeImages value:", removeImagesInput.value);
+        removeImagesInput.value += imageId + ",";
+        console.log("After update - removeImages value:", removeImagesInput.value);
+    }
+});
+
+
+
+
+
+
+
+    async function confirmAndRedirect(userId, event) {
+      event.preventDefault(); // Prevent the default behavior
+
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You want to change the status of the product",
+        icon: "warning",
+        showCancelButton: true
+      });
+
+      if (result.isConfirmed) {
+        // Redirect to the appropriate URL for toggling the product status
+        window.location.href = "/admin/productStatus?id=" + userId;
+      }
+    }
+    
+ 
+ 
+  // Function to display error messages inline with form fields
+  function displayInlineErrorMessage(field, message) {
+      var errorMessageId = field.name + "-error";
+
+      // Check if error message already exists for the field
+      var existingErrorMessage = document.getElementById(errorMessageId);
+      if (existingErrorMessage) {
+        // Update existing error message text
+        existingErrorMessage.textContent = message;
+      } else {
+        // Create new error message
+        var errorMessage = document.createElement("div");
+        errorMessage.textContent = message;
+        errorMessage.style.color = "red"; // Set color to red
+        errorMessage.style.fontSize = "12px";
+        errorMessage.style.marginTop = "5px";
+        errorMessage.setAttribute("id", errorMessageId);
+
+        // Insert error message after the field
+        field.parentNode.insertBefore(errorMessage, field.nextSibling);
+      }
+    }
+
+    // Function to remove error messages
+    function clearInlineErrorMessages(field) {
+      var errorMessageId = field.name + "-error";
+      var existingErrorMessage = document.getElementById(errorMessageId);
+      if (existingErrorMessage) {
+        existingErrorMessage.textContent = "";
+      }
+    }
+
+    // Function to handle form validation
+    function validateForm(event, formId) {
+  event.preventDefault(); // Prevent the default form submission behavior
+
+  var form = document.getElementById(formId);
+  var modal = event.target.closest(".modal");
+
+  var productName = modal.querySelector("input[name='productName']");
+  var category = modal.querySelector("select[name='category']");
+  var description = modal.querySelector("textarea[name='description']");
+  var about = modal.querySelector("textarea[name='about']");
+  var price = modal.querySelector("input[name='price']");
+  var stock = modal.querySelector("input[name='stock']");
+  var offerPrice = modal.querySelector("input[name='offerPrice']");
+
+  // Regular expressions for validation
+  var priceRegex = /^\d+(\.\d{1,2})?$/; // Matches numbers with optional decimal up to 2 places
+  var stockRegex = /^\d+$/; // Matches only positive integers
+  var offerPriceRegex = /^\d+(\.\d{1,2})?$/;
+
+  // Clear previous error messages
+  clearInlineErrorMessages(productName);
+  clearInlineErrorMessages(category);
+  clearInlineErrorMessages(description);
+  clearInlineErrorMessages(about);
+  clearInlineErrorMessages(price);
+  clearInlineErrorMessages(stock);
+  clearInlineErrorMessages(offerPrice);
+
+  var isValid = true;
+
+  // Individual field validations
+  if (productName.value.trim() === "") {
+    displayInlineErrorMessage(productName, "Please enter product name");
+    isValid = false;
+  }
+
+  if (category.value === "") {
+    displayInlineErrorMessage(category, "Please select a category");
+    isValid = false;
+  }
+
+  if (description.value.trim() === "") {
+    displayInlineErrorMessage(description, "Please enter product description");
+    isValid = false;
+  }
+
+  if (about.value.trim() === "") {
+    displayInlineErrorMessage(about, "Please enter information about the product");
+    isValid = false;
+  }
+
+  if (price.value.trim() === "" || !priceRegex.test(price.value.trim())) {
+    displayInlineErrorMessage(price, "Please enter a valid price (e.g., 10 or 10.99)");
+    isValid = false;
+  }
+
+  if (stock.value.trim() === "" || !stockRegex.test(stock.value.trim())) {
+    displayInlineErrorMessage(stock, "Please enter a valid stock quantity (must be a positive integer)");
+    isValid = false;
+  }
+
+  if ( parseFloat(offerPrice.value.trim()) >= parseFloat(price.value.trim())) {
+    displayInlineErrorMessage(offerPrice, "Please enter a valid offer price (e.g., 10 or 10.99) and ensure it is less than the price");
+    isValid = false;
+  }
+
+  // If any field is invalid, prevent form submission
+  if (!isValid) {
+    return false;
+  }
+
+  // All fields are valid, allow form submission
+  if (isValid) {
+    form.submit(); // Submit the form using its ID
+  }
+}
+    // Add event listener to each form
+    var forms = document.querySelectorAll('.modal form');
+    forms.forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        validateForm(event, this.id);
+      });
+    });
+
+    document.addEventListener("change", function (event) {
+      if (event.target.matches("input[name='image']")) {
+        var fileInput = event.target;
+        var modal = fileInput.closest(".modal"); // Find the closest modal to the file input
+        var files = fileInput.files;
+        var imagePreviewContainer = modal.querySelector("#image-preview-container");
+        var allowedExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+
+        // Store the existing file input value
+        var existingFiles = Array.from(files);
+
+        // Clear existing previews
+        imagePreviewContainer.innerHTML = "";
+
+        // Reset file input value if no files are selected
+        if (files.length === 0) {
+          fileInput.value = ""; // Clear the file input field
+          return; // Exit the function
+        }
+
+        // Limit to only five images
+        if (files.length > 5) {
+          alert("You can only select up to five images.");
+          fileInput.value = ""; // Clear the file input field
+          return;
+        }
+
+        // Loop through selected files
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var fileName = file.name.toLowerCase();
+          var fileExtension = fileName.split('.').pop();
+
+          // Check if the file extension is allowed
+          if (!allowedExtensions.includes(fileExtension)) {
+            alert("Only JPG, JPEG, PNG, and GIF images are allowed.");
+            fileInput.value = ""; // Clear the file input field
+            return;
+          }
+
+          var reader = new FileReader();
+
+          // Closure to capture the file information
+          reader.onload = (function (file, index) {
+            return function (event) {
+              // Create image preview
+              var img = document.createElement("img");
+              img.src = event.target.result;
+              img.classList.add("img-thumbnail");
+              img.style.width = "100px";
+              img.style.height = "100px";
+
+          // Create button to remove the image
+          var removeBtn = document.createElement("button");
+          removeBtn.innerHTML = "&times;"; // Cross mark icon
+          removeBtn.classList.add("btn", "btn-danger", "btn-sm", "remove-image-btn");
+          removeBtn.addEventListener("click", function() {
+            // Remove the image preview container when clicked
+            this.parentNode.remove();
+            // Remove the corresponding file from the file input
+            existingFiles.splice(index, 1);
+            // Update the file input's files property
+            var newFileList = new DataTransfer();
+            existingFiles.forEach(function(file) {
+              newFileList.items.add(file);
+            });
+            fileInput.files = newFileList.files;
+          });
+
+          // Create container for image and remove button
+          var container = document.createElement("div");
+          container.classList.add("position-relative", "mr-2", "mb-2");
+          container.appendChild(img);
+          container.appendChild(removeBtn);
+
+          // Append container to image preview container
+          imagePreviewContainer.appendChild(container);
+        };
+      })(file, i);
+
+      // Read image file as a data URL
+      reader.readAsDataURL(file);
+    }
+  }
+});
+
+// Function to handle image cropping
+document.addEventListener("DOMContentLoaded", function () {
+  var cropper;
+
+  document.querySelectorAll("[id^='crop-btn-']").forEach(function (btn, index) {
+    var modal = document.getElementById("exampleModal" + index);
+    var imgElement = modal.querySelector("#image-" + index);
+    var croppedImagePreview = modal.querySelector("#cropped-image-preview-" + index);
+    var croppedImageInput = modal.querySelector("#croppedImage-" + index);
+    var cropImageSelect = modal.querySelector("#crop-image-select-" + index);
+
+    // Disable the crop button initially
+    btn.disabled = true;
+
+    var handleImageSelection = function (event) {
+  if (event.target.tagName.toLowerCase() === "img") {
+    var selectedImageSrc = event.target.src;
+    imgElement.src = selectedImageSrc;
+    initCropper();
+    btn.disabled = false; // Enable the crop button
+  }
+};
+
+    var initCropper = function () {
+      if (cropper) {
+        cropper.destroy();
+      }
+
+      cropper = new Cropper(imgElement, {
+        aspectRatio: 1,
+        viewMode: 2,
+        autoCropArea: 1,
+        scalable: true,
+        zoomable: true,
+        movable: true,
+        responsive: true,
+        preview: croppedImagePreview
+      });
+    };
+
+    // Event listeners
+    cropImageSelect.querySelectorAll("img").forEach(function (img) {
+      img.addEventListener("click", handleImageSelection);
+    });
+
+    btn.addEventListener("click", function () {
+  var canvas = cropper.getCroppedCanvas();
+  croppedImagePreview.innerHTML = "";
+  croppedImagePreview.appendChild(canvas);
+
+  // Convert the canvas to a data URL and store it in the hidden input
+  croppedImageInput.value = canvas.toDataURL();
+
+  // Replace the original image with the cropped image
+  var selectedImageElement = cropImageSelect.querySelector(".selected-image");
+  if (selectedImageElement) {
+    selectedImageElement.src = canvas.toDataURL();
+  } else {
+    var originalImageElement = cropImageSelect.querySelector(`img[src="${imgElement.src}"]`);
+    if (originalImageElement) {
+      originalImageElement.src = canvas.toDataURL();
+      originalImageElement.classList.add("selected-image");
+      originalImageElement.style.height = "100px";
+      originalImageElement.style.width = "100px";
+    } else {
+      var newImageElement = document.createElement("img");
+      newImageElement.src = canvas.toDataURL();
+      newImageElement.classList.add("img-thumbnail", "selected-image");
+      newImageElement.style.height = "100px";
+      newImageElement.style.width = "100px";
+      cropImageSelect.appendChild(newImageElement);
+    }
+  }
+});
+  });
+});
+</script>
+
+</body>
+</html>
+</body>
+
+</html>

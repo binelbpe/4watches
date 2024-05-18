@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cart - 4Watch Store</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+   
+    <link rel="stylesheet" href="/css/cart.css"> 
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <!-- Logo -->
+      <a class="navbar-brand" href="/"
+        ><img src="/images/logo.png" alt="Logo"
+      /></a>
+      <!-- Nav Links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/men">MEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/women">WOMEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/kids">KIDS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/collection">COLLECTION</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">ABOUT US</a>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Wishlist Icon with Link -->
+      <a href="/wishlist" class="wishlist-icon"><i class="fas fa-heart" ></i></a>
+      <!-- Add-to-Cart Icon with Link -->
+      <a href="/add-to-cart" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
+      <% if (fullName) { %>
+        <div class="user-info">
+          <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+          <a href="/logout" class="nav-link logout nav-linklogout">
+            <i class="fas fa-sign-out-alt"></i>
+          </a>
+        </div>
+        <% } else { %>
+        <!-- If user is not logged in, display login/signup -->
+        <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
+        <% } %>
+      <!-- Hamburger Menu Toggle Button -->
+      <button
+        class="navbar-toggler ml-auto"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon">&#9776;</span>
+      </button>
+    </nav>
+    <body>
+
+      <h1>Cart</h1>
+      <div class="shopping-cart">
+        <div class="column-labels">
+          <label class="product-image">Image</label>
+          <label class="product-details">Product</label>.
+          <label class="product-stock">stock status</label>
+          <label class="product-price">Price</label>
+          <label class="product-quantity">Quantity</label>
+          <label class="product-removal">Remove</label>
+          <label class="product-line-price">Total</label>
+        </div>
+        <% products.forEach(product => { %>
+        <div class="product row" data-stock="<%= product.stock %>">
+          <div class="product-image">
+            <a href="/product/<%= product._id %>">
+              <img class="img-fluid" src="<%= product.image[0].path %>" alt="product image" />
+            </a>
+          </div>
+          <div class="product-details">
+            <div class="product-id" hidden><%= product._id %></div>
+            <p class="product-description"><%= product.product %></p>
+          </div>
+          <div class="product-stock">
+            <!-- Display stock status -->
+            <span class="stock-status"></span>
+            <!-- Display quantity error -->
+            <span class="quantity-error" style="color: red; display: none;"></span>
+          </div>
+          <!-- Inside the loop where products are displayed -->
+<div class="product-price">
+  <% if (product.offerPrice && product.offerPrice > 0 && product.offerPrice < product.price) { %>
+    <!-- If offer price is available and valid, display it -->
+    <span class="original-price"><s><%= product.price.toFixed(2) %></s></span>
+    <span class="offer-price"><%= product.offerPrice.toFixed(2) %></span>
+  <% } else { %>
+    <!-- Otherwise, display the original price -->
+    <%= product.price.toFixed(2) %>
+  <% } %>
+</div>
+
+          <div class="product-quantity">
+            <input type="number" value="1" min="1" />
+          </div>
+          <div class="product-removal">
+            <form id="removeFromCartForm" action="/remove-from-cart/<%= product._id %>" method="POST">
+              <input type="hidden" name="_method" value="DELETE" />
+              <button class="btn-danger" type="submit" class="remove-button" onclick="removeFromCart('<%= product._id %>')">Remove</button>
+            </form>
+          </div>
+          <div class="product-line-price" ><% if (product.offerPrice && product.offerPrice > 0 && product.offerPrice < product.price) { %>
+            <span class="offer-price"><%= product.offerPrice.toFixed(2) %></span>
+          <% } else { %>
+            <!-- Otherwise, display the original price -->
+            <%= product.price.toFixed(2) %>
+          <% } %></div>
+        </div>
+        <% }) %>
+        <div class="totals">
+          <div class="totals-item">
+            <label>Subtotal:</label>
+            <div class="totals-value" id="cart-subtotal">0.00</div>
+          </div>
+          <div class="totals-item">
+            <label>Tax (5%):</label>
+            <div class="totals-value cart-tax" id="cart-tax">0.00</div>
+          </div>
+          <div class="totals-item">
+            <label>Shipping:</label>
+            <div class="totals-value cart-shipping" id="cart-shipping">0.00</div>
+          </div>
+          <div class="totals-item totals-item-total">
+            <label>Grand Total:</label>
+            <div class="totals-value" id="cart-total">0.00</div>
+          </div>
+        </div>
+        <form id="checkoutForm" action="/checkout" method="POST">
+          <!-- Add hidden input fields to store cart data -->
+          <input type="hidden" name="cartData" id="cartData">
+          <input type="hidden" name="totalPrice" id="totalPrice">
+          <input type="hidden" name="shipping" id="shipping">
+          <input type="hidden" name="tax" id="tax">
+          <button class="checkout" type="submit">Checkout</button>
+        </form>
+      </div>
+    </div> 
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- JavaScript Function to Remove Product from Cart -->
+    <script>
+ document.addEventListener("DOMContentLoaded", function () {
+  const productQuantityInputs = document.querySelectorAll(".product-quantity input");
+
+  productQuantityInputs.forEach(input => {
+    input.addEventListener("input", function () {
+      const maxQuantity = 5; // Maximum quantity allowed
+      const stock = parseInt(this.parentNode.parentNode.dataset.stock); // Get stock quantity
+      let quantity = parseInt(this.value); // Parse input value to integer
+const qnty=maxQuantity-1
+      // Validate quantity
+      if (quantity > qnty) {
+        this.parentNode.querySelector(".quantity-error").textContent = `Maximum quantity allowed is ${maxQuantity}`;
+        this.parentNode.querySelector(".quantity-error").style.display = "block";
+      } else if (quantity < 2) {
+        this.parentNode.querySelector(".quantity-error").textContent = "Quantity cannot be less than 1";
+        this.parentNode.querySelector(".quantity-error").style.display = "block";
+      } else if (quantity > stock-1) {
+        this.parentNode.querySelector(".quantity-error").textContent = `Only ${stock} items available in stock`;
+        this.parentNode.querySelector(".quantity-error").style.display = "block";
+      } else {
+        // If quantity is valid, hide error message
+        this.parentNode.querySelector(".quantity-error").style.display = "none";
+      }
+    });
+  });
+});
+
+/* Set rates + misc */
+var taxRate = 0.05;
+var shippingRate = 45; // Change shipping rate to 45
+var fadeTime = 200;
+
+/* Assign actions */
+$(".product-quantity input").change(function () {
+  updateQuantity(this);
+});
+
+$(".product-removal button").click(function () {
+  removeItem(this);
+});
+
+// Update totals when page is loaded
+$(document).ready(function () {
+  recalculateCart();
+});
+
+/* Recalculate cart */
+function recalculateCart() {
+  var subtotal = 0;
+
+  /* Sum up row totals */
+  $(".product").each(function () {
+    var stock = parseInt($(this).data("stock")); // Get stock quantity
+    if (stock > 0) { // Check if stock is greater than 0
+      var price;
+      if ($(this).find(".offer-price").length > 0) {
+        // If offer price exists, use it for calculation
+        price = parseFloat($(this).find(".offer-price").text());
+      } else {
+        // Otherwise, use the original price
+        price = parseFloat($(this).children(".product-price").text());
+      }
+      
+      var quantity = parseInt($(this).find(".product-quantity input").val());
+      var linePrice = price * quantity;
+      subtotal += linePrice;
+    }
+  });
+
+  /* Calculate totals */
+  var tax = subtotal * taxRate;
+  var shipping = subtotal > 0 ? shippingRate : 0;
+  var total = subtotal + tax + shipping;
+
+  /* Update totals display */
+  $(".totals-value").fadeOut(fadeTime, function () {
+    $("#cart-subtotal").html(subtotal.toFixed(2));
+    $("#cart-tax").html(tax.toFixed(2));
+    $("#cart-shipping").html(shipping.toFixed(2));
+    $("#cart-total").html(total.toFixed(2));
+    if (total == 0) {
+      $(".checkout").fadeOut(fadeTime);
+    } else {
+      $(".checkout").fadeIn(fadeTime);
+    }
+    $(".totals-value").fadeIn(fadeTime);
+  });
+}
+
+/* Update quantity */
+function updateQuantity(quantityInput) {
+      /* Calculate line price */
+      var productRow = $(quantityInput).parent().parent();
+      var price = parseFloat(productRow.children(".product-price").text());
+      var quantity = $(quantityInput).val();
+      var linePrice = price * quantity;
+
+      /* Add validation for quantity */
+      var maxQuantity = 5; // Maximum quantity allowed
+      var stock = parseInt(productRow.data("stock")); // Get stock quantity
+
+      // Validate quantity
+      if (quantity > maxQuantity) {
+       
+        $(quantityInput).val(maxQuantity); // Set input value to maximum allowed
+        return; // Exit function
+      } else if (quantity > stock) {
+
+        $(quantityInput).val(stock); // Set input value to available stock
+        return; // Exit function
+      } else if (quantity < 1) {
+  
+        $(quantityInput).val(1); // Set input value to minimum allowed
+        return; // Exit function
+      }
+
+      // If quantity is valid, hide error message
+      $(quantityInput).siblings(".quantity-error").hide();
+
+      /* Update quantity input value */
+      $(quantityInput).val(quantity);
+
+      /* Update line price display and recalc cart totals */
+      productRow.children(".product-line-price").each(function () {
+        $(this).fadeOut(fadeTime, function () {
+          // $(this).text((linePrice || 0).toFixed(2));
+           // Ensure linePrice is not NaN
+          recalculateCart();
+          $(this).fadeIn(fadeTime);
+        });
+      });
+    }
+/* Remove item from cart */
+function removeItem(removeButton) {
+  /* Remove row from DOM and recalc cart total */
+  var productRow = $(removeButton).parent().parent();
+  productRow.slideUp(fadeTime, function () {
+    productRow.remove();
+    recalculateCart();
+  });
+}
+
+
+      function removeFromCart(productId) {
+        fetch(`/remove-from-cart/${productId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.ok) {
+              // Product removed successfully, you can handle the UI update here
+              console.log("Product removed from cart");
+              // Optionally, you can redirect to the cart page after removal
+              window.location.href = "/add-to-cart";
+            } else {
+              // Handle error response
+              console.error("Failed to remove product from cart");
+            }
+          })
+          .catch((error) => {
+            console.error("Error removing product from cart:", error);
+          });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+  const productCards = document.querySelectorAll(".product"); // Select all product cards
+
+  productCards.forEach((card) => {
+    const stockStatus = card.querySelector(".stock-status"); // Find the stock status element within the card
+    
+    const stock = parseInt(card.dataset.stock); // Get the stock quantity from the data attribute
+
+    if (stock <= 0) {
+      stockStatus.textContent = "Out of Stock";
+      stockStatus.style.color = "red";
+      const addToCartButton = card.querySelector(".product");
+      addToCartButton.disabled = true; // Disable add to cart button
+      addToCartButton.style.display = "none";
+    } else if (stock < 5) {
+      stockStatus.textContent = `Limited Stock (${stock} left)`;
+      stockStatus.style.color = "orange";
+    } else {
+      stockStatus.textContent = "In Stock";
+      stockStatus.style.color = "green";
+    }
+  });
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const checkoutForm = document.getElementById("checkoutForm");
+    const cartDataInput = document.getElementById("cartData");
+    const totalPriceInput = document.getElementById("totalPrice");
+    const shippingInput = document.getElementById("shipping");
+    const taxInput = document.getElementById("tax");
+
+    checkoutForm.addEventListener("submit", async function (event) {
+        console.log("Form submitted");
+        event.preventDefault();
+
+        // Check for out-of-stock products
+        const outOfStockProducts = document.querySelectorAll(".product[data-stock='0']");
+        if (outOfStockProducts.length > 0) {
+            alert("Cannot proceed to checkout. Some products are out of stock.");
+            return;
+        }
+
+        const products = [];
+
+        // Loop through each product in the cart
+        const productRows = document.querySelectorAll(".product");
+        productRows.forEach(productRow => {
+            const productId = productRow.querySelector(".product-id").textContent;
+            const productName = productRow.querySelector(".product-description").textContent;
+            const productQuantity = parseInt(productRow.querySelector(".product-quantity input").value);
+            const productPrice = parseFloat(productRow.querySelector(".product-price").textContent);
+            const productTotalPrice = parseFloat(productRow.querySelector(".product-line-price").textContent);
+
+            // Add product details to the array
+            products.push({
+                _id: productId,
+                name: productName,
+                quantity: productQuantity,
+                price: productPrice,
+                totalPrice: productTotalPrice
+            });
+        });
+
+        // Calculate total price
+        const totalPrice = parseFloat(document.getElementById("cart-total").textContent);
+
+        // Calculate tax
+        const taxRate = 0.05; // Tax rate is 5%
+        const tax = totalPrice * taxRate;
+
+        // Calculate shipping
+        let shipping = 45; // Default shipping value is 45
+        // You can add additional logic here to calculate shipping dynamically based on certain conditions
+        
+        // Set the values of hidden inputs
+        cartDataInput.value = JSON.stringify(products);
+        totalPriceInput.value = totalPrice;
+        shippingInput.value = shipping;
+        taxInput.value = tax;
+
+        // Submit the form
+        this.submit();
+    });
+});
+
+
+
+    </script>
+  </body>
+</html>

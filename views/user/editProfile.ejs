@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4Watch Store</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    
+    <link rel="stylesheet" href="/css/signup.css" />
+   
+    <!-- Custom CSS -->
+    <style>
+      .invalid-feedback {
+        color: red;
+        display: none;
+      }
+
+      .signup-container {
+        background-color: #bca374;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <!-- Logo -->
+      <a class="navbar-brand" href="/">
+        <img src="/images/logo.png" alt="Logo" />
+      </a>
+
+      <!-- Nav Links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/men">MEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/women">WOMEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/kids">KIDS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/collection">COLLECTION</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">ABOUT US</a>
+          </li>
+        </ul>
+      </div>
+      <!-- Search Bar with Link -->
+      <form class="form-inline my-2 my-lg-0 search-form" action="/womenfilter" method="GET">
+        <input
+          class="form-control mr-sm-2 search-input"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+        />
+        <button class="search-icon" type="submit">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+      <!-- Wishlist Icon with Link -->
+      <a href="/wishlist" class="wishlist-icon">
+        <i class="fas fa-heart"></i>
+      </a>
+      <!-- Add-to-Cart Icon with Link -->
+      <a href="/add-to-cart" class="cart-icon">
+        <i class="fas fa-shopping-cart"></i>
+      </a>
+
+      <% if (fullName) { %>
+      <div class="user-info">
+        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+        <a href="/logout" class="nav-link logout nav-linklogout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+      <% } %>
+
+      <!-- Hamburger Menu Toggle Button -->
+      <button
+        class="navbar-toggler ml-auto"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon">&#9776;</span>
+      </button>
+    </nav>
+  <class="signupbody">
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+          <div class="col-md-6">
+              <div class="signup-container">
+                  <!-- Edit Profile form -->
+                  <h2 class="text-center mb-4">Edit Profile</h2>
+                  <!-- Display error message if it exists -->
+                  <% if(errorMessage) { %>
+                  <div class="alert alert-danger" role="alert">
+                      <%= errorMessage %>
+                  </div>
+                  <% } %>
+
+                  <form id="editProfileForm" action="/edit-profile" method="POST" onsubmit="return validateForm()">
+                      <div class="mb-3">
+                          <label for="fullname" class="form-label">Full Name</label>
+                          <input type="text" class="form-control" id="fullname" name="fullname"
+                              placeholder="Enter your full name" value="<%= user.fullname %>" >
+                          <div id="fullnameError" class="invalid-feedback"></div>
+                      </div>
+                      <div class="mb-3">
+                          <label for="phone" class="form-label">Phone</label>
+                          <input type="text" class="form-control" id="phone" name="phone"
+                              placeholder="Enter your phone number" value="<%= user.phone %>">
+                          <div id="phoneError" class="invalid-feedback"></div>
+                      </div>
+                      <div class="mb-3">
+                          <label for="email" class="form-label">Email</label>
+                          <input type="text" class="form-control" id="email" name="email"
+                              placeholder="Enter your email address" value="<%= user.email %>" disabled >
+                          <div id="emailError" class="invalid-feedback"></div>
+                      </div>
+                      <div class="d-grid mb-3">
+                          <button class="btn btn-primary btn-lg btn-signup" type="submit">Update Profile</button>
+                      </div>
+                  </form>
+                  <p class="text-center mb-0">
+                      <!-- Provide link to go back or other actions -->
+                      <a href="/" class="login-link">Back to Dashboard</a>
+                  </p>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- JavaScript includes -->
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <script>
+      function validateForm() {
+          const fullname = document.getElementById("fullname");
+          const phone = document.getElementById("phone");
+          const email = document.getElementById("email");
+          const fullnameError = document.getElementById("fullnameError");
+          const phoneError = document.getElementById("phoneError");
+          const emailError = document.getElementById("emailError");
+
+          let isValid = true;
+
+          // Validate Full Name
+          if (fullname.value.trim() === "" || !fullname.value.match(/^[a-zA-Z\s]+$/)) {
+              fullname.classList.add("is-invalid");
+              fullnameError.textContent = "Please enter a valid full name.";
+              fullnameError.style.display = "block";
+              isValid = false;
+          } else {
+              fullname.classList.remove("is-invalid");
+              fullnameError.style.display = "none";
+          }
+
+          // Validate Phone Number
+          if (phone.value.trim() === "" || !phone.value.match(/^\d{10}$/)) {
+              phone.classList.add("is-invalid");
+              phoneError.textContent = "Please enter a valid 10-digit phone number.";
+              phoneError.style.display = "block";
+              isValid = false;
+          } else {
+              phone.classList.remove("is-invalid");
+              phoneError.style.display = "none";
+          }
+
+          // Validate Email
+          if (email.value.trim() === "" || !email.value.match(/[^\s@]+@[^\s@]+\.[^\s@]+/)) {
+              email.classList.add("is-invalid");
+              emailError.textContent = "Please enter a valid email address.";
+              emailError.style.display = "block";
+              isValid = false;
+          } else {
+              email.classList.remove("is-invalid");
+              emailError.style.display = "none";
+          }
+
+          return isValid;
+      }
+  </script>
+</body>
+</html>

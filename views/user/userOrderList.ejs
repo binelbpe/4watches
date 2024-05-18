@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4Watch Store</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      .cardbody {
+        height: 500px;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css"
+    />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <!-- Logo -->
+      <a class="navbar-brand" href="/"
+        ><img src="/images/logo.png" alt="Logo"
+      /></a>
+      <!-- Nav Links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/men">MEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/women">WOMEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/kids">KIDS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/collection">COLLECTION</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">ABOUT US</a>
+          </li>
+        </ul>
+      </div>
+
+      <% if (fullName) { %>
+      <div class="user-info">
+        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+        <a href="/logout" class="nav-link logout nav-linklogout"
+          ><i class="fas fa-sign-out-alt"></i
+        ></a>
+      </div>
+      <% } else { %>
+      <!-- If user is not logged in, display login/signup -->
+      <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
+      <% } %>
+      <!-- Hamburger Menu Toggle Button -->
+      <button
+        class="navbar-toggler ml-auto"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon">&#9776;</span>
+      </button>
+    </nav>
+
+    <div class="container mt-4">
+      <!-- Pagination section -->
+      <div class="pagination">
+        <ul class="pagination justify-content-center">
+          <% if (totalPages > 1) { %> <% if (currentPage > 1) { %>
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="/orders?page=<%= currentPage - 1 %>"
+              aria-label="Previous"
+            >
+              <span aria-hidden="true">&laquo;</span>
+              <span class="sr-only">Previous</span>
+            </a>
+          </li>
+          <% } %> <% let startPage = Math.max(1, currentPage - 2); %> <% let
+          endPage = Math.min(startPage + 3, totalPages); %> <% for(let i =
+          startPage; i <= endPage; i++) { %>
+          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+            <a class="page-link" href="/orders?page=<%= i %>"><%= i %></a>
+          </li>
+          <% } %> <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="/orders?page=<%= currentPage + 1 %>"
+              aria-label="Next"
+            >
+              <span aria-hidden="true">&raquo;</span>
+              <span class="sr-only">Next</span>
+            </a>
+          </li>
+          <% } %> <% } %>
+        </ul>
+      </div>
+
+      <h1>User Order List</h1>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Total Price</th>
+            <th>Payment Method</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% orders.forEach(order => { %>
+          <tr>
+            <td><%= order._id %></td>
+            <td><%= order.createdAt.toDateString() %></td>
+            <td><%= order.totalPrice %></td>
+            <td><%= order.paymentMethod %></td>
+            <td><%= order.address.address %></td>
+            <td>
+              <% if (order.status === 'completed') { %>Completed<% } else if
+              (order.status == 'returned') { %>Returned<% } else if
+              (order.status === 'cancelled') { %>Cancelled<% } else if
+              (order.status == 'returnrequest') { %>Requested for return<% }
+              else if (order.status == 'paymentpending') { %>Payment pending<% }
+              else { %>Pending<% } %>
+            </td>
+            <td>
+              <button
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#productDetailsModal-<%= order._id %>"
+              >
+                View Product Details
+              </button>
+              <% if (order.status == 'completed') { %>
+              <form
+                action="/orders/return/<%= order._id %>"
+                method="POST"
+                class="d-inline"
+              >
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  onclick="confirmReturnOrder('<%= order._id %>')"
+                >
+                  Return Order
+                </button>
+              </form>
+              <% } else if (order.status == 'returned') { %>
+              <button type="button" class="btn btn-secondary" disabled>
+                Order Returned
+              </button>
+              <% } else if (order.status == 'pending') { %>
+              <form
+                action="/orders/cancel/<%= order._id %>"
+                method="POST"
+                class="d-inline"
+              >
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  onclick="confirmCancelOrder('<%= order._id %>')"
+                >
+                  Cancel Order
+                </button>
+              </form>
+              <% } else if (order.status == 'cancelled') { %>
+              <button type="button" class="btn btn-secondary" disabled>
+                Order Cancelled
+              </button>
+              <% } else if (order.status == 'returnrequest') { %>
+              <button type="button" class="btn btn-secondary" disabled>
+                Requested for Return
+              </button>
+              <% } else if (order.status == 'paymentpending') { %>
+              <form action="/repayment/process" method="POST" class="d-inline">
+                <input type="hidden" name="orderId" value="<%= order._id %>" />
+                <input
+                  type="hidden"
+                  name="amount"
+                  value="<%= order.totalPrice %>"
+                />
+                <button type="submit" class="btn btn-warning">
+                  Proceed to Payment
+                </button>
+              </form>
+              <form
+                action="/orderAbort/<%= order._id %>"
+                method="POST"
+                class="d-inline"
+              >
+                <input type="hidden" name="orderId" value="<%= order._id %>" />
+                <input
+                  type="hidden"
+                  name="amount"
+                  value="<%= order.totalPrice %>"
+                />
+                <button type="submit" class="btn btn-warning">Abort</button>
+              </form>
+              <% } %> <% if (order.status === 'completed') { %>
+              <a href="/orders/<%= order._id %>/invoice" class="btn btn-primary"
+                >Download Invoice</a
+              >
+              <% } %>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <% orders.forEach(order => { %>
+      <div
+        class="modal fade"
+        id="productDetailsModal-<%= order._id %>"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="productDetailsModal-<%= order._id %>"
+        aria-hidden="true"
+      >
+        <div
+          class="modal-dialog modal-dialog-centered modal-lg"
+          role="document"
+        >
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="productDetailsModal-<%= order._id %>">
+                Product Details
+              </h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% order.products.forEach(product => { %>
+                  <tr>
+                    <td>
+                      <img
+                        class="img-fluid"
+                        src="<%= product.product.image[0].path %>"
+                        alt="product image"
+                        style="max-width: 100px"
+                      />
+                    </td>
+                    <td><%= product.product.product %></td>
+                    <td><%= product.product.price %></td>
+                    <td><%= product.quantity %></td>
+                    <td><%= product.product.price * product.quantity %></td>
+                    <td>
+                      <% if (product.status === 'completed') { %><button
+                        type="button"
+                        class="btn btn-success"
+                        disabled
+                      >
+                        Completed
+                      </button>
+                      <form
+                        action="/orders/return-product/<%= order._id %>/<%= product.product._id %>"
+                        method="POST"
+                      >
+                        <button
+                          type="button"
+                          class="btn btn-warning"
+                          onclick="confirmReturnProduct('<%= order._id %>', '<%= product.product._id %>')"
+                        >
+                          Return Product
+                        </button>
+                      </form>
+                      <%} else if (product.status == 'returned') { %>
+                      <button type="button" class="btn btn-secondary" disabled>
+                        Product Returned
+                      </button>
+                      <% } else if (product.status == 'cancelled') { %>
+                      <button type="button" class="btn btn-danger" disabled>
+                        Cancelled
+                      </button>
+                      <% } else if (product.status == 'returnrequest') { %>
+                      <button type="button" class="btn btn-primary" disabled>
+                        Requested for return
+                      </button>
+                      <% } else { %>
+                      <button type="button" class="btn btn-primary" disabled>
+                        Pending
+                      </button>
+                      <form
+                        action="/orders/cancel-product/<%= order._id %>/<%= product.product._id %>"
+                        method="POST"
+                      >
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          onclick="confirmCancelProduct('<%= order._id %>', '<%= product.product._id %>')"
+                        >
+                          Cancel Product
+                        </button>
+                      </form>
+                      <% } %>
+                    </td>
+                  </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      function confirmReturnOrder(orderId) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Do you want to return this order?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, return it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Submit the return order form
+            document
+              .querySelector(`form[action="/orders/return/${orderId}"]`)
+              .submit();
+
+            // Show a success message for 4 seconds
+            Swal.fire({
+              title: "Order returned!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 4000,
+            });
+          }
+        });
+      }
+
+      function confirmCancelOrder(orderId) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Do you want to cancel this order?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, cancel it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Submit the cancel order form
+            document
+              .querySelector(`form[action="/orders/cancel/${orderId}"]`)
+              .submit();
+
+            // Show a success message for 4 seconds
+            Swal.fire({
+              title: "Order cancelled!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 4000,
+            });
+          }
+        });
+      }
+
+      function confirmReturnProduct(orderId, productId) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Do you want to return this product?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, return it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Submit the return product form
+            document
+              .querySelector(
+                `form[action="/orders/return-product/${orderId}/${productId}"]`
+              )
+              .submit();
+
+            // Show a success message for 4 seconds
+            Swal.fire({
+              title: "Product returned!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 4000,
+            });
+          }
+        });
+      }
+
+      function confirmCancelProduct(orderId, productId) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Do you want to cancel this product?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, cancel it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Submit the cancel product form
+            document
+              .querySelector(
+                `form[action="/orders/cancel-product/${orderId}/${productId}"]`
+              )
+              .submit();
+
+            // Show a success message for 4 seconds
+            Swal.fire({
+              title: "Product cancelled!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 4000,
+            });
+          }
+        });
+      }
+    </script>
+    <script>
+      const RAZORPAY_KEY_ID = "<%= RAZORPAY_KEY_ID %>";
+      let rzp1; // Declare the Razorpay instance globally
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const orderId = this.querySelector('input[name="orderId"]').value;
+        const amount = this.querySelector('input[name="amount"]').value * 100; // Convert amount to paise
+        console.log("amount:", amount);
+        rzp1 = new Razorpay({
+          key: RAZORPAY_KEY_ID,
+          amount: amount,
+          image: "/images/logo.png",
+          handler: function (response) {
+            handlePaymentSuccess(response);
+          },
+          prefill: {
+            email: "binelbpe@gmale.com",
+            contact: "9074465607",
+          },
+          theme: {
+            color: "#bca374",
+          },
+        });
+
+        rzp1.on("payment.failed", function (response) {
+          handlePaymentFailure(response);
+        });
+
+        document
+          .querySelectorAll('form[action="/repayment/process"]')
+          .forEach((form) => {
+            form.addEventListener("submit", function (event) {
+              event.preventDefault(); // Prevent the form from submitting normally
+
+              const orderId = this.querySelector('input[name="orderId"]').value;
+              const amount =
+                this.querySelector('input[name="amount"]').value * 100; // Convert amount to paise
+              console.log("amount:", amount);
+
+              fetch("/repayment/process", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ amount, orderId }),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  const options = {
+                    key: RAZORPAY_KEY_ID,
+                    amount: amount,
+                    currency: data.currency,
+                    order_id: data.orderId,
+                    name: "4Watches Store",
+                    description: "Order Payment",
+                    image: "/images/logo.png",
+                    handler: function (response) {
+                      handlePaymentSuccess(response, orderId);
+                    },
+                  };
+
+                  rzp1.open(options);
+                })
+                .catch((error) => {
+                  console.error("Error fetching order details:", error);
+                });
+            });
+          });
+
+        function handlePaymentSuccess(response, orderId) {
+          Swal.fire({
+            icon: "success",
+            title: "Payment Successful",
+            text: "Your payment has been successfully processed!",
+          }).then(() => {
+            fetch(`/repayment/success`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(response),
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                console.log(data);
+              })
+              .catch((error) =>
+                console.error("Payment success handler error:", error)
+              );
+          });
+        }
+
+        function handlePaymentFailure(response) {
+          if (rzp1) {
+            rzp1.close(); // Close the Razorpay modal
+          }
+          window.reload();
+          console.error("Payment failed:", response);
+        }
+      });
+    </script>
+  </body>
+</html>

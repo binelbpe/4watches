@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4Watch Store</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      .cardwishlist {
+        height: max-content;
+      }
+      /* Style for the remove button */
+      .remove-button {
+        background-color: #dc3545; /* Red color for danger */
+        color: white; /* White text color */
+        border: none; /* Remove border */
+        padding: 8px 16px; /* Padding for button */
+        cursor: pointer; /* Add cursor pointer */
+        transition: background-color 0.3s; /* Smooth transition on hover */
+      }
+
+      /* Hover effect for the remove button */
+      .remove-button:hover {
+        background-color: #c82333; /* Darker red color on hover */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <!-- Logo -->
+      <a class="navbar-brand" href="/"
+        ><img src="/images/logo.png" alt="Logo"
+      /></a>
+
+      <!-- Nav Links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/men">MEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/women">WOMEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/kids">KIDS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/collection">COLLECTION</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">ABOUT US</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Add-to-Cart Icon with Link -->
+      <a href="/add-to-cart" class="cart-icon">
+        <i class="fas fa-shopping-cart"></i>
+      </a>
+
+      <% if (fullName) { %>
+      <div class="user-info">
+        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+        <a href="/logout" class="nav-link logout nav-linklogout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+      <% } else { %>
+      <!-- If user is not logged in, display login/signup -->
+      <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
+      <% } %>
+
+      <!-- Hamburger Menu Toggle Button -->
+      <button
+        class="navbar-toggler ml-auto"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon">&#9776;</span>
+      </button>
+    </nav>
+    <div class="container mt-5">
+      <div class="row">
+        <% wishlist.forEach(product => { %>
+        <div class="col-md-4 mb-4">
+          <div class="card cardwishlist" data-stock="<%= product.stock %>">
+            <a href="/product/<%= product._id %>">
+              <img
+                class="img-fluid"
+                src="<%= product.image[0].path %>"
+                alt="product image"
+              />
+            </a>
+
+            <div class="card-body">
+              <h5 class="card-title"><%= product.name %></h5>
+              <p class="card-text"><%= product.description %></p>
+
+              <p class="card-text"><% if (product.offerPrice && product.offerPrice <
+ product.price) { %>
+                <h6 class="original-price" style="color: red">
+                  <s><%= product.price %></s>
+                </h6>
+                <h6 class="offer-price" style="color: green">
+                  offer price: <%= product.offerPrice%>
+                </h6>
+                <% } else { %>
+                <h6><%= product.price %></h6>
+                <% } %></p>
+              <div class="row">
+                <div class="col">
+                  <!-- Example form to add a product to the cart -->
+                  <form
+                    action="/add-to-cart/<%= product._id %>"
+                    method="POST"
+                    class="add-to-cart"
+                  >
+                    <button type="submit" class="btn btn-primary btn-block">
+                      <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                  </form>
+                </div>
+
+                <!-- Example form to remove a product from the wishlist -->
+                <!-- Example form to remove a product from the wishlist -->
+                <form
+                  id="removeFromWishlistForm"
+                  action="/remove-from-wishlist/662110e769375a5fdb3615be"
+                  method="DELETE"
+                >
+                  <input type="hidden" name="_method" value="DELETE" />
+                  <button
+                    class="remove-button"
+                    onclick="removeFromWishlist('<%= product._id %>')"
+                  >
+                    Remove
+                  </button>
+                </form>
+              </div>
+              <span class="stock-status"></span>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+    <!-- Small separation between footers -->
+    <div class="footer-separation"></div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/main.js"></script>
+
+    <script>
+      function removeFromWishlist(productId) {
+        fetch(`/remove-from-wishlist/${productId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.ok) {
+              // Product removed successfully, you can handle the UI update here
+              console.log("Product removed from wishlist");
+              // Optionally, you can redirect to the wishlist page after removal
+              window.location.href = "/wishlist";
+            } else {
+              // Handle error response
+              console.error("Failed to remove product from wishlist");
+            }
+          })
+          .catch((error) => {
+            console.error("Error removing product from wishlist:", error);
+          });
+      }
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const productCards = document.querySelectorAll(".card"); // Select all product cards
+
+        productCards.forEach((card) => {
+          const stockStatus = card.querySelector(".stock-status"); // Find the stock status element within the card
+          const addToCartButton = card.querySelector(".add-to-cart");
+          const stock = parseInt(card.dataset.stock); // Get the stock quantity from the data attribute
+
+          if (stock <= 0) {
+            stockStatus.textContent = "Out of Stock";
+            stockStatus.style.color = "red";
+            addToCartButton.disabled = true; // Disable add to cart button
+            addToCartButton.style.display = "none";
+          } else if (stock < 5) {
+            stockStatus.textContent = `Limited Stock (${stock} left)`;
+            stockStatus.style.color = "orange";
+          } else {
+            stockStatus.textContent = "In Stock";
+            stockStatus.style.color = "green";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

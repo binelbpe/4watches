@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Admin</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="all,follow" />
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
+    <!-- Font Awesome CSS-->
+    <link
+      rel="stylesheet"
+      href="vendor/font-awesome/css/font-awesome.min.css"
+    />
+    <!-- Custom Font Icons CSS-->
+    <link rel="stylesheet" href="css/font.css" />
+    <!-- Google fonts - Muli-->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Muli:300,400,700"
+    />
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet" />
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="css/custom.css" />
+    <!-- Favicon-->
+
+    <!-- Tweaks for older IEs-->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script
+    ><![endif]-->
+  </head>
+  <body>
+    <div class="login-page">
+      <div class="container d-flex align-items-center">
+        <div class="form-holder has-shadow">
+          <div class="row">
+            <!-- Logo & Information Panel-->
+            <div class="col-lg-6">
+              <div
+                class="info d-flex align-items-center"
+                style="background-color: #bca374"
+              >
+                <div class="content">
+                  <div class="logo">
+                    <h1>Dashboard</h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Form Panel -->
+            <div class="col-lg-6 bg-white">
+              <div class="form d-flex align-items-center">
+                <div class="content">
+                  <form
+                    id="login-form"
+                    method="post"
+                    onsubmit="return validateForm()"
+                  >
+                    <div class="form-group">
+                      <input
+                        id="login-username"
+                        type="text"
+                        name="loginUsername"
+                        class="input-material"
+                      />
+                      <label for="login-username" class="label-material"
+                        >User Name</label
+                      >
+                      <span id="username-error" class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                      <input
+                        id="login-password"
+                        type="password"
+                        name="loginPassword"
+                        class="input-material"
+                      />
+                      <label for="login-password" class="label-material"
+                        >Password</label
+                      >
+                      <span id="password-error" class="error-message"></span>
+                    </div>
+                    <button
+                      type="submit"
+                      class="btn"
+                      style="background-color: #bca374"
+                    >
+                      Login
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- JavaScript files-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/popper.js/umd/popper.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="vendor/jquery.cookie/jquery.cookie.js"></script>
+    <script src="vendor/chart.js/Chart.min.js"></script>
+    <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+    <script src="js/front.js"></script>
+    <script>
+      function validateForm() {
+        var username = document.getElementById("login-username").value;
+        var password = document.getElementById("login-password").value;
+        var usernameError = document.getElementById("username-error");
+        var passwordError = document.getElementById("password-error");
+
+        usernameError.innerHTML = "";
+        passwordError.innerHTML = "";
+
+        // Regex patterns for username and password validation
+        var usernameRegex = /^[a-zA-Z0-9_]{3,20}$/; // Alphanumeric with underscore, 3 to 20 characters
+        var passwordRegex =
+          /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        // Username validation
+        if (username.trim() === "") {
+          usernameError.innerHTML = "Please enter your username";
+          return false;
+        } else if (!usernameRegex.test(username)) {
+          usernameError.innerHTML =
+            "Username must be alphanumeric with underscore, 3 to 20 characters";
+          return false;
+        }
+
+        // Password validation
+        if (password.trim() === "") {
+          passwordError.innerHTML = "Please enter your password";
+          return false;
+        } else if (!passwordRegex.test(password)) {
+          passwordError.innerHTML =
+            "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number";
+          return false;
+        }
+
+        return true;
+      }
+    </script>
+  </body>
+</html>

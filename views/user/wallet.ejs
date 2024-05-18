@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4Watch Store</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <!-- Logo -->
+      <a class="navbar-brand" href="/">
+        <img src="/images/logo.png" alt="Logo" />
+      </a>
+
+      <!-- Nav Links -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/men">MEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/women">WOMEN</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/kids">KIDS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/collection">COLLECTION</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">ABOUT US</a>
+          </li>
+        </ul>
+      </div>
+
+      <% if (fullName) { %>
+      <div class="user-info">
+        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+        <a href="/logout" class="nav-link logout nav-linklogout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+      <% } %>
+
+      <!-- Hamburger Menu Toggle Button -->
+      <button
+        class="navbar-toggler ml-auto"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon">&#9776;</span>
+      </button>
+    </nav>
+
+    <main class="container mt-5">
+      <div class="wallet-box p-4 mb-4">
+        <h1 class="mb-4">Wallet</h1>
+        <div class="wallet-balance mb-4">
+          <% if (wallet && wallet.balance !== undefined) { %>
+          <h2>Balance: <%= wallet.balance.toFixed(2) %></h2>
+          <% } else { %>
+          <h2>Balance: N/A</h2>
+          <% } %>
+        </div>
+
+        <!-- Pagination -->
+        <ul class="pagination">
+          <% if (currentPage > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="/wallet?page=<%= currentPage - 1 %>"
+              >Previous</a
+            >
+          </li>
+          <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+            <a class="page-link" href="/wallet?page=<%= i %>"><%= i %></a>
+          </li>
+          <% } %> <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="/wallet?page=<%= currentPage + 1 %>"
+              >Next</a
+            >
+          </li>
+          <% } %>
+        </ul>
+
+        <div class="wallet-transactions mb-4">
+          <h2>Transaction History</h2>
+          <% if (wallet && wallet.transactions && wallet.transactions.length >
+          0) { %>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% transactions.forEach(transaction => { %>
+              <tr>
+                <td><%= transaction.type %></td>
+                <td><%= transaction.amount %></td>
+                <td><%= transaction.description %></td>
+                <td><%= transaction.date.toLocaleDateString() %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <% } else { %>
+          <p>No transactions found.</p>
+          <% } %>
+        </div>
+      </div>
+    </main>
+
+    <footer class="main-footer mt-5">
+      <!-- Footer content -->
+    </footer>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  </body>
+</html>

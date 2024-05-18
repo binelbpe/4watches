@@ -1,0 +1,427 @@
+/* Profile Page Styling */
+
+/* Profile Details */
+.profile-details p {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+/* Profile Address */
+.profile-address p {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+/* Profile Orders */
+.profile-orders h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+/* Profile Options */
+.profile-options a {
+  font-size: 1.1rem;
+}
+
+/* Main Footer */
+.main-footer {
+  background-color: #01060c;
+  color: #fff;
+  padding: 2% 5%;
+}
+/* CSS for Navbar */
+.nav-link {
+  color: #bca374 !important;
+}
+
+.navbar {
+  padding: 0% 2%;
+  background-color: #f0f1f0 !important;
+  justify-content: space-between; /* Ensure items are spread out */
+  align-items: center; /* Center items vertically */
+  border-bottom: 1px solid #ccc; /* Add a border at the bottom of the navbar */
+}
+
+.navbar-brand img {
+  height: 5vw; /* Adjust as needed */
+  width: auto; /* Allow image to scale */
+}
+
+.navbar .nav-link {
+  color: #bca374;
+  font-weight: bold;
+  font-size: 1.3vw;
+}
+
+.navbar .login {
+  color: #bca374;
+  font-weight: bold;
+  font-size: 1.3vw;
+  margin-left: 10px; /* Add margin to separate from other links */
+}
+
+.navbar-toggler {
+  color: #bca374;
+  font-size: 1.3vw;
+}
+
+.search-form {
+  flex-grow: 1; /* Expand to fill the remaining space */
+  display: flex;
+  justify-content: center; /* Center the search bar */
+  align-items: center;
+  margin-left: auto;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 15vw;
+  border: none;
+  border-bottom: 2px solid #bca374;
+  background-color: transparent;
+  color: #bca374;
+  padding: 1%;
+  font-size: 1.3vw;
+}
+
+.search-icon {
+  color: #bca374;
+  font-size: 1.5vw;
+  cursor: pointer;
+  background: transparent; /* Remove background color */
+  border: none; /* Remove border around the icon */
+}
+
+.wishlist-icon,
+.cart-icon {
+  color: #bca374;
+  font-size: 1.5vw;
+  margin-right: 10px;
+}
+
+.filter-toggle {
+  display: none; /* Hide the filter toggle by default */
+  color: #bca374;
+  font-size: 1vw;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.filter-toggle-icon {
+  color: #bca374; /* Set the color of the filter toggle icon */
+  font-size: 1vw;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.filter-sidebar {
+  display: none; /* Hide the filter sidebar by default */
+  background-color: #f0f1f0;
+  width: 13vw;
+  height: auto; /* Height of viewport minus navbar height */
+  position: absolute;
+  left: 0;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 10px;
+  border-right: 1px solid #ccc; /* Add a border between navbar and sidebar */
+}
+
+.filter-title {
+  color: #bca374;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.filter-options {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.filter-options li {
+  margin-bottom: 10px;
+}
+
+.filter-options li label {
+  color: #bca374;
+  margin-right: 5px;
+}
+
+.filter-options li input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.filter-options li input[type="range"] {
+  width: 100%;
+}
+
+.filter-title,
+.filter-options li label,
+.price-display,
+#price-display {
+  font-size: 1vw;
+}
+
+input[type="checkbox"],
+input[type="range"] {
+  transform: scale(75%);
+}
+
+/* Custom CSS for carousel */
+.carousel-item img {
+  width: 100%;
+  height: auto;
+}
+
+/* Custom CSS for item cards */
+.item-card {
+  margin-bottom: 20px;
+  position: relative;
+}
+.responsive-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.item-card img {
+  max-width: auto;
+  height: auto;
+}
+
+.item-card .card-body {
+  padding: 1.25rem;
+}
+
+.item-card .card-title {
+  font-weight: bold;
+  font-size: 1.8vw;
+}
+.price {
+  font-size: 1.8vw;
+}
+.card-text {
+  font-size: 1.2vw;
+}
+.item-card .price {
+  font-size: 1.8vw;
+  color: #bca374; /* Custom color pattern */
+}
+
+.icons-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.icons-container i {
+  font-size: 1.8vw;
+  color: #bca374; /* Custom color pattern */
+  margin-left: 10px;
+  cursor: pointer;
+}
+.main-footer {
+  background-color: #01060c;
+  padding: 2% 10%;
+  color: white;
+  width: 100%;
+}
+
+.ui {
+  display: flex;
+  flex-direction: row;
+  gap: 20%;
+}
+
+.footer-section {
+  flex-grow: 1;
+  margin: 0 20%; /* Add space of minimum 20% after each section */
+}
+
+.footer-section:not(:last-child) {
+  margin-right: 20%;
+}
+
+.footer-section h5 {
+  color: white;
+  font-size: 1vw; /* Adjust font size */
+  margin-bottom: 2.5%;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 2%;
+  font-size: 1vw;
+}
+
+.social-media-icons {
+  margin-top: 4%;
+}
+
+.social-media-icons a {
+  color: white;
+  margin-right: 4%;
+  display: flex;
+  flex-direction: column;
+  font-size: 1vw;
+}
+
+.social-media-icons a:last-child {
+  margin-right: 0;
+}
+
+/* Custom CSS for Second Footer */
+.second-footer {
+  background-color: #000;
+  color: #fff;
+  padding: 2%;
+  text-align: center;
+}
+
+.feature {
+  margin-bottom: 4%;
+  display: inline-block;
+  width: 25%;
+  vertical-align: top;
+}
+
+.feature i {
+  font-size: 1.8vw; /* Adjust icon size */
+  margin-bottom: 2.5%;
+}
+
+.feature-text {
+  margin-bottom: 0.5%;
+  font-size: 1vw;
+}
+
+.badge-icon {
+  font-size: 1vw; /* Adjust badge size */
+  margin-bottom: 4%;
+  margin-top: 2.5%;
+}
+
+/* Custom badge color */
+.badge-primary {
+  background-color: #000;
+  color: #fff;
+}
+
+.secfootercontainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Small separation between footers */
+.footer-separation {
+  margin: 0.1%; /* Adjust spacing */
+}
+
+.similar-product-card {
+  width: 100%; /* Set the width of the card */
+  max-width: 300px; /* Set the maximum width to maintain responsiveness */
+  margin: 0 auto; /* Center the card horizontally */
+}
+
+.similar-product-card .card-img-top {
+  height: auto; /* Ensure the image maintains its aspect ratio */
+  max-height: 200px; /* Set the maximum height of the image */
+}
+
+.similar-product-card .card-body {
+  padding: 1rem; /* Add padding inside the card body */
+}
+
+.similar-product-card .card-title {
+  font-size: 1rem; /* Adjust the font size of the title */
+}
+
+.similar-product-card .card-text {
+  font-size: 0.9rem; /* Adjust the font size of the text */
+}
+.about-section {
+  padding: 50px 0; /* Adjust padding as needed */
+}
+
+.about-section h2 {
+  font-size: 28px; /* Adjust font size as needed */
+  color: #333; /* Adjust font color as needed */
+  margin-bottom: 20px; /* Adjust margin as needed */
+}
+
+.about-section p {
+  font-size: 16px; /* Adjust font size as needed */
+  color: #666; /* Adjust font color as needed */
+  line-height: 1.6; /* Adjust line height as needed */
+}
+
+/* CSS for vertical stacking of the user info */
+.user-info {
+  display: flex;
+  flex-direction: column; /* Stacks the children vertically */
+  align-items: center; /* Align items centrally */
+  gap: 4px; /* Space between the user's name and the logout icon */
+}
+
+.nav-linklogout {
+  text-decoration: none;
+  color: #333; /* Default color */
+  padding: 8px;
+}
+
+.nav-linklogout:hover {
+  color: #666; /* Color change on hover */
+}
+
+.logout {
+  color: #333; /* Consistent color for the icon */
+  font-size: 1.5em; /* Slightly larger icon for visibility */
+}
+
+.logout:hover {
+  color: #ff0000; /* Red color on hover for logout icon */
+}
+
+
+.zoom-close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+}
+  /* Style for close button */
+  .zoom-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  /* Style for close button icon */
+  .zoom-close i {
+    color: black;
+  }
+
+  /* Style for zoomed-in image */
+  .zoomed-image {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    max-width: 90%;
+    max-height: 90%;
+  }
