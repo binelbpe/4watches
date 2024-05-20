@@ -40,10 +40,18 @@ router.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
-router.get("/auth/google/callback", async (req, res, next) => {
-  // Handle Google authentication callback
-});
-
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login", // Redirect on failed login
+    failureFlash: true, // Enable flash messages
+  }),
+  (req, res) => {
+    // Successful authentication, redirect home.
+    req.session.userData = req.user; // `req.user` contains the authenticated user.
+    res.redirect("/");
+  }
+);
 // Route to render the home page
 router.get("/", nocacheMiddleware(), profileController.homePage);
 
