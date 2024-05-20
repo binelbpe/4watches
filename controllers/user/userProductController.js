@@ -63,7 +63,7 @@ const getMenProducts = async (req, res) => {
 
     // Find categories marked as "Men" that are not active (status: false)
     const categories = await categoryModel.find({
-      category: "Men",
+      category: "men",
       status: true,
     });
 
@@ -349,7 +349,7 @@ const menfilterProduct = async (req, res) => {
     }
 
     const categories = await categoryModel.find({
-      category: "Men",
+      category: "men",
       status: true,
     });
 
@@ -358,7 +358,7 @@ const menfilterProduct = async (req, res) => {
     }
 
     const products = await Product.find(
-      { status: true, category: "Men", ...filter },
+      { status: true, category: "men", ...filter },
       null,
       {
         sort: sortOptions,

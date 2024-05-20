@@ -51,31 +51,40 @@ const cancelOrder = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    if (order.status === "cancelled") {
-      return res.status(400).json({ message: "Order is already cancelled" });
+    // Check if the order is already cancelled
+    if (order.status === "Cancelled") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Order is already cancelled" });
     }
-    {
-      // Update order status to "cancelled"
-      order.status = "cancelled";
 
-      const updateProductStatusPromises = order.products.map(
-        async (productItem) => {
-          if (productItem.status === "pending") {
-            productItem.status = "cancelled";
-            await productItem.save();
-          }
-        }
-      );
-      await order.save();
+    // Check if the order is completed
+    if (order.status === "completed") {
+      return res.status(400).redirect("/orders");
     }
-    // Retain stock of products in the order
-    for (const productItem of order.products) {
-      const product = await Product.findById(productItem.product);
-      if (product) {
-        product.stock += productItem.quantity;
-        await product.save();
+
+    // Update order status to "Cancelled"
+    order.status = "cancelled";
+
+    order.products.forEach((product) => {
+      if (product.status === "pending") {
+        product.status = "cancelled";
       }
-    }
+    });
+
+    await order.save();
+
+    // Restore product quantities
+    await Promise.all(
+      order.products.map(async (orderItem) => {
+        const product = await Product.findById(orderItem.product);
+        if (product) {
+          product.stock += orderItem.quantity;
+          await product.save();
+        }
+      })
+    );
+
     if (
       order.paymentMethod !== "cash_on_delivery" &&
       order.paymentMethod !== "pay_by_wallet"
@@ -106,24 +115,34 @@ const cancelOrder = async (req, res) => {
       // Save the updated wallet
       await user.wallet.save();
     } else if (order.paymentMethod == "pay_by_wallet") {
-      const user = await User.findById(order.user).populate("wallet");
+      const user = await User.findById(req.session.userData._id).populate(
+        "wallet"
+      );
 
       if (!user || !user.wallet) {
         return res.status(404).json({ error: "User or wallet not found" });
       }
 
-      user.wallet.balance += order.walletAmount;
+      user.wallet.balance =
+        user.wallet.balance + order.walletAmount - parseFloat(reducedPrice);
 
       // Add a new transaction to the wallet
       user.wallet.transactions.push({
         type: "credit",
-        amount: order.walletAmount,
+        amount: order.walletAmount - parseFloat(reducedPrice),
         description: `Order ${order._id} cancelled`,
       });
 
       // Save the updated wallet
       await user.wallet.save();
     }
+
+    const userId = req.session.userData._id;
+    const fullName = req.session.userData.fullname;
+    const orders = await Order.find({ user: userId })
+      .populate("address")
+      .populate("products.product")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ message: "Order cancelled successfully" });
   } catch (error) {
@@ -175,16 +194,23 @@ const cancelProductAsAdmin = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
+    if (order.status !== "pending") {
+      return res
+        .status(400)
+        .json({ error: "Cannot cancel product for this order" });
+    }
+
     const productIndex = order.products.findIndex(
-      (p) => p.product.toString() === req.params.productId
+      (p) => p.product.toString() === productId
     );
+
     if (productIndex === -1) {
       return res.status(404).json({ error: "Product not found in the order" });
     }
 
     const product = order.products[productIndex];
-    const products = await Product.findById(product.product._id);
-    const productPrice = products.price;
+    const productObj = await Product.findById(product.product);
+    const productPrice = parseFloat(productObj.price) || 0;
     const productQuantity = product.quantity;
 
     if (isNaN(productPrice) || isNaN(productQuantity)) {
@@ -203,10 +229,14 @@ const cancelProductAsAdmin = async (req, res) => {
       totalPrice
     );
 
+    const isLastCompleted =
+      order.products.filter(
+        (p) => p.status === "completed" && p.product.toString() !== productId
+      ).length === 0;
     product.status = "cancelled";
-    await order.save();
 
-    const productObj = await Product.findById(req.params.productId);
+    const updatedOrder = await order.save();
+
     productObj.stock += productQuantity;
     await productObj.save();
 
@@ -219,26 +249,22 @@ const cancelProductAsAdmin = async (req, res) => {
 
       await order.save();
     }
-
-    if (order.paymentMethod !== "cash on delivery") {
+    if (order.paymentMethod !== "cash_on_delivery") {
       const user = await User.findById(order.user).populate("wallet");
 
       if (!user || !user.wallet) {
         return res.status(404).json({ error: "User or wallet not found" });
       }
-
-      order.reducedPrice =
-        parseFloat(order.reducedPrice) + parseFloat(reducedPrice);
-      await order.save();
-      console.log(order.reducedPrice);
-
+      {
+        order.reducedPrice =
+          parseFloat(order.reducedPrice) + parseFloat(reducedPrice);
+        await order.save();
+      }
       user.wallet.balance = (
         parseFloat(user.wallet.balance) +
         parseFloat(reducedPrice) +
         (remainingProducts.length === 0 ? 45 : 0)
       ).toFixed(2);
-
-      // Add a new transaction to the wallet
       user.wallet.transactions.push({
         type: "credit",
         amount:
@@ -246,7 +272,6 @@ const cancelProductAsAdmin = async (req, res) => {
         description: `Order ${order._id} cancelled`,
       });
 
-      // Save the updated wallet
       await user.wallet.save();
     }
     res.json({ success: true, message: "Product cancelled successfully" });
@@ -285,7 +310,9 @@ const returnProductAsAdmin = async (req, res) => {
         .json({ error: "Invalid product price or quantity" });
     }
 
-    const discountedAmount = parseFloat(order.discountedAmount) || 0;
+    const discountedAmount = order.discountedAmount
+      ? parseFloat(order.discountedAmount)
+      : 0;
     const totalPrice = parseFloat(order.grandTotalPrice)
       ? parseFloat(order.grandTotalPrice)
       : 0;
@@ -337,7 +364,7 @@ const returnProductAsAdmin = async (req, res) => {
     });
 
     await user.wallet.save();
-    console.log(user.wallet.balance);
+
     res.json({ success: true, message: "Product returned successfully" });
   } catch (err) {
     console.error(err);
@@ -391,7 +418,6 @@ const returnOrder = async (req, res) => {
     if (!user || !user.wallet) {
       return res.status(404).json({ error: "User or wallet not found" });
     }
-    console.log(user);
     const reduceTotal =
       (parseFloat(order.returnedPrice) ? parseFloat(order.returnedPrice) : 0) +
       (parseFloat(order.reducedPrice) ? parseFloat(order.reducedPrice) : 0);

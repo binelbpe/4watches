@@ -126,12 +126,13 @@ const cancelOrder = async (req, res) => {
         return res.status(404).json({ error: "User or wallet not found" });
       }
 
-      user.wallet.balance += order.walletAmount;
+      user.wallet.balance =
+        user.wallet.balance + order.walletAmount - parseFloat(reducedPrice);
 
       // Add a new transaction to the wallet
       user.wallet.transactions.push({
         type: "credit",
-        amount: order.walletAmount,
+        amount: order.walletAmount - parseFloat(reducedPrice),
         description: `Order ${order._id} cancelled`,
       });
 
@@ -245,10 +246,6 @@ const cancelProduct = async (req, res) => {
       discountedAmount,
       totalPrice
     );
-
-    if (isNaN(reducedPrice)) {
-      return res.status(400).json({ error: "Invalid total reduction" });
-    }
 
     const isLastCompleted =
       order.products.filter(
@@ -441,7 +438,7 @@ const placeOrder = async (req, res) => {
         product: item._id,
         quantity: item.quantity,
       })),
-      walletAmount: difference,
+      walletAmount: difference.toFixed(2),
       discountedAmount, // Use the discountedAmount from the request body
       coupon: coupon ? coupon._id : null, // Store the coupon ID if a valid coupon was applied
     });
@@ -450,16 +447,22 @@ const placeOrder = async (req, res) => {
       const user = await User.findById(userId).populate("wallet");
       const wallet = user.wallet;
       await wallet.debitBalance(
-        difference,
+        difference.toFixed(2),
         `Order ${order._id} placed with wallet balance`
       );
     }
 
-    if (totalPrice != 0 && totalPrice != grandtotalPrice) {
+    if (
+      totalPrice != 0 &&
+      totalPrice != grandtotalPrice &&
+      discountedAmount == 0
+    ) {
       const user = await User.findById(userId).populate("wallet");
       const wallet = user.wallet;
+      user.wallet.balance = user.wallet.balance - difference;
+      user.wallet.save();
       await wallet.debitBalance(
-        difference,
+        difference.toFixed(2),
         `Order ${order._id} placed with wallet balance`
       );
     }
@@ -508,15 +511,13 @@ const processpayment = async (req, res) => {
     const totalPrice = parseFloat(processOrder.amount);
     const grandtotalPrice = parseFloat(req.session.totalPrice);
     const amount = req.session.amount;
-    const discountedAmount = isNaN(processOrder.discountedAmount)
-      ? processOrder.discountedAmount
-      : parseFloat(processOrder.discountedAmount);
+    const discountedAmount = processOrder.discountedAmount
+      ? parseFloat(processOrder.discountedAmount)
+      : 0;
 
     if (isNaN(totalPrice) || isNaN(grandtotalPrice)) {
       throw new Error("Invalid totalPrice or grandtotalPrice");
     }
-
-    // 3. Handle discountedAmount
 
     // 4. Create the order with the appropriate payment method
     const paymentMethod = "Payment on online";
@@ -537,25 +538,22 @@ const processpayment = async (req, res) => {
         product: item._id,
         quantity: item.quantity,
       })),
-      walletAmount: difference,
+      walletAmount: difference.toFixed(2),
       discountedAmount, // Use the discountedAmount value after validation
       coupon: coupon ? coupon._id : null,
     });
 
-    if (paymentMethod === "pay_by_wallet") {
+    if (
+      totalPrice != 0 &&
+      totalPrice != grandtotalPrice &&
+      discountedAmount == 0
+    ) {
       const user = await User.findById(userId).populate("wallet");
       const wallet = user.wallet;
+      user.wallet.balance = user.wallet.balance - difference;
+      user.wallet.save();
       await wallet.debitBalance(
-        difference,
-        `Order ${order._id} placed with wallet balance`
-      );
-    }
-
-    if (totalPrice != 0 && totalPrice != grandtotalPrice) {
-      const user = await User.findById(userId).populate("wallet");
-      const wallet = user.wallet;
-      await wallet.debitBalance(
-        difference,
+        difference.toFixed(2),
         `Order ${order._id} placed with wallet balance`
       );
     }
@@ -864,8 +862,8 @@ const paymentFail = async (req, res) => {
     const grandtotalPrice = parseFloat(req.session.totalPrice);
     const amount = req.session.amount;
     const discountedAmount = processOrder.discountedAmount
-      ? 0
-      : parseFloat(processOrder.discountedAmount);
+      ? parseFloat(processOrder.discountedAmount)
+      : 0;
 
     if (isNaN(totalPrice) || isNaN(grandtotalPrice)) {
       throw new Error("Invalid totalPrice or grandtotalPrice");
@@ -893,26 +891,23 @@ const paymentFail = async (req, res) => {
         quantity: item.quantity,
         status: "paymentpending",
       })),
-      walletAmount: difference,
+      walletAmount: difference.toFixed(2),
       discountedAmount, // Use the discountedAmount value after validation
       coupon: coupon ? coupon._id : null,
       status: "paymentpending",
     });
 
-    if (paymentMethod === "pay_by_wallet") {
+    if (
+      totalPrice != 0 &&
+      totalPrice != grandtotalPrice &&
+      discountedAmount == 0
+    ) {
       const user = await User.findById(userId).populate("wallet");
       const wallet = user.wallet;
+      user.wallet.balance = user.wallet.balance - difference;
+      user.wallet.save();
       await wallet.debitBalance(
-        difference,
-        `Order ${order._id} placed with wallet balance`
-      );
-    }
-
-    if (totalPrice != 0 && totalPrice != grandtotalPrice) {
-      const user = await User.findById(userId).populate("wallet");
-      const wallet = user.wallet;
-      await wallet.debitBalance(
-        difference,
+        difference.toFixed(2),
         `Order ${order._id} placed with wallet balance`
       );
     }

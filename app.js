@@ -66,7 +66,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
 // Use userRoute for routes starting with '/'
 app.use("/", userRoute);
 app.use("/admin", adminRouter);
