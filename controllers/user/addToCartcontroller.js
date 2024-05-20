@@ -77,7 +77,7 @@ const renderCartPage = async (req, res) => {
     // Update user's cart with only the products with status true
     user.cart = filteredProducts;
     await user.save();
-req.session.checkout=true
+    req.session.checkout = true;
     // Render the cart page with the updated cart items
     res.render("addtocart", { fullName, products: filteredProducts });
   } catch (error) {
