@@ -17,8 +17,26 @@
     />
     <link rel="stylesheet" href="/css/style.css" />
     <style>
+      th {
+        text-align: center;
+      }
+      table {
+        border: none;
+        align-items: center;
+      }
+      table,
+      tr {
+        width: 100%;
+      }
       .cardbody {
         height: 500px;
+      }
+      body {
+        white-space: nowrap;
+      }
+      .container {
+        margin: 0 !important;
+        padding: 0 !important;
       }
     </style>
     <link
@@ -82,7 +100,7 @@
       </button>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container ml-100 mt-4">
       <!-- Pagination section -->
       <div class="pagination">
         <ul class="pagination justify-content-center">
@@ -119,15 +137,16 @@
       </div>
 
       <h1>User Order List</h1>
-      <table class="table table-bordered">
+      <table class="table">
         <thead>
           <tr>
             <th>Order ID</th>
             <th>Date</th>
-            <th>Total Price</th>
+            <th>Amount paid</th>
             <th>Payment Method</th>
             <th>Address</th>
             <th>Status</th>
+            <th>price Breakdown</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -148,12 +167,23 @@
               else { %>Pending<% } %>
             </td>
             <td>
+              <!-- Add the new button here -->
+              <button
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#priceBreakdownModal-<%= order._id %>"
+              >
+                View Price
+                <details></details>
+              </button>
+            </td>
+            <td>
               <button
                 class="btn btn-primary"
                 data-toggle="modal"
                 data-target="#productDetailsModal-<%= order._id %>"
               >
-                View Product Details
+                View Products
               </button>
               <% if (order.status == 'completed') { %>
               <form
@@ -222,7 +252,7 @@
               </form>
               <% } %> <% if (order.status === 'completed') { %>
               <a href="/orders/<%= order._id %>/invoice" class="btn btn-primary"
-                >Download Invoice</a
+                >Invoice</a
               >
               <% } %>
             </td>
@@ -258,7 +288,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <table class="table table-bordered">
+              <table class="table">
                 <thead>
                   <tr>
                     <th>Product Image</th>
@@ -336,6 +366,112 @@
                     </td>
                   </tr>
                   <% }); %>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }); %> <% orders.forEach(order => { %>
+      <div
+        class="modal fade"
+        id="priceBreakdownModal-<%= order._id %>"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="priceBreakdownModal-<%= order._id %>"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content" style="width: max-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="priceBreakdownModal-<%= order._id %>">
+                Price Breakdown
+              </h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="text-align: left">Item</th>
+                    <th style="text-align: left">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left">Subtotal</td>
+                    <td style="text-align: left">
+                      <%=
+                      ((order.grandTotalPrice-order.reducedPrice-order.returnedPrice-45-order.discountedAmount)-((order.grandTotalPrice-order.reducedPrice-order.returnedPrice-45)/21)).toFixed(2)
+                      %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left">Shipping Fee</td>
+                    <td style="text-align: left"><%= 45 %></td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left">Tax</td>
+                    <td style="text-align: left">
+                      <%=
+                      ((order.grandTotalPrice-order.reducedPrice-order.returnedPrice-45)/21).toFixed(2)
+                      %>
+                    </td>
+                  </tr>
+                  <% if(order.coupon) { %>
+                  <tr>
+                    <th style="text-align: left">Discount Amount</th>
+                    <th style="text-align: left">
+                      <%= order.discountedAmount %>
+                    </th>
+                  </tr>
+                  <% } %> <% if(order.paymentMethod == "pay_by_wallet") { %>
+                  <tr>
+                    <th style="text-align: left"></th>
+                    <th style="text-align: left">
+                      <%= "Order placed by using wallet balance" %>
+                    </th>
+                  </tr>
+                  <% } else if(order.walletAmount > 0) { %>
+                  <tr>
+                    <th style="text-align: left">
+                      <%= "For the order, used wallet amount" %>
+                    </th>
+                    <th style="text-align: left"><%= order.walletAmount %></th>
+                  </tr>
+                  <% } %> <% if(order.reducedPrice||order.returnedPrice) { %>
+                  <tr>
+                    <th style="text-align: left">returned/cancelled Amount</th>
+                    <th style="text-align: left">
+                      <%= order.reducedPrice+order.returnedPrice %>
+                    </th>
+                  </tr>
+                  <% } %>
+
+                  <tr>
+                    <th style="text-align: left">Total</th>
+                    <th style="text-align: left">
+                      <%=
+                      (order.grandTotalPrice-order.reducedPrice-order.returnedPrice-order.discountedAmount).toFixed(2)
+                      %>
+                    </th>
+                  </tr>
                 </tbody>
               </table>
             </div>

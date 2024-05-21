@@ -765,20 +765,8 @@ const invoice = async (req, res) => {
           350,
           boxTop + boxHeight + 120
         );
-    } else {
-      doc
-        .fillColor("#333333")
-        .fontSize(12)
-        .text(
-          `Wallet Balance Used: Rs.${order.walletAmount.toFixed(2)}`,
-          350,
-          boxTop + boxHeight + 120
-        );
     }
 
-    // Calculate and display effective total price
-    const totalEffectivePrice =
-      total - (discount ? discount : 0) - order.walletAmount + tax + 45;
     doc
       .fillColor("#333333")
       .fontSize(12)
@@ -786,14 +774,6 @@ const invoice = async (req, res) => {
         `Total Price: Rs.${(total + tax + 45).toFixed(2)}`,
         350,
         boxTop + boxHeight + 140
-      );
-    doc
-      .fillColor("#333333")
-      .fontSize(12)
-      .text(
-        `Total Effective Price: Rs.${totalEffectivePrice.toFixed(2)}`,
-        350,
-        boxTop + boxHeight + 160
       );
 
     doc

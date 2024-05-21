@@ -282,6 +282,15 @@ useWalletCheckbox.addEventListener('change', function() {
     totalPriceElement.textContent = '<%= totalPrice %>';
     walletBalanceElement.textContent = initialWalletBalance;
     paymentMethodSelect.disabled = false;
+    if (shouldHideCashOnDelivery()) {
+      cashOnDeliveryOption.style.display = 'none';
+      if (currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
+        onlinePaymentOption.style.display = 'block';
+      } 
+    } else {
+      cashOnDeliveryOption.style.display = 'none';
+      onlinePaymentOption.style.display = 'block';
+    }
     if (parseFloat(totalPriceElement.textContent) > 0) {
       checkoutButton.disabled = false;
     }
