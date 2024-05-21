@@ -446,9 +446,17 @@ const placeOrder = async (req, res) => {
     if (paymentMethod === "pay_by_wallet") {
       const user = await User.findById(userId).populate("wallet");
       const wallet = user.wallet;
+      wallet.balance = wallet.balance - difference.toFixed(2);
       await wallet.debitBalance(
         difference.toFixed(2),
         `Order ${order._id} placed with wallet balance`
+      );
+    } else if (difference > 0) {
+      const user = await User.findById(userId).populate("wallet");
+      const wallet = user.wallet.balance - difference.toFixed(2);
+      await wallet.debitBalance(
+        difference.toFixed(2),
+        `Order ${order._id} placed along with wallet balance`
       );
     }
 
@@ -550,11 +558,11 @@ const processpayment = async (req, res) => {
     ) {
       const user = await User.findById(userId).populate("wallet");
       const wallet = user.wallet;
-      user.wallet.balance = user.wallet.balance - difference;
+      user.wallet.balance = user.wallet.balance - difference.toFixed(2);
       user.wallet.save();
       await wallet.debitBalance(
         difference.toFixed(2),
-        `Order ${order._id} placed with wallet balance`
+        `Order ${order._id} placed along with wallet balance`
       );
     }
 
@@ -884,11 +892,11 @@ const paymentFail = async (req, res) => {
     ) {
       const user = await User.findById(userId).populate("wallet");
       const wallet = user.wallet;
-      user.wallet.balance = user.wallet.balance - difference;
+      user.wallet.balance = user.wallet.balance - difference.toFixed(2);
       user.wallet.save();
       await wallet.debitBalance(
         difference.toFixed(2),
-        `Order ${order._id} placed with wallet balance`
+        `Order ${order._id} placed along with wallet balance`
       );
     }
 
