@@ -240,62 +240,49 @@
                               </div>
                             </div>
                             <div class="form-group row">
-                        
-                              <% for(let j = 0; j < data[i].image.length; j++) { %>
-                                <div style="margin-left: 15%;">
-                                    <img id="existingImage" src="<%= data[i].image[j].path %>" alt="productImage" style="height: 80px; width: 80px;">
-                                    <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-image-id="<%= data[i].image[j].originalname %>">&times;</button>
-
+                              <label class="col-sm-3 form-control-label">Upload Images</label>
+                              <div class="col-sm-9">
+                                <div id="image-preview-container" class="d-flex flex-wrap">
+                                  <!-- Existing image previews will be added here -->
+                                  <% for(let j = 0; j < data[i].image.length; j++) { %>
+                                    <div class="position-relative mr-2 mb-2">
+                                      <img src="<%= data[i].image[j].path %>" alt="productImage" class="img-thumbnail" style="height: 100px; width: 100px;">
+                                      <button type="button" class="btn btn-danger btn-sm remove-image-btn" data-image-path="<%= data[i].image[j].path %>">Delete</button>
+                                    </div>
+                                  <% } %>
                                 </div>
-                            <% } %>
-                            
-                            <!-- Move the removeImages input field outside of the loop -->
-                            <input type="hidden" id="removeImages" name="removeImages" value="">
-                            
-
+                                
+                                <input type="hidden" id="removeImages" name="removeImages" value="">
+                              </div>
                             </div>
-                            <!-- Add this form group for selecting an image to crop -->
-<div class="form-group row">
-  <label class="col-sm-3 form-control-label">Select Image to Crop</label>
-  <div class="col-sm-9">
-    <div id="crop-image-select-<%= i %>" class="d-flex flex-wrap">
-      <% for(let j = 0; j < data[i].image.length; j++) { %>
-        <div class="position-relative mr-2 mb-2">
-          <img src="<%= data[i].image[j].path %>" alt="productImage" class="img-thumbnail crop-image-select" style="height: 100px; width: 100px; cursor: pointer;">
-        </div>
-      <% } %>
+                            <div class="form-group row">
+                              <label class="col-sm-3 form-control-label">Upload New Images</label>
+                              <div class="col-sm-9">
+                                <div id="new-image-preview-container<%= i %>" class="d-flex flex-wrap"></div>
+                                <input type="file" id="newImageInput<%= i %>" name="newImages" accept="image/*" multiple onchange="previewNewImages(event, <%= i %>)">
+                                <button type="button" class="btn btn-primary" onclick="openCropModalForNewImages(<%= i %>)" style="display: none;" id="cropButtonNewImages<%= i %>">Select New Image to Crop</button>
+                              </div>
+                            </div>
+                            <!-- Crop Modal for New Images -->
+<div class="modal fade" id="cropModalNewImages<%= i %>" tabindex="-1" role="dialog" aria-labelledby="cropModalLabelNewImages<%= i %>" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="width: max-content;" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cropModalLabelNewImages<%= i %>">Crop New Image</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="cropModalImageContainerNewImages<%= i %>"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="cropAndReplaceNewImage(<%= i %>)">Crop & Replace</button>
+      </div>
     </div>
   </div>
 </div>
-
-
-<!-- Hidden input field to store the cropped image data -->
-<input type="hidden" id="croppedImage-<%= i %>" name="croppedImage" value="">
-                            <div class="line"></div>
-                            <div class="form-group row">
-                              <label class="col-sm-3 form-control-label">Upload Images</label>
-                              <div class="col-sm-9">
-                                <div id="image-preview-container" class="d-flex flex-wrap"></div>
-                                <input type="file" name="image" class="form-control" multiple  onchange="validateField('image')">
-                              </div>
-                            </div>
-                            <div class="form-group row">
-                              <label class="col-sm-3 form-control-label">Crop Images</label>
-                              <div class="col-sm-9">
-                                <div>
-                                  <img id="image-<%= i %>" src="<%= data[i].image[0].path %>" alt="Product Image" style="max-width: 100%;">
-                                </div>
-                                <div>
-                                  <button id="crop-btn-<%= i %>" type="button" class="btn btn-primary">Crop Image</button>
-                                  <div id="cropped-image-preview-<%= i %>" style="margin-top: 10px;"></div>
-                                </div>
-                              </div>
-                            </div>
-                
-                            <!-- Hidden input field to store the cropped image data -->
-                            <input type="hidden" id="croppedImage-<%= i %>" name="croppedImage" value="">
-                
-                
                             <div class="line"></div>
                             <div class="form-group row">
                               <label class="col-sm-3 form-control-label">Offer Price</label>
@@ -351,24 +338,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   
   <script>
-document.addEventListener("click", function(event) {
+  document.addEventListener("click", function(event) {
     if (event.target.classList.contains("remove-image-btn")) {
-        console.log("Remove button clicked");
-        const imageId = event.target.dataset.imageId;
-        console.log(event.target.dataset.imageId);
-        const modal = event.target.closest(".modal"); 
-        console.log("Image ID:", imageId);
-
-        // Remove the corresponding image preview
-        event.target.parentNode.remove();
-
-        // Mark the image for removal by adding its ID to a hidden input field
-        const removeImagesInput = modal.querySelector("#removeImages");
-        console.log("Before update - removeImages value:", removeImagesInput.value);
-        removeImagesInput.value += imageId + ",";
-        console.log("After update - removeImages value:", removeImagesInput.value);
+      const imagePath = event.target.dataset.imagePath;
+      const removeImagesInput = document.getElementById("removeImages");
+      removeImagesInput.value += imagePath + ",";
+      event.target.parentNode.remove();
     }
-});
+  });
 
 
 
@@ -512,72 +489,73 @@ document.addEventListener("click", function(event) {
     });
 
     document.addEventListener("change", function (event) {
-      if (event.target.matches("input[name='image']")) {
-        var fileInput = event.target;
-        var modal = fileInput.closest(".modal"); // Find the closest modal to the file input
-        var files = fileInput.files;
-        var imagePreviewContainer = modal.querySelector("#image-preview-container");
-        var allowedExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+  if (event.target.matches("input[name='image']")) {
+    var fileInput = event.target;
+    var modal = fileInput.closest(".modal"); // Find the closest modal to the file input
+    var files = fileInput.files;
+    var imagePreviewContainer = modal.querySelector("#image-preview-container");
+    var allowedExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
 
-        // Store the existing file input value
-        var existingFiles = Array.from(files);
+    // Clear existing previews for new images
+    var existingPreviews = imagePreviewContainer.querySelectorAll(".new-image-preview");
+    existingPreviews.forEach(function (preview) {
+      preview.remove();
+    });
 
-        // Clear existing previews
-        imagePreviewContainer.innerHTML = "";
+    // Reset file input value if no files are selected
+    if (files.length === 0) {
+      fileInput.value = ""; // Clear the file input field
+      return; // Exit the function
+    }
 
-        // Reset file input value if no files are selected
-        if (files.length === 0) {
-          fileInput.value = ""; // Clear the file input field
-          return; // Exit the function
-        }
+    // Limit to only five images
+    if (files.length > 5) {
+      alert("You can only select up to five images.");
+      fileInput.value = ""; // Clear the file input field
+      return;
+    }
 
-        // Limit to only five images
-        if (files.length > 5) {
-          alert("You can only select up to five images.");
-          fileInput.value = ""; // Clear the file input field
-          return;
-        }
+    // Loop through selected files
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      var fileName = file.name.toLowerCase();
+      var fileExtension = fileName.split('.').pop();
 
-        // Loop through selected files
-        for (var i = 0; i < files.length; i++) {
-          var file = files[i];
-          var fileName = file.name.toLowerCase();
-          var fileExtension = fileName.split('.').pop();
+      // Check if the file extension is allowed
+      if (!allowedExtensions.includes(fileExtension)) {
+        alert("Only JPG, JPEG, PNG, and GIF images are allowed.");
+        fileInput.value = ""; // Clear the file input field
+        return;
+      }
 
-          // Check if the file extension is allowed
-          if (!allowedExtensions.includes(fileExtension)) {
-            alert("Only JPG, JPEG, PNG, and GIF images are allowed.");
-            fileInput.value = ""; // Clear the file input field
-            return;
-          }
+      var reader = new FileReader();
 
-          var reader = new FileReader();
-
-          // Closure to capture the file information
-          reader.onload = (function (file, index) {
-            return function (event) {
-              // Create image preview
-              var img = document.createElement("img");
-              img.src = event.target.result;
-              img.classList.add("img-thumbnail");
-              img.style.width = "100px";
-              img.style.height = "100px";
+      // Closure to capture the file information
+      reader.onload = (function (file) {
+        return function (event) {
+          // Create image preview
+          var img = document.createElement("img");
+          img.src = event.target.result;
+          img.classList.add("img-thumbnail", "new-image-preview");
+          img.style.width = "100px";
+          img.style.height = "100px";
 
           // Create button to remove the image
           var removeBtn = document.createElement("button");
           removeBtn.innerHTML = "&times;"; // Cross mark icon
           removeBtn.classList.add("btn", "btn-danger", "btn-sm", "remove-image-btn");
-          removeBtn.addEventListener("click", function() {
+          removeBtn.addEventListener("click", function () {
             // Remove the image preview container when clicked
             this.parentNode.remove();
             // Remove the corresponding file from the file input
-            existingFiles.splice(index, 1);
-            // Update the file input's files property
-            var newFileList = new DataTransfer();
-            existingFiles.forEach(function(file) {
-              newFileList.items.add(file);
-            });
-            fileInput.files = newFileList.files;
+            var dt = new DataTransfer();
+            var files = fileInput.files;
+            for (var j = 0; j < files.length; j++) {
+              if (files[j] !== file) {
+                dt.items.add(files[j]);
+              }
+            }
+            fileInput.files = dt.files;
           });
 
           // Create container for image and remove button
@@ -589,90 +567,204 @@ document.addEventListener("click", function(event) {
           // Append container to image preview container
           imagePreviewContainer.appendChild(container);
         };
-      })(file, i);
+      })(file);
 
       // Read image file as a data URL
       reader.readAsDataURL(file);
     }
   }
 });
-
 // Function to handle image cropping
-document.addEventListener("DOMContentLoaded", function () {
-  var cropper;
+let croppieNewImages = null;
+let selectedNewImageElement = null;
+let selectedNewImageIndex = null;
 
-  document.querySelectorAll("[id^='crop-btn-']").forEach(function (btn, index) {
-    var modal = document.getElementById("exampleModal" + index);
-    var imgElement = modal.querySelector("#image-" + index);
-    var croppedImagePreview = modal.querySelector("#cropped-image-preview-" + index);
-    var croppedImageInput = modal.querySelector("#croppedImage-" + index);
-    var cropImageSelect = modal.querySelector("#crop-image-select-" + index);
+function previewNewImages(event, index) {
+  const fileInput = event.target;
+  const files = fileInput.files;
+  const imagePreviewContainer = document.getElementById(`new-image-preview-container${index}`);
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-    // Disable the crop button initially
-    btn.disabled = true;
+  // Clear existing previews
+  imagePreviewContainer.innerHTML = '';
 
-    var handleImageSelection = function (event) {
-  if (event.target.tagName.toLowerCase() === "img") {
-    var selectedImageSrc = event.target.src;
-    imgElement.src = selectedImageSrc;
-    initCropper();
-    btn.disabled = false; // Enable the crop button
+  // Reset file input value if no files are selected
+  if (files.length === 0) {
+    fileInput.value = '';
+    document.getElementById(`cropButtonNewImages${index}`).style.display = 'none';
+    return;
   }
-};
 
-    var initCropper = function () {
-      if (cropper) {
-        cropper.destroy();
-      }
+  // Limit to only five images
+  if (files.length > 5) {
+    alert('You can only select up to five images.');
+    fileInput.value = '';
+    return;
+  }
 
-      cropper = new Cropper(imgElement, {
-        aspectRatio: 1,
-        viewMode: 2,
-        autoCropArea: 1,
-        scalable: true,
-        zoomable: true,
-        movable: true,
-        responsive: true,
-        preview: croppedImagePreview
-      });
-    };
+  // Show the "Select New Image to Crop" button
+  document.getElementById(`cropButtonNewImages${index}`).style.display = 'inline-block';
 
-    // Event listeners
-    cropImageSelect.querySelectorAll("img").forEach(function (img) {
-      img.addEventListener("click", handleImageSelection);
-    });
+  // Loop through selected files
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const fileName = file.name.toLowerCase();
+    const fileExtension = fileName.split('.').pop();
 
-    btn.addEventListener("click", function () {
-  var canvas = cropper.getCroppedCanvas();
-  croppedImagePreview.innerHTML = "";
-  croppedImagePreview.appendChild(canvas);
-
-  // Convert the canvas to a data URL and store it in the hidden input
-  croppedImageInput.value = canvas.toDataURL();
-
-  // Replace the original image with the cropped image
-  var selectedImageElement = cropImageSelect.querySelector(".selected-image");
-  if (selectedImageElement) {
-    selectedImageElement.src = canvas.toDataURL();
-  } else {
-    var originalImageElement = cropImageSelect.querySelector(`img[src="${imgElement.src}"]`);
-    if (originalImageElement) {
-      originalImageElement.src = canvas.toDataURL();
-      originalImageElement.classList.add("selected-image");
-      originalImageElement.style.height = "100px";
-      originalImageElement.style.width = "100px";
-    } else {
-      var newImageElement = document.createElement("img");
-      newImageElement.src = canvas.toDataURL();
-      newImageElement.classList.add("img-thumbnail", "selected-image");
-      newImageElement.style.height = "100px";
-      newImageElement.style.width = "100px";
-      cropImageSelect.appendChild(newImageElement);
+    // Check if the file extension is allowed
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert('Only JPG, JPEG, PNG, and GIF images are allowed.');
+      fileInput.value = '';
+      return;
     }
+
+    const reader = new FileReader();
+    // Closure to capture the file information
+    reader.onload = (function (file, i) {
+      return function (event) {
+        // Create image preview
+        const img = document.createElement('img');
+        img.src = event.target.result;
+        img.classList.add('img-thumbnail');
+        img.style.width = '100px';
+        img.style.height = '100px';
+        img.dataset.index = i; // Store the index as data attribute
+        img.onclick = function () {
+          selectNewImageForCrop(index, i);
+        };
+
+        // Create button to remove the image
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = '&times;'; // Cross mark icon
+        removeBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'remove-image-btn');
+        removeBtn.addEventListener('click', function () {
+          // Remove the image preview container when clicked
+          this.parentNode.remove();
+          // Remove the corresponding file from the file input
+          const fileList = Array.from(fileInput.files);
+          fileList.splice(i, 1);
+          // Update the file input's files property
+          const newFileList = new DataTransfer();
+          fileList.forEach(function (file) {
+            newFileList.items.add(file);
+          });
+          fileInput.files = newFileList.files;
+        });
+
+        // Create container for image and remove button
+        const container = document.createElement('div');
+        container.classList.add('position-relative', 'mr-2', 'mb-2');
+        container.appendChild(img);
+        container.appendChild(removeBtn);
+
+        // Append container to image preview container
+        imagePreviewContainer.appendChild(container);
+      };
+    })(file, i);
+
+    // Read image file as a data URL
+    reader.readAsDataURL(file);
   }
-});
+}
+
+function selectNewImageForCrop(modalIndex, imageIndex) {
+  selectedNewImageIndex = imageIndex;
+  openCropModalForNewImages(modalIndex);
+}
+
+function openCropModalForNewImages(modalIndex) {
+  const previewContainer = document.getElementById(`new-image-preview-container${modalIndex}`);
+  const imageElements = previewContainer.querySelectorAll('img');
+
+  // Remove previous click event listeners
+  for (let i = 0; i < imageElements.length; i++) {
+    const img = imageElements[i];
+    img.removeEventListener('click', handleNewImageClick);
+  }
+
+  // Add click event listener to each image
+  for (let i = 0; i < imageElements.length; i++) {
+    const img = imageElements[i];
+    img.addEventListener('click', handleNewImageClick);
+  }
+}
+
+function handleNewImageClick() {
+  selectedNewImageElement = this;
+  originalImageSrc = this.src;
+
+  const cropModalImageContainer = document.getElementById(`cropModalImageContainerNewImages${modalIndex}`);
+  cropModalImageContainer.innerHTML = ''; // Clear the container
+
+  const maxWidth = Math.max(this.naturalWidth, this.naturalHeight);
+  const aspectRatio = this.naturalWidth / this.naturalHeight;
+
+  // Reset the croppie instance
+  if (croppieNewImages) {
+    croppieNewImages.destroy();
+  }
+
+  croppieNewImages = new Croppie(cropModalImageContainer, {
+    viewport: {
+      width: 300,
+      height: 300,
+      type: 'square' // Set the viewport to a square aspect ratio
+    },
+    boundary: {
+      width: Math.min(maxWidth, 400), // Adjust the boundary width based on the image's dimensions
+      height: Math.min(maxWidth / aspectRatio, 400) // Adjust the boundary height based on the image's dimensions and aspect ratio
+    },
+    showZoomer: false,
+    enableOrientation: true,
+    enableResize: true // Disable manual resizing
   });
-});
+
+  croppieNewImages.bind({ url: originalImageSrc });
+  $(`#cropModalNewImages${modalIndex}`).modal('show');
+}
+
+function cropAndReplaceNewImage(modalIndex) {
+  croppieNewImages.result('base64').then(function(base64) {
+    if (selectedNewImageElement) {
+      // Replace the src of the selected new image element with the cropped image data
+      selectedNewImageElement.src = base64;
+
+      // Update the corresponding file in the file input
+      const fileInput = document.getElementById(`newImageInput${modalIndex}`);
+      const fileList = Array.from(fileInput.files);
+      const selectedIndex = parseInt(selectedNewImageElement.dataset.index);
+      const croppedFile = base64ToFile(base64, `cropped-new-image-${selectedIndex}.jpg`);
+      fileList[selectedIndex] = croppedFile;
+
+      const newFileList = new DataTransfer();
+      fileList.forEach(function(file) {
+        newFileList.items.add(file);
+      });
+      fileInput.files = newFileList.files;
+    }
+
+    $(`#cropModalNewImages${modalIndex}`).modal('hide');
+    selectedNewImageElement = null; // Reset selectedNewImageElement
+    croppieNewImages.destroy(); // Destroy the croppie instance
+    croppieNewImages = null; // Reset the croppie instance to null
+  });
+}
+
+// Helper function to convert base64 to File object
+function base64ToFile(base64, fileName) {
+  const arr = base64.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], fileName, { type: mime });
+}
+
 </script>
 
 </body>

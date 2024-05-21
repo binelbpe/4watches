@@ -8,7 +8,7 @@ const isAuth = (req, res, next) => {
     next();
   } else {
     // If user is not authenticated, render the login page
-    res.render("login", { errorMessage: "", successMessage: "" });
+    res.redirect("/login");
   }
 };
 const isAuthSIGNUP = (req, res, next) => {
@@ -18,12 +18,11 @@ const isAuthSIGNUP = (req, res, next) => {
     next();
   } else {
     // If user is not authenticated, render the login page
-    res.render("signup", { errorMessage: "", successMessage: "" });
+    res.redirect("/login");
   }
 };
 const checkoutMiddleware = (req, res, next) => {
   // Check if the user is coming from the cart page
- 
 
   // Ensure referer exists and includes the cart page URL
   if (req.session.checkout) {

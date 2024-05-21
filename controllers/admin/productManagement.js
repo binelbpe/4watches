@@ -129,57 +129,15 @@ const editProduct = async (req, res) => {
     const proId = req.params.id;
     const product = await productModel.findById(proId);
     const exImage = product.image || []; // Ensure exImage is an array even if it's null
+    const exImagePaths = product.image.map((img) => img.path); // Get the paths of existing images
     const files = req.files || []; // Ensure files is an array even if it's null
-    let updImages = [];
-    let newImages = [];
-    const { croppedImage } = req.body;
-    // Remove the selected images from the exImage array
-    const removeImages = Array.isArray(req.body.removeImages)
-      ? req.body.removeImages
-      : req.body.removeImages
-      ? [req.body.removeImages]
-      : [];
-    const removeImagesArray = removeImages.toString().split(",");
-
-    if (croppedImage) {
-      // Process the cropped image data (e.g., save it to the file system, upload to a storage service)
-      const croppedImageBuffer = Buffer.from(
-        croppedImage.split(",")[1],
-        "base64"
-      );
-      const croppedImagePath = path.join(
-        "path/to/uploads",
-        `cropped-${Date.now()}.jpg`
-      );
-      fs.writeFileSync(croppedImagePath, croppedImageBuffer);
-
-      // Update the product model with the cropped image path
-      updImages.push({
-        path: croppedImagePath.replace(/\\/g, "/").replace(/public/, ""),
-      });
-    }
-    // Extract original names from exImage
-    const exImageOriginalNames = exImage.map((img) => img.originalname);
-
-    // Filter out images that exist in the exImage array based on their originalname
-    const validRemoveImages = removeImagesArray.filter((originalname) =>
-      exImageOriginalNames.includes(originalname)
-    );
-    // Remove the matched images from the exImage array
-    const remainingImages = exImage.filter(
-      (img) => !validRemoveImages.includes(img.originalname)
-    );
-    // Construct the $pull update query using the validRemoveImages array
-    const removeImagesResult = await productModel.findByIdAndUpdate(
-      proId,
-      {
-        $set: { image: remainingImages }, // Update the image array with the remaining images
-      },
-      { new: true }
-    );
+    let updImages = [...exImage]; // Start with the existing images
+    const removedImagesPaths = req.body.removeImages
+      ? req.body.removeImages.split(",").filter((path) => path)
+      : []; // Get the paths of images to be removed as an array
 
     if (files.length > 0) {
-      // Check if files were uploaded
+      // Process new uploaded images
       for (const file of files) {
         const resizedImageBuffer = await sharp(file.path)
           .resize({ width: 500, height: 500 })
@@ -189,16 +147,17 @@ const editProduct = async (req, res) => {
         const filePath = path.join("./public/uploads/", fileName);
         fs.writeFileSync(filePath, resizedImageBuffer);
         let newPath = filePath.replace(/\\/g, "/").replace(/public/, "");
-        newImages.push({
+        updImages.push({
           originalname: file.originalname,
           mimetype: file.mimetype,
           path: newPath,
         });
       }
-      updImages = [...remainingImages, ...newImages];
-    } else {
-      updImages = remainingImages;
+      // Remove the paths of deleted images from the updImages array
     }
+    updImages = updImages.filter(
+      (img) => !removedImagesPaths.includes(img.path)
+    );
 
     const {
       productName,
@@ -224,11 +183,22 @@ const editProduct = async (req, res) => {
         is_blocked: false,
         image: updImages,
       },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     if (!updatedProduct) {
       return res.redirect("/admin/error");
+    }
+
+    // Remove the images from the file system
+    const uploadsDir = path.join(__dirname, "..", "..", "public"); // Get the absolute path of the uploads directory
+    for (const imagePath of removedImagesPaths) {
+      const fullPath = path.join(uploadsDir, imagePath); // Construct the absolute path of the image file
+      fs.unlink(fullPath, (err) => {
+        if (err) {
+          console.error(`Failed to remove file: ${fullPath}`, err);
+        }
+      });
     }
 
     res.redirect("/admin/Product?msg=Product Edited successful");
