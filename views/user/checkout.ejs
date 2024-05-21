@@ -356,10 +356,7 @@ document.addEventListener("DOMContentLoaded", function () {
       resetProductPriceDetails();
       showApplyCouponBtn();
     }
-    
   });
-
-  
 
   function clearCoupon() {
     couponInput.value = "";
@@ -402,6 +399,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Display the error message
         couponMessage.textContent = data.message;
         couponMessage.style.display = "block";
+        showClearCouponBtn(); // Show the clear coupon button on error
         // Reset the product price details if there's an error
         resetProductPriceDetails();
       }
@@ -411,8 +409,7 @@ document.addEventListener("DOMContentLoaded", function () {
       resetProductPriceDetails();
     }
   }
-})
-
+});
 
   function updateProductPriceDetails(discountAmount, discountedTotalPrice) {
   const discountedAmountElement = document.getElementById("discountedAmount");
