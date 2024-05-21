@@ -20,14 +20,13 @@
       th {
         text-align: center;
       }
-      table {
+      .ordertable {
         align-items: center !important;
         border: none;
         margin-left: 8%;
       }
-      table,
-      tr {
-        width: 100% !important;
+      table {
+        width: 100%;
       }
       .cardbody {
         height: 500px;
@@ -39,6 +38,12 @@
         width: max-content !important;
         margin: 0 !important;
         padding: 0 !important;
+      }
+      tr,
+      td {
+        width: max-content !important;
+        margin: 0;
+        align-items: left;
       }
     </style>
     <link
@@ -139,7 +144,7 @@
       </div>
 
       <h1>User Order List</h1>
-      <table class="table">
+      <table class="table ordertable">
         <thead>
           <tr>
             <th>Order ID</th>
@@ -408,7 +413,10 @@
         aria-labelledby="priceBreakdownModal-<%= order._id %>"
         aria-hidden="true"
       >
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div
+          class="modal-dialog modal-dialog-centered modalorder"
+          role="document"
+        >
           <div class="modal-content" style="width: max-content">
             <div class="modal-header">
               <h5 class="modal-title" id="priceBreakdownModal-<%= order._id %>">
@@ -424,7 +432,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <table class="table">
+              <table class="table modalorder">
                 <thead>
                   <tr>
                     <th style="text-align: left">Item</th>
