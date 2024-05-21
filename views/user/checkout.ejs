@@ -359,6 +359,15 @@ document.addEventListener("DOMContentLoaded", function () {
     
   });
 
+  
+
+  function clearCoupon() {
+    couponInput.value = "";
+    resetProductPriceDetails();
+    showApplyCouponBtn();
+    couponMessage.style.display = "none"; // Hide the coupon message
+  }
+
   function showApplyCouponBtn() {
     applyCouponBtn.style.display = "inline-block";
     clearCouponBtn.style.display = "none";
@@ -367,13 +376,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function showClearCouponBtn() {
     applyCouponBtn.style.display = "none";
     clearCouponBtn.style.display = "inline-block";
-  }
-
-  function clearCoupon() {
-    couponInput.value = "";
-    resetProductPriceDetails();
-    showApplyCouponBtn();
-    couponMessage.style.display = "none"; // Hide the coupon message
   }
 
   async function applyCoupon() {
@@ -395,6 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Update the discounted amount and total price
         updateProductPriceDetails(data.discountAmount, data.discountedTotalPrice);
         couponMessage.style.display = "none";
+        showClearCouponBtn();
       } else {
         // Display the error message
         couponMessage.textContent = data.message;

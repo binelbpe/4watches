@@ -205,7 +205,7 @@ router.post(
   checkUserStatus,
   addToCartController.addToCart
 );
-router.delete(
+router.post(
   "/remove-from-cart/:productId",
   isAuth,
   checkUserStatus,

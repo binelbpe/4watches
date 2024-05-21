@@ -18,6 +18,7 @@ const adminRouter = require("./routes/admin.js/admin");
 const nocacheMiddleware = require("./middleware/noCache");
 const flash = require("express-flash");
 const authController = require("./controllers/user/authController");
+const methodOverride = require("method-override");
 
 // Import OTP service
 const { sendOTP } = require("./helpers/otpService");
@@ -77,6 +78,8 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+app.use(methodOverride("_method")); // Use the '_method' query parameter
 
 // Error handling middleware
 app.use((err, req, res, next) => {
