@@ -47,6 +47,7 @@ router.get(
     failureFlash: true, // Enable flash messages
   }),
   (req, res) => {
+    req.session.isAuth = true;
     // Successful authentication, redirect home.
     req.session.userData = req.user; // `req.user` contains the authenticated user.
     res.redirect("/");

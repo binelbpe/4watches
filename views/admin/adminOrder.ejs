@@ -393,10 +393,8 @@ document.querySelectorAll('.return-product').forEach(button => {
     });
   });
 });
-    function changeStatus(element) {
-  const orderId = element.dataset.orderId;
-  const newStatus = element.value;
-  document.querySelectorAll('.return-order').forEach(button => {
+
+document.querySelectorAll('.return-order').forEach(button => {
   button.addEventListener('click', async function() {
     const orderId = this.dataset.orderId;
 
@@ -418,18 +416,17 @@ document.querySelectorAll('.return-product').forEach(button => {
             }
           });
 
-          const data = await response.json();
-
-          if (data.success) {
+          if (response.ok) {
             Swal.fire(
               'Returned!',
               'The order has been returned.',
               'success'
             ).then(() => location.reload()); // Reload the page to update the status
           } else {
+            const data = await response.json();
             Swal.fire(
               'Error!',
-              'Failed to return the order.',
+              data.error || 'Failed to return the order.',
               'error'
             );
           }
@@ -445,6 +442,11 @@ document.querySelectorAll('.return-product').forEach(button => {
     });
   });
 });
+
+
+function changeStatus(element) {
+  const orderId = element.dataset.orderId;
+  const newStatus = element.value;
   if (newStatus === 'completed') {
     fetch(`/admin/changeOrderStatus`, {
       method: 'POST',
@@ -490,6 +492,8 @@ document.querySelectorAll('.return-product').forEach(button => {
 
 
   <script>
+
+
   document.querySelectorAll('.cancel-order').forEach(button => {
   button.addEventListener('click', async function() {
     const orderId = this.dataset.orderId;

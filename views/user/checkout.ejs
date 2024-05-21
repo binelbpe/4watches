@@ -113,9 +113,8 @@
           <div class="input-group">
             <input type="text" name="coupon" id="coupon" class="form-control" />
             <div class="input-group-append">
-              <button class="btn btn-primary" id="applyCouponBtn">
-                Apply Coupon
-              </button>
+              <button class="btn btn-primary" id="applyCouponBtn">Apply Coupon</button>
+              <button class="btn btn-danger" id="clearCouponBtn" style="display: none;">Clear Coupon</button>
             </div>
           </div>
           <p id="couponMessage" style="color: red; display: none">
@@ -141,7 +140,7 @@
           </p>
         </div>
       </div>
-      <p id="cashOnDeliveryError" style="color: red; display: none;">Cash on Delivery is not available for orders above ₹1000.</p>
+      <p id="cashOnDeliveryError" style="color: red;">Cash on Delivery is not available for orders above ₹1000.</p>
       <div class="row mt-5">
         <div class="col-md-6">
           <h2>Payment Method</h2>
@@ -197,10 +196,10 @@ function toggleCashOnDeliveryOption() {
 
   if (useWallet && currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
     cashOnDeliveryOption.disabled = true;
-    cashOnDeliveryError.style.display = 'block';
+
   } else {
     cashOnDeliveryOption.disabled = shouldHideCashOnDelivery();
-    cashOnDeliveryError.style.display = 'none';
+   
   }
 }
       const useWalletCheckbox = document.getElementById('useWalletCheckbox');
@@ -233,9 +232,11 @@ function toggleCashOnDeliveryOption() {
   } else {
     // If "Use wallet balance" checkbox is not checked and the total price is above the threshold, hide "Cash on Delivery"
     if (totalPrice > cashOnDeliveryThreshold) {
+      cashOnDeliveryError.style.display = 'block';
       return true;
     } else {
       // Otherwise, show the "Cash on Delivery" option
+      cashOnDeliveryError.style.display = 'none';
       return false;
     }
   }
@@ -330,23 +331,43 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
     <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const applyCouponBtn = document.getElementById("applyCouponBtn");
-    const couponInput = document.getElementById("coupon");
-    const couponMessage = document.getElementById("couponMessage");
-    const discountedAmount = document.getElementById("discountedAmount");
-    const totalPrice = document.getElementById("totalPrice");
+document.addEventListener("DOMContentLoaded", function () {
+  const applyCouponBtn = document.getElementById("applyCouponBtn");
+  const clearCouponBtn = document.getElementById("clearCouponBtn");
+  const couponInput = document.getElementById("coupon");
+  const couponMessage = document.getElementById("couponMessage");
+  const discountedAmount = document.getElementById("discountedAmount");
+  const totalPrice = document.getElementById("totalPrice");
 
-    applyCouponBtn.addEventListener("click", applyCoupon);
+  applyCouponBtn.addEventListener("click", applyCoupon);
+  clearCouponBtn.addEventListener("click", clearCoupon);
 
-    // Listen for changes in the coupon input field
-    couponInput.addEventListener("input", function () {
-      // If the coupon input field is empty, reset the product price details
-      if (!couponInput.value.trim()) {
-        resetProductPriceDetails();
-      }
-    });
+  // Listen for changes in the coupon input field
+  couponInput.addEventListener("input", function () {
+    // If the coupon input field is empty, reset the product price details and show the "Apply Coupon" button
+    if (!couponInput.value.trim()) {
+      resetProductPriceDetails();
+      showApplyCouponBtn();
+    }
+    
   });
+
+  function showApplyCouponBtn() {
+    applyCouponBtn.style.display = "inline-block";
+    clearCouponBtn.style.display = "none";
+  }
+
+  function showClearCouponBtn() {
+    applyCouponBtn.style.display = "none";
+    clearCouponBtn.style.display = "inline-block";
+  }
+
+  function clearCoupon() {
+    couponInput.value = "";
+    resetProductPriceDetails();
+    showApplyCouponBtn();
+    couponMessage.style.display = "none"; // Hide the coupon message
+  }
 
   async function applyCoupon() {
     const couponInput = document.getElementById("coupon");
@@ -380,7 +401,7 @@ document.addEventListener("DOMContentLoaded", function () {
       resetProductPriceDetails();
     }
   }
-
+})
 
 
   function updateProductPriceDetails(discountAmount, discountedTotalPrice) {
@@ -415,7 +436,7 @@ document.addEventListener("DOMContentLoaded", function () {
     totalPriceInput.value = "<%= totalPrice %>"; // Reset to the original total price
   }
 
- 
+
   function submitForm() {
   const totalPriceInput = document.getElementById("totalPriceInput");
   const discountedAmountInput = document.getElementById("discountedAmountInput");
