@@ -50,6 +50,7 @@ const validateAndApplyCoupon = async (req, res, next) => {
     const couponCode = req.body.coupon; // Get the coupon code from the request body
     const userId = req.session.userData._id;
     const cart = req.session.cart;
+    const totalPrice = req.session.totalPrice;
 
     // Find the coupon by code
     const coupon = await Coupon.findOne({ code: couponCode });
@@ -78,6 +79,12 @@ const validateAndApplyCoupon = async (req, res, next) => {
           .status(400)
           .json({ message: "Coupon can be used only once per user" });
       }
+    }
+
+    if (!(coupon.minPurchaseAmount <= totalPrice)) {
+      return res.status(400).json({
+        message: `Coupon can be used only above the total price ${coupon.minPurchaseAmount}`,
+      });
     }
 
     // Calculate the discount amount based on the coupon type
