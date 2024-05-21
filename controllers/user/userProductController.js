@@ -456,38 +456,38 @@ const collectionfilterProduct = async (req, res) => {
 
     let filter = {};
     if (category) {
-      filter.category = category;
+      filter.category = category; // Directly assign category to filter
     }
+
     if (price) {
-      const [min, max] = price.split("-");
-      filter.price = { $gte: parseInt(min), $lte: parseInt(max) };
+      const [min, max] = price.split("-").map(Number);
+      filter.price = { $gte: min, $lte: max }; // Directly use $gte and $lte
     }
 
     let sortOptions = {};
     switch (sort) {
       case "priceAsc":
-        sortOptions = { price: 1 };
+        sortOptions.price = 1;
         break;
       case "priceDesc":
-        sortOptions = { price: -1 };
+        sortOptions.price = -1;
         break;
       case "ratings":
-        sortOptions = { ratings: -1 };
+        sortOptions.ratings = -1;
         break;
       case "featured":
-        sortOptions = { featured: -1 };
+        sortOptions.featured = -1;
         break;
       case "newArrivals":
-        sortOptions = { createdAt: -1 };
+        sortOptions.createdAt = -1;
         break;
       case "aToZ":
-        sortOptions = { product: 1 };
+        sortOptions.product = 1;
         break;
       case "zToA":
-        sortOptions = { product: -1 };
+        sortOptions.product = -1;
         break;
       default:
-        // Default sorting option or no sorting
         break;
     }
 
@@ -507,14 +507,8 @@ const collectionfilterProduct = async (req, res) => {
       return res.render("collection", { categories, products: [], fullName });
     }
 
-    let products;
-    if (Object.keys(filter).length > 0) {
-      // If there are filter options, apply them
-      products = await Product.find({ filter, status: true }).sort(sortOptions);
-    } else {
-      // If no filter options, just get all products with sorting
-      products = await Product.find().sort(sortOptions);
-    }
+    const queryObject = { status: true, ...filter };
+    const products = await Product.find(queryObject).sort(sortOptions);
 
     res.render("collection", { categories, products, fullName });
   } catch (err) {
