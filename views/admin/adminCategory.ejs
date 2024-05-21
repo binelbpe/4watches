@@ -20,6 +20,11 @@
   <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
   <!-- Custom stylesheet - for your changes-->
   <link rel="stylesheet" href="css/custom.css">
+  <style> 
+ .swal2-container {
+  z-index: 9999 !important;
+}
+</style>
  </head>
 
 <body>
@@ -293,19 +298,32 @@
   var categoryRegex = /^[a-zA-Z\s]+$/; // Matches only alphabets and spaces
 
   if (category.trim() === "") {
-    alert("Please enter a category");
+    Swal.fire({
+      title: 'Error',
+      text: 'Please enter a category',
+      icon: 'error',
+      customClass: {
+        container: 'swal2-container'
+      }
+    });
     return false;
   }
 
   if (!categoryRegex.test(category)) {
-    alert("Category name can only contain letters and spaces");
+    Swal.fire({
+      title: 'Error',
+      text: 'Category name can only contain letters and spaces',
+      icon: 'error',
+      customClass: {
+        container: 'swal2-container'
+      }
+    });
     return false;
   }
 
   console.log("Validation successful"); // Check if validation passes
   return true;
 }
-
 
   </script>
   

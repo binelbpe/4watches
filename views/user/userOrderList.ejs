@@ -21,12 +21,13 @@
         text-align: center;
       }
       table {
+        align-items: center !important;
         border: none;
-        align-items: center;
+        margin-left: 8%;
       }
       table,
       tr {
-        width: 100%;
+        width: 100% !important;
       }
       .cardbody {
         height: 500px;
@@ -35,6 +36,7 @@
         white-space: nowrap;
       }
       .container {
+        width: max-content !important;
         margin: 0 !important;
         padding: 0 !important;
       }
@@ -100,7 +102,7 @@
       </button>
     </nav>
 
-    <div class="container ml-100 mt-4">
+    <div class="container">
       <!-- Pagination section -->
       <div class="pagination">
         <ul class="pagination justify-content-center">
@@ -185,6 +187,8 @@
               >
                 View Products
               </button>
+              <br />
+              <br />
               <% if (order.status == 'completed') { %>
               <form
                 action="/orders/return/<%= order._id %>"
@@ -198,11 +202,15 @@
                 >
                   Return Order
                 </button>
+                <br />
+                <br />
               </form>
               <% } else if (order.status == 'returned') { %>
               <button type="button" class="btn btn-secondary" disabled>
                 Order Returned
               </button>
+              <br />
+              <br />
               <% } else if (order.status == 'pending') { %>
               <form
                 action="/orders/cancel/<%= order._id %>"
@@ -216,15 +224,21 @@
                 >
                   Cancel Order
                 </button>
+                <br />
+                <br />
               </form>
               <% } else if (order.status == 'cancelled') { %>
               <button type="button" class="btn btn-secondary" disabled>
                 Order Cancelled
               </button>
+              <br />
+              <br />
               <% } else if (order.status == 'returnrequest') { %>
               <button type="button" class="btn btn-secondary" disabled>
                 Requested for Return
               </button>
+              <br />
+              <br />
               <% } else if (order.status == 'paymentpending') { %>
               <form action="/repayment/process" method="POST" class="d-inline">
                 <input type="hidden" name="orderId" value="<%= order._id %>" />
@@ -236,6 +250,8 @@
                 <button type="submit" class="btn btn-warning">
                   Proceed to Payment
                 </button>
+                <br />
+                <br />
               </form>
               <form
                 action="/orderAbort/<%= order._id %>"
@@ -249,6 +265,8 @@
                   value="<%= order.totalPrice %>"
                 />
                 <button type="submit" class="btn btn-warning">Abort</button>
+                <br />
+                <br />
               </form>
               <% } %> <% if (order.status === 'completed') { %>
               <a href="/orders/<%= order._id %>/invoice" class="btn btn-primary"
