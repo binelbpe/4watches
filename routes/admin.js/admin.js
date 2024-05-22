@@ -55,7 +55,7 @@ router.post(
 router.get("/productstatus", adminAuth.isLogin, productManagement.changeStatus);
 router.post(
   "/editProduct/:id",
-  storage.array("image", 5),
+  storage.array("images", 5),
   productManagement.editProduct
 );
 
