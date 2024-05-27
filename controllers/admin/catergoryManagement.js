@@ -22,12 +22,11 @@ const getCategory = async (req, res) => {
       .skip((page - 1) * ITEMS_PER_PAGE) // Calculate skip based on page number
       .limit(ITEMS_PER_PAGE) // Limit results per page
       .sort({ _id: -1 }); // Sort categories by _id in descending order
-
     res.render("adminCategory", {
       data: categories,
       currentPage: page,
       totalPages: totalPages,
-      error: "",
+      error: req.flash("error"),
     });
   } catch (error) {
     console.log("Error in getCategory:", error);
@@ -46,15 +45,15 @@ const addCategory = async (req, res) => {
     });
 
     if (existingCategory) {
-      const errorMessage = "Category already exists: " + categoryName;
       let data = await category.find().sort({ _id: -1 });
       // Pass the error message and the existing data to the template
-      return res.render("adminCategory", { error: errorMessage, data: data });
+      req.flash("error", `Category already exists ${categoryName}`);
+      return res.redirect("/admin/Category");
     } else {
       // Ensure the category name is stored in a consistent case, e.g., all lower case
       await category.create({
         ...req.body,
-        category: categoryName.toLowerCase(),
+        category: categoryName,
       });
       res.redirect("/admin/Category");
     }
@@ -94,14 +93,14 @@ const editCategory = async (req, res) => {
     });
 
     if (existingCategory) {
-      const errorMessage = "Category already exists: " + newCategoryName;
       const data = await category.find().sort({ _id: -1 });
-      return res.render("adminCategory", { error: errorMessage, data: data });
+      req.flash("error","Existing category")
+      return res.redirect("/admin/Category");
     } else {
       // Update the category name, ensuring consistency in case
       await category.updateOne(
         { _id: categoryId },
-        { category: newCategoryName.toLowerCase() }
+        { category: newCategoryName}
       );
       res.redirect("/admin/Category");
     }

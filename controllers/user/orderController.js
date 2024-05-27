@@ -857,8 +857,6 @@ const paymentFail = async (req, res) => {
       throw new Error("Invalid totalPrice or grandtotalPrice");
     }
 
-    // 3. Handle discountedAmount
-
     // 4. Create the order with the appropriate payment method
     const paymentMethod = "Payment on online";
     const user = await User.findById(req.session.userData._id).populate({
@@ -977,6 +975,12 @@ const repaymentOrderCreation = async (req, res) => {
     const order = await Order.findById(orderId);
 
     order.status = "pending";
+
+    order.products.forEach((product) => {
+      if (product.status === "paymentpending") {
+        product.status = "pending";
+      }
+    });
     await order.save();
     res.status(201).redirect("/orders");
   } catch (err) {
@@ -992,7 +996,7 @@ const orderAbort = async (req, res) => {
     const order = await Order.findById(orderId);
 
     // Check if the order is already cancelled
-    if (order.status === "Cancelled") {
+    if (order.status === "cancelled") {
       return res
         .status(400)
         .json({ success: false, message: "Order is already cancelled" });
@@ -1007,7 +1011,7 @@ const orderAbort = async (req, res) => {
     order.status = "cancelled";
 
     order.products.forEach((product) => {
-      if (product.status === "pending") {
+      if (product.status === "paymentpending") {
         product.status = "cancelled";
       }
     });
@@ -1039,21 +1043,18 @@ const orderAbort = async (req, res) => {
 
       user.wallet.balance = (
         parseFloat(user.wallet.balance) +
-        parseFloat(order.totalPrice) +
-        (order.walletAmount ? parseFloat(order.walletAmount) : 0) -
-        parseFloat(order.reducedPrice)
+        (order.walletAmount ? parseFloat(order.walletAmount) : 0)
       ).toFixed(2);
-
-      // Add a new transaction to the wallet
-      user.wallet.transactions.push({
-        type: "credit",
-        amount:
-          parseFloat(order.totalPrice) +
-          (order.walletAmount ? parseFloat(order.walletAmount) : 0) -
-          parseFloat(order.reducedPrice),
-        description: `Order ${order._id} cancelled`,
-      });
-
+      if (order.walletAmount!=0) {
+        // Add a new transaction to the wallet
+        user.wallet.transactions.push({
+          type: "credit",
+          amount:
+            (order.walletAmount ? parseFloat(order.walletAmount) : 0) -
+            parseFloat(order.reducedPrice),
+          description: `Order ${order._id} cancelled`,
+        });
+      }
       // Save the updated wallet
       await user.wallet.save();
     }

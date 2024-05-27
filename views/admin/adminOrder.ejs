@@ -201,6 +201,9 @@
                             <button class="btn btn-secondary" disabled>Product Cancelled</button>
                             <% } else if (order[i].products[j].status === 'returnrequest') { %>
                               <button class="btn btn-secondary" disabled>requsted for Return</button>
+                              <% } else if (order[i].products[j].status === 'paymentpending') { %>
+                                <button class="btn btn-secondary" disabled>payment pending</button>
+                                
                             <% } %>
                         </td>
                         <td>
@@ -246,6 +249,10 @@
                     <span class="text-<%= order[i].status === 'cancelled' ? 'danger' : 'danger' %>">
                       <%= order[i].status.charAt(0).toUpperCase() + order[i].status.slice(1) %>
                     </span>
+                    <% }  else if(order[i].status === 'paymentpending') {%>
+                      <span class="text-<%= order[i].status === 'paymentpending' ? 'danger' : 'danger' %>">
+                        <%= order[i].status.charAt(0).toUpperCase() + order[i].status.slice(1) %>
+                      </span>
                   <% } %>
                 </td>
                 
@@ -258,8 +265,8 @@
                     <span class="text-warning">Order Returned</span>
                     <% }else if(order[i].status == 'returnrequest'){ %>
                       <span class="text-warning">Requested for Return</span>
-                  <% } else { %>
-                  <span class="text-danger">Order Cancelled</span>
+                  <% } else  if(order[i].status == 'paymentpending'){ %>
+                  <span class="text-danger">Payment pending</span>
                   <% } %>
                 </td>
                 <td>
