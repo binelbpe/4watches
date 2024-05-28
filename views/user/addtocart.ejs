@@ -120,7 +120,7 @@
 </div>
 
           <div class="product-quantity">
-            <input type="number" value="1" min="1" />
+            <input type="number" value="1" />
           </div>
           <div class="product-removal">
             <form id="removeFromCartForm" action="/remove-from-cart/<%= product._id %>" method="POST">
@@ -168,6 +168,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- JavaScript Function to Remove Product from Cart -->
     <script>
  document.addEventListener("DOMContentLoaded", function () {
@@ -266,6 +268,7 @@ function updateQuantity(quantityInput) {
       var price = parseFloat(productRow.children(".product-price").text());
       var quantity = $(quantityInput).val();
       var linePrice = price * quantity;
+      
 
       /* Add validation for quantity */
       var maxQuantity = 5; // Maximum quantity allowed
@@ -275,14 +278,21 @@ function updateQuantity(quantityInput) {
       if (quantity > maxQuantity) {
        
         $(quantityInput).val(maxQuantity); // Set input value to maximum allowed
+        Swal.fire("maximum 5 quantity is allowed")
         return; // Exit function
       } else if (quantity > stock) {
 
         $(quantityInput).val(stock); // Set input value to available stock
+        Swal.fire(`maximum of stock ${stock} quantity is allowed`)
         return; // Exit function
-      } else if (quantity < 1) {
-  
+      }  else if (quantity === 1) {
+        Swal.fire("minimum of 1 quantity is required")
+        
+        return; // Exit function
+      }else if (quantity < 1) {
+        Swal.fire("minimum of 1 quantity is required")
         $(quantityInput).val(1); // Set input value to minimum allowed
+       
         return; // Exit function
       }
 
