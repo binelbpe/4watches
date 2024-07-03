@@ -105,7 +105,8 @@ const handleGoogleSignup = async (profile) => {
   try {
     // Check if user exists in the database
     let user = await User.findOne({ email: profile.emails[0].value });
-
+    let password="User@123"
+    const hashedPassword = await bcrypt.hash(password, 10);
     if (!user) {
       const newWallet = await Wallet.create({ balance: 0 });
       // Create new user
@@ -115,6 +116,7 @@ const handleGoogleSignup = async (profile) => {
         email: profile.emails[0].value,
         googleuser: true,
         wallet: newWallet._id,
+        password:hashedPassword,
         // Add other relevant user data here
       });
       await user.save();

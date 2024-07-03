@@ -355,8 +355,9 @@ const updateProfile = async (req, res) => {
 };
 
 //function for render password change page
-const renderchangepassPage = (req, res) => {
-  res.render("password-change", { errorMessage: "" });
+const renderchangepassPage =async (req, res) => {
+  const user=await User.findById(req.session.userData._id)
+  res.render("password-change", { user,errorMessage: "" });
 };
 
 // Assuming you have a user model and appropriate methods for updating the password
