@@ -12,7 +12,6 @@ const renderCheckoutPage = async (req, res) => {
     const user = await User.findById(userId)
       .populate({
         path: "addresses",
-        match: { status: true }, // Only populate addresses with status true
       })
       .populate("wallet");
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cart - 4Watch Store</title>
+    <title>Cart - Gamers Paradise</title>
 
     <!-- Bootstrap CSS -->
     <link
@@ -32,16 +32,16 @@
             <a class="nav-link" href="/">HOME</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
+            <a class="nav-link" href="/console">CONSOLE</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
+            <a class="nav-link" href="/games">GAMES</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
+            <a class="nav-link" href="/computer">COMPUTER</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
+            <a class="nav-link" href="/shop">SHOP</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/about">ABOUT US</a>
@@ -108,19 +108,20 @@
             <span class="quantity-error" style="color: red; display: none;"></span>
           </div>
           <!-- Inside the loop where products are displayed -->
-<div class="product-price">
-  <% if (product.offerPrice && product.offerPrice > 0 && product.offerPrice < product.price) { %>
-    <!-- If offer price is available and valid, display it -->
-    <span class="original-price"><s><%= product.price.toFixed(2) %></s></span>
-    <span class="offer-price"><%= product.offerPrice.toFixed(2) %></span>
-  <% } else { %>
-    <!-- Otherwise, display the original price -->
-    <%= product.price.toFixed(2) %>
-  <% } %>
-</div>
-
+          <div class="product-price">
+            <% if (product.offerPrice && product.offerPrice > 0 && product.offerPrice < product.price) { %>
+              <!-- If offer price is available and valid, display it -->
+              <span class="original-price"><s><%= product.price.toFixed(2) %></s></span>
+              <span class="offer-price"><%= product.offerPrice.toFixed(2) %></span>
+            <% } else { %>
+              <!-- Otherwise, display the original price -->
+              <%= product.price.toFixed(2) %>
+            <% } %>
+          </div>
           <div class="product-quantity">
-            <input type="number" value="1" />
+            <button class="quantity-btn decrease">-</button>
+            <input type="number" value="1" min="1" readonly />
+            <button class="quantity-btn increase">+</button>
           </div>
           <div class="product-removal">
             <form id="removeFromCartForm" action="/remove-from-cart/<%= product._id %>" method="POST">
@@ -172,32 +173,6 @@
 
     <!-- JavaScript Function to Remove Product from Cart -->
     <script>
- document.addEventListener("DOMContentLoaded", function () {
-  const productQuantityInputs = document.querySelectorAll(".product-quantity input");
-
-  productQuantityInputs.forEach(input => {
-    input.addEventListener("input", function () {
-      const maxQuantity = 5; // Maximum quantity allowed
-      const stock = parseInt(this.parentNode.parentNode.dataset.stock); // Get stock quantity
-      let quantity = parseInt(this.value); // Parse input value to integer
-const qnty=maxQuantity-1
-      // Validate quantity
-      if (quantity > qnty) {
-        this.parentNode.querySelector(".quantity-error").textContent = `Maximum quantity allowed is ${maxQuantity}`;
-        this.parentNode.querySelector(".quantity-error").style.display = "block";
-      } else if (quantity < 2) {
-        this.parentNode.querySelector(".quantity-error").textContent = "Quantity cannot be less than 1";
-        this.parentNode.querySelector(".quantity-error").style.display = "block";
-      } else if (quantity > stock-1) {
-        this.parentNode.querySelector(".quantity-error").textContent = `Only ${stock} items available in stock`;
-        this.parentNode.querySelector(".quantity-error").style.display = "block";
-      } else {
-        // If quantity is valid, hide error message
-        this.parentNode.querySelector(".quantity-error").style.display = "none";
-      }
-    });
-  });
-});
 
 /* Set rates + misc */
 var taxRate = 0.05;
@@ -261,57 +236,6 @@ function recalculateCart() {
   });
 }
 
-/* Update quantity */
-function updateQuantity(quantityInput) {
-      /* Calculate line price */
-      var productRow = $(quantityInput).parent().parent();
-      var price = parseFloat(productRow.children(".product-price").text());
-      var quantity = $(quantityInput).val();
-      var linePrice = price * quantity;
-      
-
-      /* Add validation for quantity */
-      var maxQuantity = 5; // Maximum quantity allowed
-      var stock = parseInt(productRow.data("stock")); // Get stock quantity
-
-      // Validate quantity
-      if (quantity > maxQuantity) {
-       
-        $(quantityInput).val(maxQuantity); // Set input value to maximum allowed
-        Swal.fire("maximum 5 quantity is allowed")
-        return; // Exit function
-      } else if (quantity > stock) {
-
-        $(quantityInput).val(stock); // Set input value to available stock
-        Swal.fire(`maximum of stock ${stock} quantity is allowed`)
-        return; // Exit function
-      }  else if (quantity === 1) {
-        Swal.fire("minimum of 1 quantity is required")
-        
-        return; // Exit function
-      }else if (quantity < 1) {
-        Swal.fire("minimum of 1 quantity is required")
-        $(quantityInput).val(1); // Set input value to minimum allowed
-       
-        return; // Exit function
-      }
-
-      // If quantity is valid, hide error message
-      $(quantityInput).siblings(".quantity-error").hide();
-
-      /* Update quantity input value */
-      $(quantityInput).val(quantity);
-
-      /* Update line price display and recalc cart totals */
-      productRow.children(".product-line-price").each(function () {
-        $(this).fadeOut(fadeTime, function () {
-          // $(this).text((linePrice || 0).toFixed(2));
-           // Ensure linePrice is not NaN
-          recalculateCart();
-          $(this).fadeIn(fadeTime);
-        });
-      });
-    }
 /* Remove item from cart */
 function removeItem(removeButton) {
   /* Remove row from DOM and recalc cart total */
@@ -432,8 +356,152 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+    </script>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+  const productCards = document.querySelectorAll(".product");
 
+  productCards.forEach((card) => {
+    const decreaseBtn = card.querySelector(".quantity-btn.decrease");
+    const increaseBtn = card.querySelector(".quantity-btn.increase");
+    const quantityInput = card.querySelector(".product-quantity input");
+    const stock = parseInt(card.dataset.stock);
+
+    decreaseBtn.addEventListener("click", function () {
+      let quantity = parseInt(quantityInput.value);
+      if (quantity > 1) {
+        quantity -= 1;
+        quantityInput.value = quantity;
+        updateQuantity(quantityInput);
+        if (quantity === 1) {
+          Swal.fire({
+            title: 'Minimum Quantity',
+            text: 'You have reached the minimum quantity of 1.',
+            icon: 'info',
+            confirmButtonText: 'OK'
+          });
+        }
+      }
+    });
+
+    increaseBtn.addEventListener("click", function () {
+      let quantity = parseInt(quantityInput.value);
+      if (quantity < stock && quantity < 5) {
+        quantity += 1;
+        quantityInput.value = quantity;
+        updateQuantity(quantityInput);
+        if (quantity === 5) {
+          Swal.fire({
+            title: 'Maximum Quantity',
+            text: 'You have reached the maximum quantity of 5.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          });
+        }
+        else if (quantity == stock) {
+          Swal.fire({
+          title: 'Stock Limit',
+          text: 'The maximum quantity available is ' + stock + '.',
+          icon: 'warning',
+          confirmButtonText: 'OK'
+        });
+        }
+      }
+    });
+
+    quantityInput.addEventListener("input", function () {
+      let quantity = parseInt(quantityInput.value);
+      if (quantity > stock) {
+        quantity = stock;
+        Swal.fire({
+          title: 'Stock Limit',
+          text: 'The maximum quantity available is ' + stock + '.',
+          icon: 'warning',
+          confirmButtonText: 'OK'
+        });
+      } else if (quantity < 1) {
+        quantity = 1;
+        Swal.fire({
+          title: 'Minimum Quantity',
+          text: 'The minimum quantity is 1.',
+          icon: 'info',
+          confirmButtonText: 'OK'
+        });
+      } else if (quantity === 5) {
+        Swal.fire({
+          title: 'Maximum Quantity',
+          text: 'The maximum quantity allowed is 5.',
+          icon: 'warning',
+          confirmButtonText: 'OK'
+        });
+      }
+      quantityInput.value = quantity;
+      updateQuantity(quantityInput);
+    });
+  });
+});
+      function updateQuantity(quantityInput) {
+        const productRow = $(quantityInput).closest(".product");
+        let price;
+        if (productRow.find(".offer-price").length > 0) {
+          price = parseFloat(productRow.find(".offer-price").text());
+        } else {
+          price = parseFloat(productRow.find(".product-price").text());
+        }
+        const quantity = $(quantityInput).val();
+        const linePrice = price * quantity;
+        
+        productRow.find(".product-line-price").fadeOut(fadeTime, function () {
+          $(this).text(linePrice.toFixed(2));
+          recalculateCart();
+          $(this).fadeIn(fadeTime);
+        });
+      }
+
+      function recalculateCart() {
+        let subtotal = 0;
+
+        $(".product").each(function () {
+          const stock = parseInt($(this).data("stock"));
+          if (stock > 0) {
+            let price;
+            if ($(this).find(".offer-price").length > 0) {
+              price = parseFloat($(this).find(".offer-price").text());
+            } else {
+              price = parseFloat($(this).find(".product-price").text());
+            }
+            const quantity = parseInt($(this).find(".product-quantity input").val());
+            const linePrice = price * quantity;
+            subtotal += linePrice;
+          }
+        });
+
+        const tax = subtotal * taxRate;
+        const shipping = subtotal > 0 ? shippingRate : 0;
+        const total = subtotal + tax + shipping;
+
+        $(".totals-value").fadeOut(fadeTime, function () {
+          $("#cart-subtotal").text(subtotal.toFixed(2));
+          $("#cart-tax").text(tax.toFixed(2));
+          $("#cart-shipping").text(shipping.toFixed(2));
+          $("#cart-total").text(total.toFixed(2));
+          if (total === 0) {
+            $(".checkout").fadeOut(fadeTime);
+          } else {
+            $(".checkout").fadeIn(fadeTime);
+          }
+          $(".totals-value").fadeIn(fadeTime);
+        });
+      }
+
+      function removeItem(removeButton) {
+        const productRow = $(removeButton).closest(".product");
+        productRow.slideUp(fadeTime, function () {
+          productRow.remove();
+          recalculateCart();
+        });
+      }
     </script>
   </body>
 </html>

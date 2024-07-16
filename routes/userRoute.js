@@ -125,6 +125,7 @@ router.get(
   checkUserStatus,
   profileController.setActiveAddress
 );
+router.post('/update-address-status/:id', isAuth, checkUserStatus, profileController.updateAddressStatus);
 router.post(
   "/edit-address/:id",
   isAuth,

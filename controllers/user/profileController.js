@@ -254,6 +254,41 @@ const setActiveAddress = async (req, res) => {
   }
 };
 
+const updateAddressStatus = async (req, res) => {
+  const addressId = req.params.id;
+  const { status } = req.body;
+  const userId = req.session.userData ? req.session.userData._id : null;
+
+  try {
+    // Find the address by ID and update its status
+    if (!userId) {
+      return res.status(403).redirect("/login");
+    }
+
+    const updatedAddress = await Address.findById(addressId);
+    if (!updatedAddress) {
+      return res.status(404).send("Address not found");
+    }
+
+    const user = await User.findById(userId);
+
+    for (const addressId of user.addresses) {
+      await Address.findByIdAndUpdate(addressId, { status: false });
+    }
+    // Set the selected address as active
+    await Address.findByIdAndUpdate(addressId, { $set: { status: true } });
+    // Optionally, you can send back the updated address or a success message
+    console.log(updatedAddress,updatedAddress.status);
+    res.status(200).json({
+      message: "Address status updated successfully.",
+      address: updatedAddress,
+    });
+  } catch (error) {
+    console.error("Error updating address status:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 //function for make default address in order
 const setActiveAddressorder = async (req, res) => {
   try {
@@ -355,9 +390,9 @@ const updateProfile = async (req, res) => {
 };
 
 //function for render password change page
-const renderchangepassPage =async (req, res) => {
-  const user=await User.findById(req.session.userData._id)
-  res.render("password-change", { user,errorMessage: "" });
+const renderchangepassPage = async (req, res) => {
+  const user = await User.findById(req.session.userData._id);
+  res.render("password-change", { user, errorMessage: "" });
 };
 
 // Assuming you have a user model and appropriate methods for updating the password
@@ -449,6 +484,7 @@ const changeForgotPassword = async (req, res) => {
 };
 
 module.exports = {
+  updateAddressStatus,
   addAddressorder,
   setActiveAddressorder,
   changeForgotPassword,

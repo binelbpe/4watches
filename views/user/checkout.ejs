@@ -80,14 +80,14 @@
           <form action="/checkout/place-order" method="POST">
             <input type="hidden" name="totalPrice" id="totalPriceInput" value="<%= totalPrice %>" />
             <input type="hidden" name="discountedAmount" id="discountedAmountInput" value="<%= discountedAmount %>" />
-            <select name="address" id="address" class="form-control mb-3">
+            <select name="address" id="address" class="form-control mb-3" onchange="updateAddressStatus(this)">
               <% addresses.forEach(address => { %>
-              <option value="<%= address._id %>">
-                <%= address.address %>, <%= address.city %>, <%= address.state
-                %> - <%= address.pincode %>
-              </option>
+                <option value="<%= address._id %>" data-status="<%= address.status %>">
+                  <%= address.address %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %>
+                </option>
               <% }); %>
             </select>
+            
             
             <button
               type="button"
@@ -176,6 +176,31 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script>
+      function updateAddressStatus(selectElement) {
+  const selectedAddressId = selectElement.value;
+  const selectedAddressStatus = selectElement.options[selectElement.selectedIndex].getAttribute('data-status');
+
+  // AJAX request to update address status
+  fetch(`/update-address-status/${selectedAddressId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: selectedAddressStatus }),
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log('Address status updated successfully.');
+      // Optionally, you can update UI or perform any other actions upon successful update
+    } else {
+      console.error('Failed to update address status.');
+    }
+  })
+  .catch(error => {
+    console.error('Error updating address status:', error);
+  });
+}
+
       document.addEventListener("DOMContentLoaded", function() {
   const checkoutButton = document.getElementById("useWalletCheckbox");
   const walletBalance = parseFloat(document.getElementById("walletBalance").textContent);
