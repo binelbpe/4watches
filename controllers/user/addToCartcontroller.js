@@ -121,7 +121,7 @@ const renderCartPage = async (req, res) => {
       product: item.product,
       quantity: item.quantity
     }));
-
+    req.session.checkout=true;
     // Render the cart page with the updated cart items and their quantities
     res.render("addtocart", { fullName, products: cartData });
   } catch (error) {

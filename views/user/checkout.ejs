@@ -1,79 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css" />
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/"
-        ><img src="/images/logo.png" alt="Logo"
-      /></a>
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
-      </div>
-      <!-- User Info -->
-      <% if (fullName) { %>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css" />
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Logo -->
+    <a class="navbar-brand" href="/"><img src="/images/logo.png" alt="Logo" /></a>
+    <!-- Nav Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">HOME</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/men">MEN</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/women">WOMEN</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/kids">KIDS</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/collection">COLLECTION</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">ABOUT US</a>
+        </li>
+      </ul>
+    </div>
+    <!-- User Info -->
+    <% if (fullName) { %>
       <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
+        <a href="/profile" class="nav-link nav-linklogout">
+          <%= fullName %>
+        </a>
         <a href="/logout" class="nav-link logout nav-linklogout">
           <i class="fas fa-sign-out-alt"></i>
         </a>
       </div>
       <% } %>
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
+        <!-- Hamburger Menu Toggle Button -->
+        <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon">&#9776;</span>
+        </button>
+  </nav>
 
-    <div class="container mt-5">
-      <h1 class="text-center mb-4">Checkout</h1>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Checkout</h1>
 
-      <% if (addresses.length > 0) { %>
+    <% if (addresses.length> 0) { %>
       <div class="row">
         <div class="col-md-6">
           <h2>Shipping Address</h2>
@@ -81,558 +70,557 @@
             <input type="hidden" name="totalPrice" id="totalPriceInput" value="<%= totalPrice %>" />
             <input type="hidden" name="discountedAmount" id="discountedAmountInput" value="<%= discountedAmount %>" />
             <select name="address" id="address" class="form-control mb-3" onchange="updateAddressStatus(this)">
-              <% addresses.forEach(address => { %>
+              <% addresses.forEach(address=> { %>
                 <option value="<%= address._id %>" data-status="<%= address.status %>">
                   <%= address.address %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %>
                 </option>
-              <% }); %>
+                <% }); %>
             </select>
-            
-            
-            <button
-              type="button"
-              onclick="location.href='/orderviewaddresses'"
-              class="btn btn-primary"
-            >
+
+
+            <button type="button" onclick="location.href='/orderviewaddresses'" class="btn btn-primary">
               View Addresses
             </button>
           </form>
         </div>
       </div>
       <% } else { %>
-      <p>
-        No shipping addresses found. Please add a shipping address
-        <a href="/add-addressorder">here</a>.
-      </p>
-      <div id="addressError" style="color: red;">Please add a shipping address before proceeding to checkout.</div>
-      <button
-      type="button"
-      onclick="location.href='/orderviewaddresses'"
-      class="btn btn-primary"
-    >
-      View Addresses
-    </button>
-      <% } %>
+        <p>
+          No shipping addresses found. Please add a shipping address
+          <a href="/add-addressorder">here</a>.
+        </p>
+        <div id="addressError" style="color: red;">Please add a shipping address before proceeding to checkout.</div>
+        <button type="button" onclick="location.href='/orderviewaddresses'" class="btn btn-primary">
+          View Addresses
+        </button>
+        <% } %>
 
-      <div class="row mt-5">
-        <div class="col-md-6">
-          <h2>Coupon Code</h2>
-          <div class="input-group">
-            <input type="text" name="coupon" id="coupon" class="form-control" />
-            <div class="input-group-append">
-              <button class="btn btn-primary" id="applyCouponBtn">Apply Coupon</button>
-              <button class="btn btn-danger" id="clearCouponBtn" style="display: none;">Clear Coupon</button>
+          <div class="row mt-5">
+            <div class="col-md-6">
+              <h2>Coupon Code</h2>
+              <div class="input-group">
+                <input type="text" name="coupon" id="coupon" class="form-control" />
+                <div class="input-group-append">
+                  <button class="btn btn-primary" id="applyCouponBtn">Apply Coupon</button>
+                  <button class="btn btn-danger" id="clearCouponBtn" style="display: none;">Clear Coupon</button>
+                </div>
+              </div>
+              <p id="couponMessage" style="color: red; display: none">
+                Invalid coupon code
+              </p>
             </div>
           </div>
-          <p id="couponMessage" style="color: red; display: none">
-            Invalid coupon code
-          </p>
-        </div>
-      </div>
-      <div class="row mt-5">
-        <div class="col-md-6">
-          <h2>Summary</h2>
-          <p>
-            Wallet Balance: <span id="walletBalance"><%= walletBalance.toFixed(0) %></span>
-          </p>
-          <p>
-            Discounted Amount:
-            <span id="discountedAmount" >0.00</span>
-          </p>
-          <p>Tax: <%= tax %></p>
-          <p>Shipping: <%= shipping %></p>
-          <p>
-            Total Price:
-            <span id="totalPrice" ><%= totalPrice %></span>
-          </p>
-        </div>
-      </div>
-      <p id="cashOnDeliveryError" style="color: red;">Cash on Delivery is not available for orders above ₹1000.</p>
-      <div class="row mt-5">
-        <div class="col-md-6">
-          <h2>Payment Method</h2>
-          <select name="paymentMethod" id="paymentMethod" class="form-control">
-            <option ></option>
-            <option value="pay_on_online">Online Payment</option>
-            <option value="cash_on_delivery">Cash on Delivery</option>
-            <option value="pay_by_wallet" hidden>Use wallet</option>
-          </select>
-          <div class="form-check mt-3">
-            <input type="checkbox" class="form-check-input" id="useWalletCheckbox">
-            <label id="useWallet" class="form-check-label" for="useWalletCheckbox">Use wallet balance</label>
+          <div class="row mt-5">
+            <div class="col-md-6">
+              <h2>Summary</h2>
+              <p>
+                Wallet Balance: <span id="walletBalance">
+                  <%= walletBalance.toFixed(0) %>
+                </span>
+              </p>
+              <p>
+                Discounted Amount:
+                <span id="discountedAmount">0.00</span>
+              </p>
+              <p>Tax: <%= tax %></p>
+              <p>Shipping: <%= shipping %>
+              </p>
+              <p>
+                Total Price:
+                <span id="totalPrice">
+                  <%= totalPrice %>
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
+          <p id="cashOnDeliveryError" style="color: red;">Cash on Delivery is not available for orders above ₹1000.</p>
+          <div class="row mt-5">
+            <div class="col-md-6">
+              <h2>Payment Method</h2>
+              <select name="paymentMethod" id="paymentMethod" class="form-control">
+                <option></option>
+                <option value="pay_on_online">Online Payment</option>
+                <option value="cash_on_delivery">Cash on Delivery</option>
+                <option value="pay_by_wallet" hidden>Use wallet</option>
+              </select>
+              <div class="form-check mt-3">
+                <input type="checkbox" class="form-check-input" id="useWalletCheckbox">
+                <label id="useWallet" class="form-check-label" for="useWalletCheckbox">Use wallet balance</label>
+              </div>
+            </div>
+          </div>
 
-  <br>
-  
-      <button id="checkoutButton" class="btn btn-primary">Place Order</button>
-      <div id="addressError" style="color: red; display: none;">Please add a shipping address before proceeding to checkout.</div>
-    </form>
- 
-    <!-- Bootstrap JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-    <script>
-      function updateAddressStatus(selectElement) {
-  const selectedAddressId = selectElement.value;
-  const selectedAddressStatus = selectElement.options[selectElement.selectedIndex].getAttribute('data-status');
+          <br>
 
-  // AJAX request to update address status
-  fetch(`/update-address-status/${selectedAddressId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ status: selectedAddressStatus }),
-  })
-  .then(response => {
-    if (response.ok) {
-      console.log('Address status updated successfully.');
-      // Optionally, you can update UI or perform any other actions upon successful update
-    } else {
-      console.error('Failed to update address status.');
-    }
-  })
-  .catch(error => {
-    console.error('Error updating address status:', error);
-  });
-}
+          <button id="checkoutButton" class="btn btn-primary">Place Order</button>
+          <div id="addressError" style="color: red; display: none;">Please add a shipping address before proceeding to
+            checkout.</div>
+          </form>
 
-      document.addEventListener("DOMContentLoaded", function() {
-  const checkoutButton = document.getElementById("useWalletCheckbox");
-  const walletBalance = parseFloat(document.getElementById("walletBalance").textContent);
-  
-  const wallertUse = document.getElementById("useWallet");
-  if (walletBalance === 0) {
-    checkoutButton.style.display = "none";
-    wallertUse.innerHTML="";      
-  }
-});
-   document.addEventListener('DOMContentLoaded', function() {
-  toggleCashOnDeliveryOption();
-  const cashOnDeliveryError = document.getElementById('cashOnDeliveryError');
-  cashOnDeliveryError.style.display = 'none';
-});
+          <!-- Bootstrap JS -->
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+          <script>
+            function updateAddressStatus(selectElement) {
+              const selectedAddressId = selectElement.value;
+              const selectedAddressStatus = selectElement.options[selectElement.selectedIndex].getAttribute('data-status');
 
-document.addEventListener("DOMContentLoaded", function() {
-  toggleCashOnDeliveryOption();
-});
-function toggleCashOnDeliveryOption() {
-  const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
-  const cashOnDeliveryError = document.getElementById('cashOnDeliveryError');
-  const discountedAmount = parseFloat(document.getElementById("discountedAmount").textContent);
-  const useWallet = document.getElementById("useWalletCheckbox").checked;
-
-  if (useWallet && currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
-    cashOnDeliveryOption.disabled = true;
-
-  } else {
-    cashOnDeliveryOption.disabled = shouldHideCashOnDelivery();
-   
-  }
-}
-      const useWalletCheckbox = document.getElementById('useWalletCheckbox');
-      const totalPriceElement = document.getElementById('totalPrice');
-      const walletBalanceElement = document.getElementById('walletBalance');
-      const paymentMethodSelect = document.getElementById('paymentMethod');
-      const checkoutButton = document.getElementById('checkoutButton');
-      const initialWalletBalance = '<%= walletBalance %>';
-      let currentWalletBalance = parseFloat(initialWalletBalance);
-      
-
-      
-      function shouldHideCashOnDelivery() {
-  const discountedAmount = parseFloat(document.getElementById("discountedAmount").textContent);
-  const useWallet = document.getElementById("useWalletCheckbox").checked;
-  const totalPrice = parseFloat(document.getElementById("totalPrice").textContent);
-  const cashOnDeliveryThreshold = 1000;
-
-  if (useWallet) {
-    if (totalPrice <= currentWalletBalance) {
-      // If wallet balance is enough to cover the total price, hide all payment methods except "Use wallet"
-      return true;
-    } else if (currentWalletBalance !== 0 && discountedAmount <= currentWalletBalance) {
-      // If wallet balance is enough to cover the discounted amount, show "Online Payment" and hide "Cash on Delivery"
-      return false;
-    } else {
-      // If wallet balance is not enough to cover the discounted amount, show only "Online Payment"
-      return true;
-    }
-  } else {
-    // If "Use wallet balance" checkbox is not checked and the total price is above the threshold, hide "Cash on Delivery"
-    if (totalPrice > cashOnDeliveryThreshold) {
-      cashOnDeliveryError.style.display = 'block';
-      return true;
-    } else {
-      // Otherwise, show the "Cash on Delivery" option
-      cashOnDeliveryError.style.display = 'none';
-      return false;
-    }
-  }
-}
-
-useWalletCheckbox.addEventListener('change', function() {
-  const totalPrice = parseFloat(totalPriceElement.textContent);
-
-  if (this.checked) {
-    const remainingAmount = Math.max(0, totalPrice - currentWalletBalance);
-    totalPriceElement.textContent = remainingAmount.toFixed(2);
-    walletBalanceElement.textContent = currentWalletBalance - (totalPrice - remainingAmount);
-
-    if (remainingAmount === 0) {
-      paymentMethodSelect.value = 'pay_by_wallet';
-      paymentMethodSelect.disabled = true;
-      checkoutButton.disabled = false;
-    } else {
-      paymentMethodSelect.disabled = false;
-    }
-
-    const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
-    const onlinePaymentOption = paymentMethodSelect.querySelector('option[value="pay_on_online"]');
-
-    if (shouldHideCashOnDelivery()) {
-      cashOnDeliveryOption.style.display = 'none';
-      if (currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
-        onlinePaymentOption.style.display = 'block';
-      } 
-    } else {
-      cashOnDeliveryOption.style.display = 'none';
-      onlinePaymentOption.style.display = 'block';
-    }
-  } else {
-    paymentMethodSelect.value = ''; // Reset the payment method value
-    totalPriceElement.textContent = '<%= totalPrice %>';
-    walletBalanceElement.textContent = initialWalletBalance;
-    paymentMethodSelect.disabled = false;
-    if (shouldHideCashOnDelivery()) {
-      cashOnDeliveryOption.style.display = 'none';
-      if (currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
-        onlinePaymentOption.style.display = 'block';
-      } 
-    } else {
-      cashOnDeliveryOption.style.display = 'none';
-      onlinePaymentOption.style.display = 'block';
-    }
-    if (parseFloat(totalPriceElement.textContent) > 0) {
-      checkoutButton.disabled = false;
-    }
-    currentWalletBalance = parseFloat(initialWalletBalance);
-
-    const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
-    const onlinePaymentOption = paymentMethodSelect.querySelector('option[value="pay_on_online"]');
-
-    cashOnDeliveryOption.style.display = 'block';
-    onlinePaymentOption.style.display = 'block';
-  }
-});
-
-const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
-if (shouldHideCashOnDelivery()) {
-  cashOnDeliveryOption.style.display = 'none';
-} else {
-  cashOnDeliveryOption.style.display = 'block';
-}
-</script>
-    <script>
-      const RAZORPAY_KEY_ID = '<%= RAZORPAY_KEY_ID %>';
-      
-    </script>
-
-<script>
-
-document.addEventListener("DOMContentLoaded", function () {
-  const checkoutButton = document.getElementById("checkoutButton");
-  const paymentMethodSelect = document.getElementById("paymentMethod");
-
-  // Add event listener to the checkout button
-  checkoutButton.addEventListener("click", function (event) {
-    const addressSelect = document.getElementById("address");
-    const addressError = document.getElementById("addressError");
-
-    if (!addressSelect.value) {
-      event.preventDefault(); // Prevent form submission
-      addressError.style.display = "block"; // Show the error message
-    } else {
-      addressError.style.display = "none"; // Hide the error message
-      const selectedPaymentMethod = paymentMethodSelect.value;
-
-      if (selectedPaymentMethod === "pay_on_online") {
-        // If the payment method is "Online Payment," initiate Razorpay checkout
-        initiateRazorpayCheckout();
-      } else {
-        // Otherwise, submit the form
-        submitForm();
-      }
-    }
-  });
-});
-</script>
-
-    <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const applyCouponBtn = document.getElementById("applyCouponBtn");
-  const clearCouponBtn = document.getElementById("clearCouponBtn");
-  const couponInput = document.getElementById("coupon");
-  const couponMessage = document.getElementById("couponMessage");
-  const discountedAmount = document.getElementById("discountedAmount");
-  const totalPrice = document.getElementById("totalPrice");
-
-  applyCouponBtn.addEventListener("click", applyCoupon);
-  clearCouponBtn.addEventListener("click", clearCoupon);
-
-  // Listen for changes in the coupon input field
-  couponInput.addEventListener("input", function () {
-    // If the coupon input field is empty, reset the product price details and show the "Apply Coupon" button
-    if (!couponInput.value.trim()) {
-      resetProductPriceDetails();
-      showApplyCouponBtn();
-    }
-  });
-
-  function clearCoupon() {
-    couponInput.value = "";
-    resetProductPriceDetails();
-    showApplyCouponBtn();
-    couponMessage.style.display = "none"; // Hide the coupon message
-  }
-
-  function showApplyCouponBtn() {
-    applyCouponBtn.style.display = "inline-block";
-    clearCouponBtn.style.display = "none";
-  }
-
-  function showClearCouponBtn() {
-    applyCouponBtn.style.display = "none";
-    clearCouponBtn.style.display = "inline-block";
-  }
-
-  async function applyCoupon() {
-    const couponInput = document.getElementById("coupon");
-    const couponCode = couponInput.value.trim();
-
-    try {
-      const response = await fetch("/apply-coupon", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ coupon: couponCode }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Update the discounted amount and total price
-        updateProductPriceDetails(data.discountAmount, data.discountedTotalPrice);
-        couponMessage.style.display = "none";
-        showClearCouponBtn();
-      } else {
-        // Display the error message
-        couponMessage.textContent = data.message;
-        couponMessage.style.display = "block";
-        showClearCouponBtn(); // Show the clear coupon button on error
-        // Reset the product price details if there's an error
-        resetProductPriceDetails();
-      }
-    } catch (error) {
-      console.error("Error applying coupon:", error);
-      // Reset the product price details in case of an error
-      resetProductPriceDetails();
-    }
-  }
-});
-
-  function updateProductPriceDetails(discountAmount, discountedTotalPrice) {
-  const discountedAmountElement = document.getElementById("discountedAmount");
-  const totalPriceElement = document.getElementById("totalPrice");
-
-  discountedAmountElement.textContent = discountAmount.toFixed(2);
-  totalPriceElement.textContent = discountedTotalPrice.toFixed(2);
-
-  // Update the hidden input fields
-  const discountedAmountInput = document.getElementById("discountedAmountInput");
-  const totalPriceInput = document.getElementById("totalPriceInput");
-  discountedAmountInput.value = discountAmount;
-  totalPriceInput.value = discountedTotalPrice;
-
-  const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
-  cashOnDeliveryOption.disabled = shouldHideCashOnDelivery();
-}
-
-  function resetProductPriceDetails() {
-    const discountedAmountElement = document.getElementById("discountedAmount");
-    const totalPriceElement = document.getElementById("totalPrice");
-
-    // Reset the product price details
-    discountedAmountElement.textContent = "0.00";
-    totalPriceElement.textContent = "<%= totalPrice %>"; // Reset to the original total price
-
-    // Reset the hidden input fields
-    const discountedAmountInput = document.getElementById("discountedAmountInput");
-    const totalPriceInput = document.getElementById("totalPriceInput");
-    discountedAmountInput.value = 0;
-    totalPriceInput.value = "<%= totalPrice %>"; // Reset to the original total price
-  }
-
-
-  function submitForm() {
-  const totalPriceInput = document.getElementById("totalPriceInput");
-  const discountedAmountInput = document.getElementById("discountedAmountInput");
-  const totalPrice = document.getElementById("totalPrice").textContent;
-  const discountedAmount = document.getElementById("discountedAmount").textContent;
-  const paymentMethod = document.getElementById("paymentMethod").value;
-  const coupon = document.getElementById("coupon").value;
-
-  // Check if the payment method is selected
-  if (paymentMethod === "") {
-    swal("Please select a payment method.", "", "warning");
-    return; // Exit the function if no payment method is selected
-  }
-
-  // Ensure paymentMethod is always included
-  const form = document.querySelector("form");
-  const paymentMethodInput = document.createElement("input");
-  paymentMethodInput.setAttribute("type", "hidden");
-  paymentMethodInput.setAttribute("name", "paymentMethod");
-  paymentMethodInput.setAttribute("value", paymentMethod);
-  form.appendChild(paymentMethodInput);
-
-  totalPriceInput.value = totalPrice;
-  discountedAmountInput.value = discountedAmount;
-  const couponInput = document.createElement("input");
-  couponInput.setAttribute("type", "hidden");
-  couponInput.setAttribute("name", "coupon");
-  couponInput.setAttribute("value", coupon);
-  form.appendChild(couponInput);
-
-  // Submit the form
-  form.submit();
-}
-    </script>
-    <!-- Razorpay Script -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-<script>
-  // Function to initiate Razorpay checkout
-  function initiateRazorpayCheckout() {
-    const coupon = document.getElementById("coupon").value;
-  const amount = document.getElementById('totalPrice').textContent;
-  const discountedAmount = document.getElementById("discountedAmount").textContent;
-
-  // Create the orderRazerpay object
-  const orderRazerpay = {
-    amount,
-    coupon,
-    discountedAmount,
-  };
-
-  
-
-  // Fetch and process the payment
-  fetch('/create-order', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ amount,orderRazerpay }),
-  })
-  .then((response) => response.json())
-  .then((data) => {
-    const options = {
-      key: RAZORPAY_KEY_ID,
-      amount: data.amount,
-      currency: 'INR',
-      name: '4WATCHES',
-      description: 'Your order Transaction',
-      image: '/images/logo.png',
-      order_id: data.id,
-      handler: function (response) {
-        console.log(response);
-        processPayment(response);
-      },
-      prefill: {
-        name: '<%= fullName %>',
-        email: "<%= user.name %>",
-        contact: "<%= user.phone %>",
-      },
-      notes: {
-        addresses: '<%=user.address%>',
-      },
-      theme: {
-        color: '#bca374',
-      },
-    };
-
-    var rzp1 = new Razorpay(options);
-
-rzp1.on('payment.failed', function (response) {
-  swal("Payment Unsuccessful", "", "error")
-  handlePaymentFailure(orderRazerpay, amount);
-});
-
-rzp1.open();
-})
-.catch((error) => {
-console.error(error);
-});
-}
-
-// Function to handle payment failure
-function handlePaymentFailure(orderRazerpay, amount) {
-      fetch('/payment-fail', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ orderRazerpay, amount }),
-      })
-      .then((response) => {
-        if (response.ok) {
-      
-            window.location.href = '/orders';
-        
-        } else {
-          console.error('Payment failure handling failed');
-          throw new Error('Payment failure handling failed');
-        }
-      })
-      .catch((error) => {
-        console.error('Error handling payment failure:', error);
-      });
-    }
-
-// Function to process the payment
-  function processPayment(paymentResponse) {
-        // Send the payment details to the server for order processing
-        fetch('/process-payment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ paymentResponse }),
-        })
-          .then((response) => {
-            if (response.ok) {
-              // Redirect to the order success page or perform any other necessary actions
-              window.location.href = '/orders';
-            } else {
-              console.error('Payment processing failed');
-            
+              // AJAX request to update address status
+              fetch(`/update-address-status/${selectedAddressId}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: selectedAddressStatus }),
+              })
+                .then(response => {
+                  if (response.ok) {
+                    console.log('Address status updated successfully.');
+                    // Optionally, you can update UI or perform any other actions upon successful update
+                  } else {
+                    console.error('Failed to update address status.');
+                  }
+                })
+                .catch(error => {
+                  console.error('Error updating address status:', error);
+                });
             }
-          })
-          .catch((error) => {
-            console.error(error);
-            window.location.href = '/orderpaymentfail';
-          });
-      }
-    </script>
 
-</script>
+            document.addEventListener("DOMContentLoaded", function () {
+              const checkoutButton = document.getElementById("useWalletCheckbox");
+              const walletBalance = parseFloat(document.getElementById("walletBalance").textContent);
 
-<!-- Razorpay Payment Button -->
+              const wallertUse = document.getElementById("useWallet");
+              if (walletBalance === 0) {
+                checkoutButton.style.display = "none";
+                wallertUse.innerHTML = "";
+              }
+            });
+            document.addEventListener('DOMContentLoaded', function () {
+              toggleCashOnDeliveryOption();
+              const cashOnDeliveryError = document.getElementById('cashOnDeliveryError');
+              cashOnDeliveryError.style.display = 'none';
+            });
 
-  </body>
+            document.addEventListener("DOMContentLoaded", function () {
+              toggleCashOnDeliveryOption();
+            });
+            function toggleCashOnDeliveryOption() {
+              const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
+              const cashOnDeliveryError = document.getElementById('cashOnDeliveryError');
+              const discountedAmount = parseFloat(document.getElementById("discountedAmount").textContent);
+              const useWallet = document.getElementById("useWalletCheckbox").checked;
+
+              if (useWallet && currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
+                cashOnDeliveryOption.disabled = true;
+
+              } else {
+                cashOnDeliveryOption.disabled = shouldHideCashOnDelivery();
+
+              }
+            }
+            const useWalletCheckbox = document.getElementById('useWalletCheckbox');
+            const totalPriceElement = document.getElementById('totalPrice');
+            const walletBalanceElement = document.getElementById('walletBalance');
+            const paymentMethodSelect = document.getElementById('paymentMethod');
+            const checkoutButton = document.getElementById('checkoutButton');
+            const initialWalletBalance = '<%= walletBalance %>';
+            let currentWalletBalance = parseFloat(initialWalletBalance);
+
+
+
+            function shouldHideCashOnDelivery() {
+              const discountedAmount = parseFloat(document.getElementById("discountedAmount").textContent);
+              const useWallet = document.getElementById("useWalletCheckbox").checked;
+              const totalPrice = parseFloat(document.getElementById("totalPrice").textContent);
+              const cashOnDeliveryThreshold = 1000;
+
+              if (useWallet) {
+                if (totalPrice <= currentWalletBalance) {
+                  // If wallet balance is enough to cover the total price, hide all payment methods except "Use wallet"
+                  return true;
+                } else if (currentWalletBalance !== 0 && discountedAmount <= currentWalletBalance) {
+                  // If wallet balance is enough to cover the discounted amount, show "Online Payment" and hide "Cash on Delivery"
+                  return false;
+                } else {
+                  // If wallet balance is not enough to cover the discounted amount, show only "Online Payment"
+                  return true;
+                }
+              } else {
+                // If "Use wallet balance" checkbox is not checked and the total price is above the threshold, hide "Cash on Delivery"
+                if (totalPrice > cashOnDeliveryThreshold) {
+                  cashOnDeliveryError.style.display = 'block';
+                  return true;
+                } else {
+                  // Otherwise, show the "Cash on Delivery" option
+                  cashOnDeliveryError.style.display = 'none';
+                  return false;
+                }
+              }
+            }
+
+            useWalletCheckbox.addEventListener('change', function () {
+              const totalPrice = parseFloat(totalPriceElement.textContent);
+
+              if (this.checked) {
+                const remainingAmount = Math.max(0, totalPrice - currentWalletBalance);
+                totalPriceElement.textContent = remainingAmount.toFixed(2);
+                walletBalanceElement.textContent = currentWalletBalance - (totalPrice - remainingAmount);
+
+                if (remainingAmount === 0) {
+                  paymentMethodSelect.value = 'pay_by_wallet';
+                  paymentMethodSelect.disabled = true;
+                  checkoutButton.disabled = false;
+                } else {
+                  paymentMethodSelect.disabled = false;
+                }
+
+                const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
+                const onlinePaymentOption = paymentMethodSelect.querySelector('option[value="pay_on_online"]');
+
+                if (shouldHideCashOnDelivery()) {
+                  cashOnDeliveryOption.style.display = 'none';
+                  if (currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
+                    onlinePaymentOption.style.display = 'block';
+                  }
+                } else {
+                  cashOnDeliveryOption.style.display = 'none';
+                  onlinePaymentOption.style.display = 'block';
+                }
+              } else {
+                paymentMethodSelect.value = ''; // Reset the payment method value
+                totalPriceElement.textContent = '<%= totalPrice %>';
+                walletBalanceElement.textContent = initialWalletBalance;
+                paymentMethodSelect.disabled = false;
+                if (shouldHideCashOnDelivery()) {
+                  cashOnDeliveryOption.style.display = 'none';
+                  if (currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
+                    onlinePaymentOption.style.display = 'block';
+                  }
+                } else {
+                  cashOnDeliveryOption.style.display = 'none';
+                  onlinePaymentOption.style.display = 'block';
+                }
+                if (parseFloat(totalPriceElement.textContent) > 0) {
+                  checkoutButton.disabled = false;
+                }
+                currentWalletBalance = parseFloat(initialWalletBalance);
+
+                const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
+                const onlinePaymentOption = paymentMethodSelect.querySelector('option[value="pay_on_online"]');
+
+                cashOnDeliveryOption.style.display = 'block';
+                onlinePaymentOption.style.display = 'block';
+              }
+            });
+
+            const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
+            if (shouldHideCashOnDelivery()) {
+              cashOnDeliveryOption.style.display = 'none';
+            } else {
+              cashOnDeliveryOption.style.display = 'block';
+            }
+          </script>
+          <script>
+            const RAZORPAY_KEY_ID = '<%= RAZORPAY_KEY_ID %>';
+
+          </script>
+
+          <script>
+
+            document.addEventListener("DOMContentLoaded", function () {
+              const checkoutButton = document.getElementById("checkoutButton");
+              const paymentMethodSelect = document.getElementById("paymentMethod");
+
+              // Add event listener to the checkout button
+              checkoutButton.addEventListener("click", function (event) {
+                const addressSelect = document.getElementById("address");
+                const addressError = document.getElementById("addressError");
+
+                if (!addressSelect.value) {
+                  event.preventDefault(); // Prevent form submission
+                  addressError.style.display = "block"; // Show the error message
+                } else {
+                  addressError.style.display = "none"; // Hide the error message
+                  const selectedPaymentMethod = paymentMethodSelect.value;
+
+                  if (selectedPaymentMethod === "pay_on_online") {
+                    // If the payment method is "Online Payment," initiate Razorpay checkout
+                    initiateRazorpayCheckout();
+                  } else {
+                    // Otherwise, submit the form
+                    submitForm();
+                  }
+                }
+              });
+            });
+          </script>
+
+          <script>
+            document.addEventListener("DOMContentLoaded", function () {
+              const applyCouponBtn = document.getElementById("applyCouponBtn");
+              const clearCouponBtn = document.getElementById("clearCouponBtn");
+              const couponInput = document.getElementById("coupon");
+              const couponMessage = document.getElementById("couponMessage");
+              const discountedAmount = document.getElementById("discountedAmount");
+              const totalPrice = document.getElementById("totalPrice");
+
+              applyCouponBtn.addEventListener("click", applyCoupon);
+              clearCouponBtn.addEventListener("click", clearCoupon);
+
+              // Listen for changes in the coupon input field
+              couponInput.addEventListener("input", function () {
+                // If the coupon input field is empty, reset the product price details and show the "Apply Coupon" button
+                if (!couponInput.value.trim()) {
+                  resetProductPriceDetails();
+                  showApplyCouponBtn();
+                }
+              });
+
+              function clearCoupon() {
+                couponInput.value = "";
+                resetProductPriceDetails();
+                showApplyCouponBtn();
+                couponMessage.style.display = "none"; // Hide the coupon message
+              }
+
+              function showApplyCouponBtn() {
+                applyCouponBtn.style.display = "inline-block";
+                clearCouponBtn.style.display = "none";
+              }
+
+              function showClearCouponBtn() {
+                applyCouponBtn.style.display = "none";
+                clearCouponBtn.style.display = "inline-block";
+              }
+
+              async function applyCoupon() {
+                const couponInput = document.getElementById("coupon");
+                const couponCode = couponInput.value.trim();
+
+                try {
+                  const response = await fetch("/apply-coupon", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ coupon: couponCode }),
+                  });
+
+                  const data = await response.json();
+
+                  if (response.ok) {
+                    // Update the discounted amount and total price
+                    updateProductPriceDetails(data.discountAmount, data.discountedTotalPrice);
+                    couponMessage.style.display = "none";
+                    showClearCouponBtn();
+                  } else {
+                    // Display the error message
+                    couponMessage.textContent = data.message;
+                    couponMessage.style.display = "block";
+                    showClearCouponBtn(); // Show the clear coupon button on error
+                    // Reset the product price details if there's an error
+                    resetProductPriceDetails();
+                  }
+                } catch (error) {
+                  console.error("Error applying coupon:", error);
+                  // Reset the product price details in case of an error
+                  resetProductPriceDetails();
+                }
+              }
+            });
+
+            function updateProductPriceDetails(discountAmount, discountedTotalPrice) {
+              const discountedAmountElement = document.getElementById("discountedAmount");
+              const totalPriceElement = document.getElementById("totalPrice");
+
+              discountedAmountElement.textContent = discountAmount.toFixed(2);
+              totalPriceElement.textContent = discountedTotalPrice.toFixed(2);
+
+              // Update the hidden input fields
+              const discountedAmountInput = document.getElementById("discountedAmountInput");
+              const totalPriceInput = document.getElementById("totalPriceInput");
+              discountedAmountInput.value = discountAmount;
+              totalPriceInput.value = discountedTotalPrice;
+
+              const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
+              cashOnDeliveryOption.disabled = shouldHideCashOnDelivery();
+            }
+
+            function resetProductPriceDetails() {
+              const discountedAmountElement = document.getElementById("discountedAmount");
+              const totalPriceElement = document.getElementById("totalPrice");
+
+              // Reset the product price details
+              discountedAmountElement.textContent = "0.00";
+              totalPriceElement.textContent = "<%= totalPrice %>"; // Reset to the original total price
+
+              // Reset the hidden input fields
+              const discountedAmountInput = document.getElementById("discountedAmountInput");
+              const totalPriceInput = document.getElementById("totalPriceInput");
+              discountedAmountInput.value = 0;
+              totalPriceInput.value = "<%= totalPrice %>"; // Reset to the original total price
+            }
+
+
+            function submitForm() {
+              const totalPriceInput = document.getElementById("totalPriceInput");
+              const discountedAmountInput = document.getElementById("discountedAmountInput");
+              const totalPrice = document.getElementById("totalPrice").textContent;
+              const discountedAmount = document.getElementById("discountedAmount").textContent;
+              const paymentMethod = document.getElementById("paymentMethod").value;
+              const coupon = document.getElementById("coupon").value;
+
+              // Check if the payment method is selected
+              if (paymentMethod === "") {
+                swal("Please select a payment method.", "", "warning");
+                return; // Exit the function if no payment method is selected
+              }
+
+              // Ensure paymentMethod is always included
+              const form = document.querySelector("form");
+              const paymentMethodInput = document.createElement("input");
+              paymentMethodInput.setAttribute("type", "hidden");
+              paymentMethodInput.setAttribute("name", "paymentMethod");
+              paymentMethodInput.setAttribute("value", paymentMethod);
+              form.appendChild(paymentMethodInput);
+
+              totalPriceInput.value = totalPrice;
+              discountedAmountInput.value = discountedAmount;
+              const couponInput = document.createElement("input");
+              couponInput.setAttribute("type", "hidden");
+              couponInput.setAttribute("name", "coupon");
+              couponInput.setAttribute("value", coupon);
+              form.appendChild(couponInput);
+
+              // Submit the form
+              form.submit();
+            }
+          </script>
+          <!-- Razorpay Script -->
+          <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+          <script>
+            // Function to initiate Razorpay checkout
+            function initiateRazorpayCheckout() {
+              const coupon = document.getElementById("coupon").value;
+              const amount = document.getElementById('totalPrice').textContent;
+              const discountedAmount = document.getElementById("discountedAmount").textContent;
+
+              // Create the orderRazerpay object
+              const orderRazerpay = {
+                amount,
+                coupon,
+                discountedAmount,
+              };
+
+
+
+              // Fetch and process the payment
+              fetch('/create-order', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ amount, orderRazerpay }),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  const options = {
+                    key: RAZORPAY_KEY_ID,
+                    amount: data.amount,
+                    currency: 'INR',
+                    name: '4WATCHES',
+                    description: 'Your order Transaction',
+                    image: '/images/logo.png',
+                    order_id: data.id,
+                    handler: function (response) {
+                      console.log(response);
+                      processPayment(response);
+                    },
+                    prefill: {
+                      name: '<%= fullName %>',
+                      email: "<%= user.name %>",
+                      contact: "<%= user.phone %>",
+                    },
+                    notes: {
+                      addresses: '<%=user.address%>',
+                    },
+                    theme: {
+                      color: '#bca374',
+                    },
+                  };
+
+                  var rzp1 = new Razorpay(options);
+
+                  rzp1.on('payment.failed', function (response) {
+                    swal("Payment Unsuccessful", "", "error")
+                    handlePaymentFailure(orderRazerpay, amount);
+                  });
+
+                  rzp1.open();
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            }
+
+            // Function to handle payment failure
+            function handlePaymentFailure(orderRazerpay, amount) {
+              fetch('/payment-fail', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderRazerpay, amount }),
+              })
+                .then((response) => {
+                  if (response.ok) {
+
+                    window.location.href = '/orders';
+
+                  } else {
+                    console.error('Payment failure handling failed');
+                    throw new Error('Payment failure handling failed');
+                  }
+                })
+                .catch((error) => {
+                  console.error('Error handling payment failure:', error);
+                });
+            }
+
+            // Function to process the payment
+            function processPayment(paymentResponse) {
+              // Send the payment details to the server for order processing
+              fetch('/process-payment', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ paymentResponse }),
+              })
+                .then((response) => {
+                  if (response.ok) {
+                    // Redirect to the order success page or perform any other necessary actions
+                    window.location.href = '/orders';
+                  } else {
+                    console.error('Payment processing failed');
+
+                  }
+                })
+                .catch((error) => {
+                  console.error(error);
+                  window.location.href = '/orderpaymentfail';
+                });
+            }
+          </script>
+
+          </script>
+
+          <!-- Razorpay Payment Button -->
+
+</body>
+
 </html>
