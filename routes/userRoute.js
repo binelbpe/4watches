@@ -220,7 +220,11 @@ router.post(
 
   addToCartController.checkout
 );
-
+router.patch('/update-cart-quantity/:productId',
+  isAuth,
+  checkUserStatus,
+  addToCartController.updateCartQuantity
+)
 // Routes for checkout and orders
 router.get(
   "/orderviewaddresses",

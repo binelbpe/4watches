@@ -1,170 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cart - Gamers Paradise</title>
 
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-   
-    <link rel="stylesheet" href="/css/cart.css"> 
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/"
-        ><img src="/images/logo.png" alt="Logo"
-      /></a>
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/console">CONSOLE</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/games">GAMES</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/computer">COMPUTER</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/shop">SHOP</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart - Gamers Paradise</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/css/cart.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Logo -->
+    <a class="navbar-brand" href="/"><img src="/images/logo.png" alt="Logo" /></a>
+    <!-- Nav Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">HOME</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/console">CONSOLE</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/games">GAMES</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/computer">COMPUTER</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/shop">SHOP</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">ABOUT US</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Wishlist Icon with Link -->
+    <a href="/wishlist" class="wishlist-icon"><i class="fas fa-heart"></i></a>
+    <!-- Add-to-Cart Icon with Link -->
+    <a href="/add-to-cart" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
+    <% if (fullName) { %>
+      <div class="user-info">
+        <a href="/profile" class="nav-link nav-linklogout">
+          <%= fullName %>
+        </a>
+        <a href="/logout" class="nav-link logout nav-linklogout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
       </div>
-      
-      <!-- Wishlist Icon with Link -->
-      <a href="/wishlist" class="wishlist-icon"><i class="fas fa-heart" ></i></a>
-      <!-- Add-to-Cart Icon with Link -->
-      <a href="/add-to-cart" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
-      <% if (fullName) { %>
-        <div class="user-info">
-          <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-          <a href="/logout" class="nav-link logout nav-linklogout">
-            <i class="fas fa-sign-out-alt"></i>
-          </a>
-        </div>
-        <% } else { %>
+      <% } else { %>
         <!-- If user is not logged in, display login/signup -->
         <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
         <% } %>
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
-    <body>
+          <!-- Hamburger Menu Toggle Button -->
+          <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon">&#9776;</span>
+          </button>
+  </nav>
 
-      <h1>Cart</h1>
-      <div class="shopping-cart">
-        <div class="column-labels">
-          <label class="product-image">Image</label>
-          <label class="product-details">Product</label>.
-          <label class="product-stock">stock status</label>
-          <label class="product-price">Price</label>
-          <label class="product-quantity">Quantity</label>
-          <label class="product-removal">Remove</label>
-          <label class="product-line-price">Total</label>
-        </div>
-        <% products.forEach(product => { %>
-        <div class="product row" data-stock="<%= product.stock %>">
-          <div class="product-image">
-            <a href="/product/<%= product._id %>">
-              <img class="img-fluid" src="<%= product.image[0].path %>" alt="product image" />
-            </a>
-          </div>
-          <div class="product-details">
-            <div class="product-id" hidden><%= product._id %></div>
-            <p class="product-description"><%= product.product %></p>
-          </div>
-          <div class="product-stock">
-            <!-- Display stock status -->
-            <span class="stock-status"></span>
-            <!-- Display quantity error -->
-            <span class="quantity-error" style="color: red; display: none;"></span>
-          </div>
-          <!-- Inside the loop where products are displayed -->
-          <div class="product-price">
-            <% if (product.offerPrice && product.offerPrice > 0 && product.offerPrice < product.price) { %>
-              <!-- If offer price is available and valid, display it -->
-              <span class="original-price"><s><%= product.price.toFixed(2) %></s></span>
-              <span class="offer-price"><%= product.offerPrice.toFixed(2) %></span>
-            <% } else { %>
-              <!-- Otherwise, display the original price -->
-              <%= product.price.toFixed(2) %>
-            <% } %>
-          </div>
-          <div class="product-quantity">
-            <button class="quantity-btn decrease">-</button>
-            <input type="number" value="1" min="1" readonly />
-            <button class="quantity-btn increase">+</button>
-          </div>
-          <div class="product-removal">
-            <form id="removeFromCartForm" action="/remove-from-cart/<%= product._id %>" method="POST">
-              <input type="hidden" name="_method" value="DELETE" />
-              <button class="btn-danger" type="submit" class="remove-button" onclick="removeFromCart('<%= product._id %>')">Remove</button>
-            </form>
-          </div>
-          <div class="product-line-price" ><% if (product.offerPrice && product.offerPrice > 0 && product.offerPrice < product.price) { %>
-            <span class="offer-price"><%= product.offerPrice.toFixed(2) %></span>
-          <% } else { %>
-            <!-- Otherwise, display the original price -->
-            <%= product.price.toFixed(2) %>
-          <% } %></div>
-        </div>
-        <% }) %>
-        <div class="totals">
-          <div class="totals-item">
-            <label>Subtotal:</label>
-            <div class="totals-value" id="cart-subtotal">0.00</div>
-          </div>
-          <div class="totals-item">
-            <label>Tax (5%):</label>
-            <div class="totals-value cart-tax" id="cart-tax">0.00</div>
-          </div>
-          <div class="totals-item">
-            <label>Shipping:</label>
-            <div class="totals-value cart-shipping" id="cart-shipping">0.00</div>
-          </div>
-          <div class="totals-item totals-item-total">
-            <label>Grand Total:</label>
-            <div class="totals-value" id="cart-total">0.00</div>
-          </div>
-        </div>
-        <form id="checkoutForm" action="/checkout" method="POST">
-          <!-- Add hidden input fields to store cart data -->
-          <input type="hidden" name="cartData" id="cartData">
-          <input type="hidden" name="totalPrice" id="totalPrice">
-          <input type="hidden" name="shipping" id="shipping">
-          <input type="hidden" name="tax" id="tax">
-          <button class="checkout" type="submit">Checkout</button>
-        </form>
+  <body>
+
+    <h1>Cart</h1>
+    <div class="shopping-cart">
+      <div class="column-labels">
+        <label class="product-image">Image</label>
+        <label class="product-details">Product</label>.
+        <label class="product-stock">stock status</label>
+        <label class="product-price">Price</label>
+        <label class="product-quantity">Quantity</label>
+        <label class="product-removal">Remove</label>
+        <label class="product-line-price">Total</label>
       </div>
-    </div> 
+      <% if (products.length===0) { %>
+        <p>Your cart is empty.</p>
+        <% } else { %>
+          <% products.forEach(item=> { %>
+            <% if (item.product && item.product.status) { %>
+              <div class="product row" data-stock="<%= item.product.stock %>">
+                <div class="product-image">
+                  <a href="/product/<%= item.product._id %>">
+                    <img class="img-fluid" src="<%= item.product.image[0].path %>" alt="product image" />
+                  </a>
+                </div>
+                <div class="product-details">
+                  <div class="product-id" hidden>
+                    <%= item.product._id %>
+                  </div>
+                  <p class="product-description">
+                    <%= item.product.product %>
+                  </p>
+                </div>
+                <div class="product-stock">
+                  <span class="stock-status"></span>
+                  <span class="quantity-error" style="color: red; display: none;"></span>
+                </div>
+                <div class="product-price">
+                  <% if (item.product.offerPrice && item.product.offerPrice> 0 && item.product.offerPrice <
+                      item.product.price) { %>
+                      <span class="original-price"><s>
+                          <%= item.product.price.toFixed(2) %>
+                        </s></span>
+                      <span class="offer-price">
+                        <%= item.product.offerPrice.toFixed(2) %>
+                      </span>
+                      <% } else { %>
+                        <%= item.product.price.toFixed(2) %>
+                          <% } %>
+                </div>
+                <div class="product-quantity">
+                  <button class="quantity-btn decrease">-</button>
+                  <input type="number" value="<%= item.quantity %>" min="1" readonly />
+                  <button class="quantity-btn increase">+</button>
+                </div>
+                <div class="product-removal">
+                  <form id="removeFromCartForm" action="/remove-from-cart/<%= item.product._id %>" method="POST">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <button class="btn-danger" type="submit" class="remove-button"
+                      onclick="removeFromCart('<%= item.product._id %>')">Remove</button>
+                  </form>
+                </div>
+                <div class="product-line-price">
+                  <% if (item.product.offerPrice && item.product.offerPrice> 0 && item.product.offerPrice <
+                      item.product.price) { %>
+                      <span class="offer-price">
+                        <%= (item.product.offerPrice * item.quantity).toFixed(2) %>
+                      </span>
+                      <% } else { %>
+                        <%= (item.product.price * item.quantity).toFixed(2) %>
+                          <% } %>
+                </div>
+              </div>
+              <% } %>
+                <% }) %>
+                  <% } %>
+                    <div class="totals">
+                      <div class="totals-item">
+                        <label>Subtotal:</label>
+                        <div class="totals-value" id="cart-subtotal">0.00</div>
+                      </div>
+                      <div class="totals-item">
+                        <label>Tax (5%):</label>
+                        <div class="totals-value cart-tax" id="cart-tax">0.00</div>
+                      </div>
+                      <div class="totals-item">
+                        <label>Shipping:</label>
+                        <div class="totals-value cart-shipping" id="cart-shipping">0.00</div>
+                      </div>
+                      <div class="totals-item totals-item-total">
+                        <label>Grand Total:</label>
+                        <div class="totals-value" id="cart-total">0.00</div>
+                      </div>
+                    </div>
+                    <form id="checkoutForm" action="/checkout" method="POST">
+                      <!-- Add hidden input fields to store cart data -->
+                      <input type="hidden" name="cartData" id="cartData">
+                      <input type="hidden" name="totalPrice" id="totalPrice">
+                      <input type="hidden" name="shipping" id="shipping">
+                      <input type="hidden" name="tax" id="tax">
+                      <button class="checkout" type="submit">Checkout</button>
+                    </form>
+    </div>
+    </div>
     <!-- Bootstrap JS and jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -174,77 +179,77 @@
     <!-- JavaScript Function to Remove Product from Cart -->
     <script>
 
-/* Set rates + misc */
-var taxRate = 0.05;
-var shippingRate = 45; // Change shipping rate to 45
-var fadeTime = 200;
+      /* Set rates + misc */
+      var taxRate = 0.05;
+      var shippingRate = 45; // Change shipping rate to 45
+      var fadeTime = 200;
 
-/* Assign actions */
-$(".product-quantity input").change(function () {
-  updateQuantity(this);
-});
+      /* Assign actions */
+      $(".product-quantity input").change(function () {
+        updateQuantity(this);
+      });
 
-$(".product-removal button").click(function () {
-  removeItem(this);
-});
+      $(".product-removal button").click(function () {
+        removeItem(this);
+      });
 
-// Update totals when page is loaded
-$(document).ready(function () {
-  recalculateCart();
-});
+      // Update totals when page is loaded
+      $(document).ready(function () {
+        recalculateCart();
+      });
 
-/* Recalculate cart */
-function recalculateCart() {
-  var subtotal = 0;
+      /* Recalculate cart */
+      function recalculateCart() {
+        var subtotal = 0;
 
-  /* Sum up row totals */
-  $(".product").each(function () {
-    var stock = parseInt($(this).data("stock")); // Get stock quantity
-    if (stock > 0) { // Check if stock is greater than 0
-      var price;
-      if ($(this).find(".offer-price").length > 0) {
-        // If offer price exists, use it for calculation
-        price = parseFloat($(this).find(".offer-price").text());
-      } else {
-        // Otherwise, use the original price
-        price = parseFloat($(this).children(".product-price").text());
+        /* Sum up row totals */
+        $(".product").each(function () {
+          var stock = parseInt($(this).data("stock")); // Get stock quantity
+          if (stock > 0) { // Check if stock is greater than 0
+            var price;
+            if ($(this).find(".offer-price").length > 0) {
+              // If offer price exists, use it for calculation
+              price = parseFloat($(this).find(".offer-price").text());
+            } else {
+              // Otherwise, use the original price
+              price = parseFloat($(this).children(".product-price").text());
+            }
+
+            var quantity = parseInt($(this).find(".product-quantity input").val());
+            var linePrice = price * quantity;
+            subtotal += linePrice;
+          }
+        });
+
+        /* Calculate totals */
+        var tax = subtotal * taxRate;
+        var shipping = subtotal > 0 ? shippingRate : 0;
+        var total = subtotal + tax + shipping;
+
+        /* Update totals display */
+        $(".totals-value").fadeOut(fadeTime, function () {
+          $("#cart-subtotal").html(subtotal.toFixed(2));
+          $("#cart-tax").html(tax.toFixed(2));
+          $("#cart-shipping").html(shipping.toFixed(2));
+          $("#cart-total").html(total.toFixed(2));
+          if (total == 0) {
+            $(".checkout").fadeOut(fadeTime);
+          } else {
+            $(".checkout").fadeIn(fadeTime);
+          }
+          $(".totals-value").fadeIn(fadeTime);
+        });
       }
-      
-      var quantity = parseInt($(this).find(".product-quantity input").val());
-      var linePrice = price * quantity;
-      subtotal += linePrice;
-    }
-  });
 
-  /* Calculate totals */
-  var tax = subtotal * taxRate;
-  var shipping = subtotal > 0 ? shippingRate : 0;
-  var total = subtotal + tax + shipping;
-
-  /* Update totals display */
-  $(".totals-value").fadeOut(fadeTime, function () {
-    $("#cart-subtotal").html(subtotal.toFixed(2));
-    $("#cart-tax").html(tax.toFixed(2));
-    $("#cart-shipping").html(shipping.toFixed(2));
-    $("#cart-total").html(total.toFixed(2));
-    if (total == 0) {
-      $(".checkout").fadeOut(fadeTime);
-    } else {
-      $(".checkout").fadeIn(fadeTime);
-    }
-    $(".totals-value").fadeIn(fadeTime);
-  });
-}
-
-/* Remove item from cart */
-function removeItem(removeButton) {
-  /* Remove row from DOM and recalc cart total */
-  var productRow = $(removeButton).parent().parent();
-  productRow.slideUp(fadeTime, function () {
-    productRow.remove();
-    recalculateCart();
-  });
-}
+      /* Remove item from cart */
+      function removeItem(removeButton) {
+        /* Remove row from DOM and recalc cart total */
+        var productRow = $(removeButton).parent().parent();
+        productRow.slideUp(fadeTime, function () {
+          productRow.remove();
+          recalculateCart();
+        });
+      }
 
 
       function removeFromCart(productId) {
@@ -271,53 +276,53 @@ function removeItem(removeButton) {
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-  const productCards = document.querySelectorAll(".product"); // Select all product cards
+        const productCards = document.querySelectorAll(".product"); // Select all product cards
 
-  productCards.forEach((card) => {
-    const stockStatus = card.querySelector(".stock-status"); // Find the stock status element within the card
-    
-    const stock = parseInt(card.dataset.stock); // Get the stock quantity from the data attribute
+        productCards.forEach((card) => {
+          const stockStatus = card.querySelector(".stock-status"); // Find the stock status element within the card
 
-    if (stock <= 0) {
-      stockStatus.textContent = "Out of Stock";
-      stockStatus.style.color = "red";
-      const addToCartButton = card.querySelector(".product");
-      addToCartButton.disabled = true; // Disable add to cart button
-      addToCartButton.style.display = "none";
-    } else if (stock < 5) {
-      stockStatus.textContent = `Limited Stock (${stock} left)`;
-      stockStatus.style.color = "orange";
-    } else {
-      stockStatus.textContent = "In Stock";
-      stockStatus.style.color = "green";
-    }
-  });
-});
+          const stock = parseInt(card.dataset.stock); // Get the stock quantity from the data attribute
+
+          if (stock <= 0) {
+            stockStatus.textContent = "Out of Stock";
+            stockStatus.style.color = "red";
+            const addToCartButton = card.querySelector(".product");
+            addToCartButton.disabled = true; // Disable add to cart button
+            addToCartButton.style.display = "none";
+          } else if (stock < 5) {
+            stockStatus.textContent = `Limited Stock (${stock} left)`;
+            stockStatus.style.color = "orange";
+          } else {
+            stockStatus.textContent = "In Stock";
+            stockStatus.style.color = "green";
+          }
+        });
+      });
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    const checkoutForm = document.getElementById("checkoutForm");
-    const cartDataInput = document.getElementById("cartData");
-    const totalPriceInput = document.getElementById("totalPrice");
-    const shippingInput = document.getElementById("shipping");
-    const taxInput = document.getElementById("tax");
+      document.addEventListener("DOMContentLoaded", function () {
+        const checkoutForm = document.getElementById("checkoutForm");
+        const cartDataInput = document.getElementById("cartData");
+        const totalPriceInput = document.getElementById("totalPrice");
+        const shippingInput = document.getElementById("shipping");
+        const taxInput = document.getElementById("tax");
 
-    checkoutForm.addEventListener("submit", async function (event) {
-        console.log("Form submitted");
-        event.preventDefault();
+        checkoutForm.addEventListener("submit", async function (event) {
+          console.log("Form submitted");
+          event.preventDefault();
 
-        // Check for out-of-stock products
-        const outOfStockProducts = document.querySelectorAll(".product[data-stock='0']");
-        if (outOfStockProducts.length > 0) {
+          // Check for out-of-stock products
+          const outOfStockProducts = document.querySelectorAll(".product[data-stock='0']");
+          if (outOfStockProducts.length > 0) {
             alert("Cannot proceed to checkout. Some products are out of stock.");
             return;
-        }
+          }
 
-        const products = [];
+          const products = [];
 
-        // Loop through each product in the cart
-        const productRows = document.querySelectorAll(".product");
-        productRows.forEach(productRow => {
+          // Loop through each product in the cart
+          const productRows = document.querySelectorAll(".product");
+          productRows.forEach(productRow => {
             const productId = productRow.querySelector(".product-id").textContent;
             const productName = productRow.querySelector(".product-description").textContent;
             const productQuantity = parseInt(productRow.querySelector(".product-quantity input").value);
@@ -326,121 +331,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Add product details to the array
             products.push({
-                _id: productId,
-                name: productName,
-                quantity: productQuantity,
-                price: productPrice,
-                totalPrice: productTotalPrice
+              _id: productId,
+              name: productName,
+              quantity: productQuantity,
+              price: productPrice,
+              totalPrice: productTotalPrice
             });
+          });
+
+          // Calculate total price
+          const totalPrice = parseFloat(document.getElementById("cart-total").textContent);
+
+          // Calculate tax
+          const taxRate = 0.05; // Tax rate is 5%
+          const tax = totalPrice * taxRate;
+
+          // Calculate shipping
+          let shipping = 45; // Default shipping value is 45
+          // You can add additional logic here to calculate shipping dynamically based on certain conditions
+
+          // Set the values of hidden inputs
+          cartDataInput.value = JSON.stringify(products);
+          totalPriceInput.value = totalPrice;
+          shippingInput.value = shipping;
+          taxInput.value = tax;
+
+          // Submit the form
+          this.submit();
         });
-
-        // Calculate total price
-        const totalPrice = parseFloat(document.getElementById("cart-total").textContent);
-
-        // Calculate tax
-        const taxRate = 0.05; // Tax rate is 5%
-        const tax = totalPrice * taxRate;
-
-        // Calculate shipping
-        let shipping = 45; // Default shipping value is 45
-        // You can add additional logic here to calculate shipping dynamically based on certain conditions
-        
-        // Set the values of hidden inputs
-        cartDataInput.value = JSON.stringify(products);
-        totalPriceInput.value = totalPrice;
-        shippingInput.value = shipping;
-        taxInput.value = tax;
-
-        // Submit the form
-        this.submit();
-    });
-});
+      });
 
     </script>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-  const productCards = document.querySelectorAll(".product");
-
-  productCards.forEach((card) => {
-    const decreaseBtn = card.querySelector(".quantity-btn.decrease");
-    const increaseBtn = card.querySelector(".quantity-btn.increase");
-    const quantityInput = card.querySelector(".product-quantity input");
-    const stock = parseInt(card.dataset.stock);
-
-    decreaseBtn.addEventListener("click", function () {
-      let quantity = parseInt(quantityInput.value);
-      if (quantity > 1) {
-        quantity -= 1;
-        quantityInput.value = quantity;
-        updateQuantity(quantityInput);
-        if (quantity === 1) {
-          Swal.fire({
-            title: 'Minimum Quantity',
-            text: 'You have reached the minimum quantity of 1.',
-            icon: 'info',
-            confirmButtonText: 'OK'
-          });
-        }
-      }
-    });
-
-    increaseBtn.addEventListener("click", function () {
-      let quantity = parseInt(quantityInput.value);
-      if (quantity < stock && quantity < 5) {
-        quantity += 1;
-        quantityInput.value = quantity;
-        updateQuantity(quantityInput);
-        if (quantity === 5) {
-          Swal.fire({
-            title: 'Maximum Quantity',
-            text: 'You have reached the maximum quantity of 5.',
-            icon: 'warning',
-            confirmButtonText: 'OK'
-          });
-        }
-        else if (quantity == stock) {
-          Swal.fire({
-          title: 'Stock Limit',
-          text: 'The maximum quantity available is ' + stock + '.',
-          icon: 'warning',
-          confirmButtonText: 'OK'
-        });
-        }
-      }
-    });
-
-    quantityInput.addEventListener("input", function () {
-      let quantity = parseInt(quantityInput.value);
-      if (quantity > stock) {
-        quantity = stock;
-        Swal.fire({
-          title: 'Stock Limit',
-          text: 'The maximum quantity available is ' + stock + '.',
-          icon: 'warning',
-          confirmButtonText: 'OK'
-        });
-      } else if (quantity < 1) {
-        quantity = 1;
-        Swal.fire({
-          title: 'Minimum Quantity',
-          text: 'The minimum quantity is 1.',
-          icon: 'info',
-          confirmButtonText: 'OK'
-        });
-      } else if (quantity === 5) {
-        Swal.fire({
-          title: 'Maximum Quantity',
-          text: 'The maximum quantity allowed is 5.',
-          icon: 'warning',
-          confirmButtonText: 'OK'
-        });
-      }
-      quantityInput.value = quantity;
-      updateQuantity(quantityInput);
-    });
-  });
-});
+      // Update quantity function
       function updateQuantity(quantityInput) {
         const productRow = $(quantityInput).closest(".product");
         let price;
@@ -451,57 +375,118 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         const quantity = $(quantityInput).val();
         const linePrice = price * quantity;
-        
+
         productRow.find(".product-line-price").fadeOut(fadeTime, function () {
           $(this).text(linePrice.toFixed(2));
           recalculateCart();
           $(this).fadeIn(fadeTime);
         });
+
+        // Get product ID from the product row
+        const productId = productRow.find(".product-id").text();
+
+        // Send update request to backend
+        fetch(`/update-cart-quantity/${productId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ quantity: quantity }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log("Quantity updated successfully:", data);
+          })
+          .catch(error => {
+            console.error("Error updating quantity:", error);
+          });
       }
 
-      function recalculateCart() {
-        let subtotal = 0;
+      // Increment and Decrement handlers
+      document.addEventListener("DOMContentLoaded", function () {
+        const productCards = document.querySelectorAll(".product");
 
-        $(".product").each(function () {
-          const stock = parseInt($(this).data("stock"));
-          if (stock > 0) {
-            let price;
-            if ($(this).find(".offer-price").length > 0) {
-              price = parseFloat($(this).find(".offer-price").text());
-            } else {
-              price = parseFloat($(this).find(".product-price").text());
+        productCards.forEach((card) => {
+          const decreaseBtn = card.querySelector(".quantity-btn.decrease");
+          const increaseBtn = card.querySelector(".quantity-btn.increase");
+          const quantityInput = card.querySelector(".product-quantity input");
+          const stock = parseInt(card.dataset.stock);
+
+          decreaseBtn.addEventListener("click", function () {
+            let quantity = parseInt(quantityInput.value);
+            if (quantity > 1) {
+              quantity -= 1;
+              quantityInput.value = quantity;
+              updateQuantity(quantityInput);
+              if (quantity === 1) {
+                Swal.fire({
+                  title: 'Minimum Quantity',
+                  text: 'You have reached the minimum quantity of 1.',
+                  icon: 'info',
+                  confirmButtonText: 'OK'
+                });
+              }
             }
-            const quantity = parseInt($(this).find(".product-quantity input").val());
-            const linePrice = price * quantity;
-            subtotal += linePrice;
-          }
-        });
+          });
 
-        const tax = subtotal * taxRate;
-        const shipping = subtotal > 0 ? shippingRate : 0;
-        const total = subtotal + tax + shipping;
+          increaseBtn.addEventListener("click", function () {
+            let quantity = parseInt(quantityInput.value);
+            if (quantity < stock && quantity < 5) {
+              quantity += 1;
+              quantityInput.value = quantity;
+              updateQuantity(quantityInput);
+              if (quantity === 5) {
+                Swal.fire({
+                  title: 'Maximum Quantity',
+                  text: 'You have reached the maximum quantity of 5.',
+                  icon: 'warning',
+                  confirmButtonText: 'OK'
+                });
+              }
+              else if (quantity == stock) {
+                Swal.fire({
+                  title: 'Stock Limit',
+                  text: 'The maximum quantity available is ' + stock + '.',
+                  icon: 'warning',
+                  confirmButtonText: 'OK'
+                });
+              }
+            }
+          });
 
-        $(".totals-value").fadeOut(fadeTime, function () {
-          $("#cart-subtotal").text(subtotal.toFixed(2));
-          $("#cart-tax").text(tax.toFixed(2));
-          $("#cart-shipping").text(shipping.toFixed(2));
-          $("#cart-total").text(total.toFixed(2));
-          if (total === 0) {
-            $(".checkout").fadeOut(fadeTime);
-          } else {
-            $(".checkout").fadeIn(fadeTime);
-          }
-          $(".totals-value").fadeIn(fadeTime);
+          quantityInput.addEventListener("input", function () {
+            let quantity = parseInt(quantityInput.value);
+            if (quantity > stock) {
+              quantity = stock;
+              Swal.fire({
+                title: 'Stock Limit',
+                text: 'The maximum quantity available is ' + stock + '.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+              });
+            } else if (quantity < 1) {
+              quantity = 1;
+              Swal.fire({
+                title: 'Minimum Quantity',
+                text: 'The minimum quantity is 1.',
+                icon: 'info',
+                confirmButtonText: 'OK'
+              });
+            } else if (quantity === 5) {
+              Swal.fire({
+                title: 'Maximum Quantity',
+                text: 'The maximum quantity allowed is 5.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+              });
+            }
+            quantityInput.value = quantity;
+            updateQuantity(quantityInput);
+          });
         });
-      }
-
-      function removeItem(removeButton) {
-        const productRow = $(removeButton).closest(".product");
-        productRow.slideUp(fadeTime, function () {
-          productRow.remove();
-          recalculateCart();
-        });
-      }
+      });
     </script>
+
   </body>
+
 </html>
