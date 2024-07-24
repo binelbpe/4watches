@@ -5,6 +5,7 @@ const Address = require("../../models/addressModel");
 const Coupon = require("../../models/couponModel");
 const razorpay = require("../../helpers/razorpay");
 const Wallet = require("../../models/walletModel");
+const Cart = require("../../models/addtocartModel")
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
@@ -377,14 +378,13 @@ function calculateReducedPrice(price, discountedAmount, totalPrice) {
 
   return reducedPrice;
 }
-
-//function for placing new order
 const placeOrder = async (req, res) => {
   try {
     if (!req.session.userData) {
       // Handle unauthenticated user
       return res.redirect("/login");
     }
+    
     req.session.checkout = false;
     const cart = req.session.cart;
     const userId = req.session.userData._id;
@@ -401,17 +401,13 @@ const placeOrder = async (req, res) => {
     });
 
     if (user.addresses.length === 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No active address found" });
+      return res.status(400).json({ success: false, message: "No active address found" });
     }
 
     const activeAddress = user.addresses[0];
 
     // Get the coupon code from the request body
-
     const products = req.session.cart;
-    // Find the coupon by code
     const coupon = await Coupon.findOne({ code: couponCode });
 
     if (coupon && coupon.oncePerUser) {
@@ -419,15 +415,17 @@ const placeOrder = async (req, res) => {
         $push: { usedCoupons: coupon },
       });
     }
+
     for (const product of products) {
       const productObj = await Product.findById(product._id);
       if (!productObj || productObj.stock < product.quantity) {
         return res.status(400).redirect("/add-to-cart");
       }
     }
+
     const grandtotalPrice = req.session.totalPrice;
-    const difference =
-      grandtotalPrice - totalPrice - parseInt(discountedAmount);
+    const difference = grandtotalPrice - totalPrice - parseInt(discountedAmount);
+    
     const order = await Order.create({
       grandTotalPrice: grandtotalPrice,
       user: userId,
@@ -439,36 +437,41 @@ const placeOrder = async (req, res) => {
         quantity: item.quantity,
       })),
       walletAmount: difference.toFixed(2),
-      discountedAmount, // Use the discountedAmount from the request body
-      coupon: coupon ? coupon._id : null, // Store the coupon ID if a valid coupon was applied
+      discountedAmount,
+      coupon: coupon ? coupon._id : null,
     });
 
-    if (paymentMethod === "pay_by_wallet") {
-      const user = await User.findById(userId).populate("wallet");
-      const wallet = user.wallet;
-      wallet.balance = wallet.balance - difference.toFixed(2);
-      await wallet.debitBalance(
-        difference.toFixed(2),
-        `Order ${order._id} placed with wallet balance`
-      );
-    } else if (difference > 0) {
-      const user = await User.findById(userId).populate("wallet");
-      const wallet = user.wallet.balance - difference.toFixed(2);
-      await wallet.debitBalance(
-        difference.toFixed(2),
-        `Order ${order._id} placed along with wallet balance`
+    let walletUpdate = null;
+    if (paymentMethod === "pay_by_wallet" || difference > 0) {
+      const debitAmount = paymentMethod === "pay_by_wallet" ? totalPrice : difference.toFixed(2);
+      
+      walletUpdate = User.findOneAndUpdate(
+        { _id: userId },
+        {
+          $inc: { "wallet.balance": -debitAmount },
+          $push: {
+            "wallet.transactions": {
+              type: "debit",
+              amount: debitAmount,
+              description: `Order ${order._id} placed with wallet balance`
+            }
+          }
+        },
+        { new: true }
       );
     }
 
-    if (
-      totalPrice != 0 &&
-      totalPrice != grandtotalPrice &&
-      discountedAmount == 0
-    ) {
-      const user = await User.findById(userId).populate("wallet");
-      const wallet = user.wallet;
-      user.wallet.balance = user.wallet.balance - difference;
-      user.wallet.save();
+    if (totalPrice != 0 && totalPrice != grandtotalPrice && discountedAmount == 0) {
+      const userWithWallet = await User.findById(userId).populate("wallet");
+      const wallet = userWithWallet.wallet;
+
+      wallet.balance -= difference;
+      await wallet.save();  // Save the wallet balance update
+
+      if (walletUpdate) {
+        await walletUpdate; // Ensure previous wallet update is finished
+      }
+      
       await wallet.debitBalance(
         difference.toFixed(2),
         `Order ${order._id} placed with wallet balance`
@@ -481,12 +484,10 @@ const placeOrder = async (req, res) => {
       });
     }
 
-    // Associate the order with the user
     await User.findByIdAndUpdate(userId, {
       $push: { order: order._id },
     });
 
-    // Update product quantities
     await Promise.all(
       cart.map(async (item) => {
         const product = await Product.findById(item._id);
@@ -497,10 +498,10 @@ const placeOrder = async (req, res) => {
       })
     );
 
-    // Clear cart after placing order
     req.session.cart = [];
+    
     // Clear cart in the database
-    await User.findByIdAndUpdate(userId, { cart: [] });
+    await Cart.findOneAndUpdate({ userId: userId }, { cartItems: [] });
 
     res.status(201).redirect("/orders");
   } catch (error) {
@@ -588,7 +589,7 @@ const processpayment = async (req, res) => {
     );
 
     req.session.cart = [];
-    await User.findByIdAndUpdate(userId, { cart: [] });
+    await Cart.findOneAndUpdate({ userId: userId }, { cartItems: [] });
 
     // 6. Redirect to the order success page or perform any other necessary actions
     res.status(200).json({ success: true });
