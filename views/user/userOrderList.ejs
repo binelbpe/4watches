@@ -149,8 +149,6 @@
           <tr>
             <th>Order ID</th>
             <th>Date</th>
-            <th>Amount paid</th>
-            <th>Payment Method</th>
             <th>Address</th>
             <th>Status</th>
             <th>price Breakdown</th>
@@ -162,8 +160,6 @@
           <tr>
             <td><%= order._id %></td>
             <td><%= order.createdAt.toDateString() %></td>
-            <td><%= order.totalPrice %></td>
-            <td><%= order.paymentMethod %></td>
             <td><%= order.address.address %></td>
             <td>
               <% if (order.status === 'completed') { %>Completed<% } else if
@@ -497,6 +493,14 @@
                     <th style="text-align: left">
                       <%=
                       (order.grandTotalPrice-order.reducedPrice-order.returnedPrice-order.discountedAmount).toFixed(2)
+                      %>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th style="text-align: left">Payment Method</th>
+                    <th style="text-align: left">
+                      <%=
+                      (order.paymentMethod)
                       %>
                     </th>
                   </tr>
