@@ -222,7 +222,7 @@
                                     <%= order[i].products[j].status %>
                                   </td>
                                   <td>
-                                    <% if (order[i].products[j].status==='pending' ) { %>
+                                    <% if (order[i].products[j].status==='pending'||'Dispatched'||'In Transit' ) { %>
                                       <button class="btn btn-danger btn-sm cancel-product"
                                         data-order-id="<%= order[i]._id %>"
                                         data-product-id="<%= order[i].products[j].product._id %>">Cancel
@@ -424,12 +424,14 @@
               </td>
 
               <td>
-                <% if (order[i].status==='pending' ) { %>
+                <% if (order[i].status==='pending'||'Dispatched'||'In Transit' ) { %>
                   <!-- Show dropdown only if current status is 'pending' -->
                   <select name="status" class="order-status" data-order-id="<%= order[i]._id %>"
                     onchange="changeStatus(this)">
                     <option value="pending" <% if (order[i].status==='pending' ) { %>selected<% } %>>Pending</option>
                     <option value="completed">Completed</option>
+                    <option value="Dispatched" <% if (order[i].status==='Dispatched' ) { %>selected<% } %>>Dispatched</option>
+                      <option value="In Transit" <% if (order[i].status==='In Transit' ) { %>selected<% } %>>In Transit</option>
                   </select>
                   <% } else if(order[i].status==='completed' ) { %>
                     <!-- Display current status if not 'pending' -->
@@ -448,7 +450,11 @@
                           <span class="text-<%= order[i].status === 'paymentpending' ? 'danger' : 'danger' %>">
                             <%= order[i].status.charAt(0).toUpperCase() + order[i].status.slice(1) %>
                           </span>
-                          <% } %>
+                          <% } else {%>
+                            <span class="text-success">
+                              <%= order[i].status.charAt(0).toUpperCase() + order[i].status.slice(1) %>
+                            </span>
+                            <% } %>
               </td>
 
               <td>
@@ -463,7 +469,10 @@
                         <span class="text-warning">Requested for Return</span>
                         <% } else if(order[i].status=='paymentpending' ){ %>
                           <span class="text-danger">Payment pending</span>
-                          <% } %>
+                          <% } else {%>
+                            <button type="button" class="btn btn-danger cancel-order" data-order-id="<%= order[i]._id %>">Cancel
+                              Order</button>
+                            <% } %>
               </td>
               <td>
                 <% if (order[i].status==='returnrequest' ) { %>
@@ -651,7 +660,7 @@
     function changeStatus(element) {
       const orderId = element.dataset.orderId;
       const newStatus = element.value;
-      if (newStatus === 'completed') {
+      if (newStatus) {
         fetch(`/admin/changeOrderStatus`, {
           method: 'POST',
           headers: {

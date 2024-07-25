@@ -6,27 +6,27 @@ const User = require("../../models/userModel");
 const changeOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.body;
-    const newStatus = "completed"; // Admin can only set to completed
+    const newStatus = req.body.newStatus; // Admin can only set to completed
 
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Check if the current order status is 'pending'
-    if (order.status !== "pending") {
-      return res.status(400).json({
-        message:
-          "Order status can only be changed from 'pending' to 'completed'",
-      });
-    }
+    // // Check if the current order status is 'pending'
+    // if (order.status !== "pending"||"Dispatched"||"In Transit") {
+    //   return res.status(400).json({
+    //     message:
+    //       "Order status can only be changed from 'pending' to 'completed'",
+    //   });
+    // }
 
     // Set new status if the validation passes
     order.status = newStatus;
 
     order.products.forEach((product) => {
-      if (product.status === "pending") {
-        product.status = "completed";
+      if (product.status === "pending"||"Dispatched"||"In Transit") {
+        product.status = newStatus;
       }
     });
 

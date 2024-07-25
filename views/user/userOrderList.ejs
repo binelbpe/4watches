@@ -170,8 +170,10 @@
               (order.status == 'returned') { %>Returned<% } else if
               (order.status === 'cancelled') { %>Cancelled<% } else if
               (order.status == 'returnrequest') { %>Requested for return<% }
-              else if (order.status == 'paymentpending') { %>Payment pending<% }
-              else { %>Pending<% } %>
+              else if (order.status == 'paymentpending') { %>Payment pending <% }
+              else if (order.status == 'pending'){ %>Pending<% } else { %><%= order.status %>
+                <% } %>
+
             </td>
             <td>
               <!-- Add the new button here -->
@@ -216,7 +218,7 @@
               </button>
               <br />
               <br />
-              <% } else if (order.status == 'pending') { %>
+              <% } else if (order.status == 'pending'||'Dispatched'||'In Transit') { %>
               <form
                 action="/orders/cancel/<%= order._id %>"
                 method="POST"
@@ -371,7 +373,7 @@
                       </button>
                       <% } else { %>
                       <button type="button" class="btn btn-primary" disabled>
-                        Pending
+                        <%=order.status %></order> %>
                       </button>
                       <form
                         action="/orders/cancel-product/<%= order._id %>/<%= product.product._id %>"
