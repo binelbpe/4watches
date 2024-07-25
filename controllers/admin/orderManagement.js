@@ -166,7 +166,7 @@ const getOrdersWithPagination = async (req, res) => {
       .skip(skip)
       .limit(pageSize)
       .populate("user")
-      .populate({ path: "products.product", select: "name price" })
+      .populate("products.product")
       .populate("address");
 
     // Count total number of orders for pagination

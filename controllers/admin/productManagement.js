@@ -209,6 +209,16 @@ const editProduct = async (req, res) => {
 };
 
 //function for change status of product
+const deleteProduct = async (req, res) => {
+  try {
+    const data = await productModel.findByIdAndDelete(req.query.id);
+   
+    res.redirect("/admin/Product");
+  } catch (e) {
+    console.log("error in the changeStatus", e);
+    res.redirect("/admin/error");
+  }
+};
 const changeStatus = async (req, res) => {
   try {
     const data = await productModel.findOne({ _id: req.query.id });
@@ -230,4 +240,5 @@ module.exports = {
   addProduct,
   editProduct,
   changeStatus,
+  deleteProduct,
 };

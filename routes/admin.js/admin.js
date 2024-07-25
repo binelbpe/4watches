@@ -41,6 +41,11 @@ router.get(
   adminAuth.isLogin,
   categoryManagement.changeStatus
 );
+router.get(
+  "/categoryDelete",
+  adminAuth.isLogin,
+  categoryManagement.deleteCategory
+);
 router.post("/editCategory", categoryManagement.editCategory);
 router.post("/category", categoryManagement.addCategory);
 
@@ -53,6 +58,7 @@ router.post(
   productManagement.addProduct
 );
 router.get("/productstatus", adminAuth.isLogin, productManagement.changeStatus);
+router.get("/productDelete", adminAuth.isLogin, productManagement.deleteProduct);
 router.post(
   "/editProduct/:id",
   storage.array("images", 5),

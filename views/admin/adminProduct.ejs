@@ -143,6 +143,7 @@
               <th>Description</th>
               <th>Edit</th>
               <th>Status</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -318,6 +319,9 @@
                     <a href="#" class="btn btn-success" onclick="confirmAndRedirect('<%= data[i]._id %>', event)">List</a>
                   <% } %>
                 </td>
+<td>
+  <a href="#" class="btn btn-danger" onclick="confirmAndRedirectDelete('<%= data[i]._id %>', event)">Delete</a>
+</td>
               </tr>
             <% } %>
           </tbody>
@@ -375,6 +379,21 @@
       if (result.isConfirmed) {
         // Redirect to the appropriate URL for toggling the product status
         window.location.href = "/admin/productStatus?id=" + userId;
+      }
+    }
+    async function confirmAndRedirectDelete(userId, event) {
+      event.preventDefault(); // Prevent the default behavior
+
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You want to Delete the product",
+        icon: "warning",
+        showCancelButton: true
+      });
+
+      if (result.isConfirmed) {
+        // Redirect to the appropriate URL for toggling the product status
+        window.location.href = "/admin/productDelete?id=" + userId;
       }
     }
     
