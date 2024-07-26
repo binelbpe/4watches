@@ -14,7 +14,11 @@ const changeOrderStatus = async (req, res) => {
     }
 
     // Check if the current order status is 'pending'
-    if (order.status !== "pending"&& order.status !== "Dispatched" && order.status !== "In Transit") {
+    if (
+      order.status !== "pending" &&
+      order.status !== "Dispatched" &&
+      order.status !== "In Transit"
+    ) {
       return res.status(400).json({
         message:
           "Order status can only be changed from 'pending' to 'completed'",
@@ -25,7 +29,11 @@ const changeOrderStatus = async (req, res) => {
     order.status = newStatus;
 
     order.products.forEach((product) => {
-      if (product.status === "pending"||product.status ==="Dispatched"||product.status ==="In Transit") {
+      if (
+        product.status === "pending" ||
+        product.status === "Dispatched" ||
+        product.status === "In Transit"
+      ) {
         product.status = newStatus;
       }
     });
@@ -67,7 +75,11 @@ const cancelOrder = async (req, res) => {
     order.status = "cancelled";
 
     order.products.forEach((product) => {
-      if (product.status === "pending"|| product.status ==="Dispatched" || product.status ==="In Transit") {
+      if (
+        product.status === "pending" ||
+        product.status === "Dispatched" ||
+        product.status === "In Transit"
+      ) {
         product.status = "cancelled";
       }
     });
@@ -188,12 +200,16 @@ const getOrdersWithPagination = async (req, res) => {
 const cancelProductAsAdmin = async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId);
-    const productId=req.params.productId
+    const productId = req.params.productId;
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    if (order.status !=="pending" && order.status !=="Dispatched"&&order.status !=="In Transit") {
+    if (
+      order.status !== "pending" &&
+      order.status !== "Dispatched" &&
+      order.status !== "In Transit"
+    ) {
       return res
         .status(400)
         .json({ error: "Cannot cancel product for this order" });
@@ -257,6 +273,8 @@ const cancelProductAsAdmin = async (req, res) => {
       {
         order.reducedPrice =
           parseFloat(order.reducedPrice) + parseFloat(reducedPrice);
+        order.totalPrice = 0;
+        order;
         await order.save();
       }
       user.wallet.balance = (
@@ -401,7 +419,7 @@ const returnOrder = async (req, res) => {
     );
 
     await order.save();
-
+    console.log("order", order);
     // Restore product quantities
     await Promise.all(
       order.products.map(async (orderItem) => {
@@ -437,6 +455,10 @@ const returnOrder = async (req, res) => {
 
     // Save the updated wallet
     await user.wallet.save();
+    order.returnedPrice +=
+      parseFloat(order.grandTotalPrice - order.discountedAmount) - reduceTotal;
+    await order.save();
+    console.log("order", order);
     return res.status(200).redirect("/admin/order");
   } catch (err) {
     console.error(err);

@@ -1,281 +1,275 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Admin</title>
-    <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="all,follow" />
-    <!-- Bootstrap CSS-->
-    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
-    <!-- Font Awesome CSS-->
-    <link
-      rel="stylesheet"
-      href="vendor/font-awesome/css/font-awesome.min.css"
-    />
-    <!-- Custom Font Icons CSS-->
-    <link rel="stylesheet" href="css/font.css" />
-    <!-- Google fonts - Muli-->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Muli:300,400,700"
-    />
-    <!-- theme stylesheet-->
-    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet" />
-    <!-- Custom stylesheet - for your changes-->
-    <link rel="stylesheet" href="css/custom.css" />
-    <!-- Favicon-->
-    <link rel="shortcut icon" href="img/favicon.ico" />
-    <!-- Tweaks for older IEs-->
-    <!--[if lt IE 9]>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Admin</title>
+  <meta name="description" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="all,follow" />
+  <!-- Bootstrap CSS-->
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
+  <!-- Font Awesome CSS-->
+  <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css" />
+  <!-- Custom Font Icons CSS-->
+  <link rel="stylesheet" href="css/font.css" />
+  <!-- Google fonts - Muli-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:300,400,700" />
+  <!-- theme stylesheet-->
+  <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet" />
+  <!-- Custom stylesheet - for your changes-->
+  <link rel="stylesheet" href="css/custom.css" />
+  <!-- Favicon-->
+  <link rel="shortcut icon" href="img/favicon.ico" />
+  <!-- Tweaks for older IEs-->
+  <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
+</head>
 
-  <body>
-    <header class="header">
-      <nav class="navbar navbar-expand-lg">
-        <div class="search-panel">
-          <div
-            class="search-inner d-flex align-items-center justify-content-center"
-          >
-            <div class="close-btn">Close <i class="fa fa-close"></i></div>
-            <form id="searchForm" action="#">
-              <div class="form-group">
-                <input
-                  type="search"
-                  name="search"
-                  placeholder="What are you searching for..."
-                />
-                <button type="submit" class="submit">Search</button>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div
-          class="container-fluid d-flex align-items-center justify-content-between"
-        >
-          <div class="navbar-header">
-            <!-- Navbar Header--><a href="/" class="navbar-brand">
-              <div class="brand-text brand-big visible text-uppercase">
-                <strong class="text-primary">4WATCHES</strong
-                ><strong>Admin</strong>
-              </div>
-              <div class="brand-text brand-sm">
-                <strong class="text-primary">D</strong><strong>A</strong>
-              </div>
-            </a>
-
-            <!-- Languages dropdown    -->
-            <div class="list-inline-item dropdown">
-              <a
-                id="languages"
-                rel="nofollow"
-                data-target="#"
-                href="#"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-                class="nav-link language dropdown-toggle"
-                ><img src="img/flags/16/GB.png" alt="English" /><span
-                  class="d-none d-sm-inline-block"
-                  >English</span
-                ></a
-              >
-              <div aria-labelledby="languages" class="dropdown-menu">
-                <a rel="nofollow" href="#" class="dropdown-item">
-                  <img
-                    src="img/flags/16/DE.png"
-                    alt="English"
-                    class="mr-2"
-                  /><span>German</span></a
-                ><a rel="nofollow" href="#" class="dropdown-item">
-                  <img
-                    src="img/flags/16/FR.png"
-                    alt="English"
-                    class="mr-2"
-                  /><span>French </span></a
-                >
-              </div>
-            </div>
-            <!-- Log out               -->
-            <div class="list-inline-item logout">
-              <a id="logout" href="/admin/logout" class="nav-link"
-                >Logout <i class="icon-logout"></i
-              ></a>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </header>
-    <div class="d-flex align-items-stretch">
-      <!-- Sidebar Navigation-->
-      <nav id="sidebar">
-        <!-- Sidebar Header-->
-        <div class="sidebar-header d-flex align-items-center">
-          <div class="avatar">
-            <img
-              src="/images/logo.png"
-              alt="..."
-              class="img-fluid rounded-circle"
-            />
-          </div>
-          <div class="title">
-            <h1 class="h5">Binel</h1>
-            <p>Web Designer</p>
-          </div>
-        </div>
-        <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
-        <ul class="list-unstyled">
-          <li>
-            <a href="/admin/adminHome"> <i class="icon-home"></i>Dashboard</a>
-          </li>
-          <li>
-            <a href="/admin/Product"> <i class="icon-grid"></i>Product</a>
-          </li>
-          <li>
-            <a href="/admin/User"> <i class="fa fa-bar-chart"></i>user</a>
-          </li>
-          <li>
-            <a href="/admin/Category"> <i class="icon-padnote"></i>Category</a>
-          </li>
-          <li>
-            <a href="/admin/order">
-              <i class="icon-paper-and-pencil"></i>Order</a
-            >
-          </li>
-          <li>
-            <a href="/admin/coupons">
-              <i class="icon-three-cells"></i>Coupons</a
-            >
-          </li>
-          <li  class="active">
-            <a href="/admin/sales"> <i class="icon-info"></i>Sales Report</a>
-          </li>
-        </ul>
-      </nav>
-      <div class="page-content">
-        <div class="page-header">
-          <div class="container-fluid">
-            <h2 class="h5 no-margin-bottom">Sales Report</h2>
-          </div>
-        </div>
-        <div style="display: flex; flex-direction: column">
-          <div class="container">
-            <h1>Sales Report</h1>
+<body>
+  <header class="header">
+    <nav class="navbar navbar-expand-lg">
+      <div class="search-panel">
+        <div class="search-inner d-flex align-items-center justify-content-center">
+          <div class="close-btn">Close <i class="fa fa-close"></i></div>
+          <form id="searchForm" action="#">
             <div class="form-group">
-              <label for="sortOption">Sort by:</label>
-              <select id="sortOption" class="form-control">
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-                <option value="custom">Custom Date Range</option>
-              </select>
+              <input type="search" name="search" placeholder="What are you searching for..." />
+              <button type="submit" class="submit">Search</button>
             </div>
-            <div id="customDateRange" style="display: none">
-              <div class="form-group">
-                <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate" class="form-control" />
-              </div>
-              <div class="form-group">
-                <label for="endDate">End Date:</label>
-                <input type="date" id="endDate" class="form-control" />
-              </div>
+          </form>
+        </div>
+      </div>
+      <div class="container-fluid d-flex align-items-center justify-content-between">
+        <div class="navbar-header">
+          <!-- Navbar Header--><a href="/" class="navbar-brand">
+            <div class="brand-text brand-big visible text-uppercase">
+              <strong class="text-primary">4WATCHES</strong><strong>Admin</strong>
             </div>
-            <div class="form-group">
-              <label for="sortStatus">Sort by Status:</label>
-              <select id="sortStatus" class="form-control">
-                <option value="default">Default</option>
-                <option value="pending">Pending First</option>
-                <option value="completed">Completed First</option>
-                <option value="paymentpending">
-                  Payment pending order First
-                </option>
-                <option value="returned">Returned First</option>
-                <option value="cancelled">Cancelled First</option>
-              </select>
+            <div class="brand-text brand-sm">
+              <strong class="text-primary">D</strong><strong>A</strong>
             </div>
+          </a>
 
-            <button id="generateReport" class="btn btn-primary">
-              Generate Report
-            </button>
-            <button id="downloadReportPDF" class="btn btn-secondary">
-              Download PDF
-            </button>
-            <div id="reportContainer"></div>
+          <!-- Languages dropdown    -->
+          <div class="list-inline-item dropdown">
+            <a id="languages" rel="nofollow" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false" class="nav-link language dropdown-toggle"><img src="img/flags/16/GB.png"
+                alt="English" /><span class="d-none d-sm-inline-block">English</span></a>
+            <div aria-labelledby="languages" class="dropdown-menu">
+              <a rel="nofollow" href="#" class="dropdown-item">
+                <img src="img/flags/16/DE.png" alt="English" class="mr-2" /><span>German</span></a><a rel="nofollow"
+                href="#" class="dropdown-item">
+                <img src="img/flags/16/FR.png" alt="English" class="mr-2" /><span>French </span></a>
+            </div>
           </div>
-
-          <!-- Order Details Report -->
-          <div
-            id="orderDetailsReport"
-            style="display: none"
-            class="container-fluid"
-          >
-            <h2>Order Details Report</h2>
-            <div id="orderDetailsPagination"></div>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer</th>
-                  <th>Products</th>
-                  <th>Total Price</th>
-                  <th>Payment Method</th>
-                  <th>Address</th>
-                  <th>Coupon</th>
-                  <th>Status</th>
-                  <th>Ordered Date</th>
-                </tr>
-              </thead>
-              <tbody id="orderDetailsTableBody"></tbody>
-            </table>
+          <!-- Log out               -->
+          <div class="list-inline-item logout">
+            <a id="logout" href="/admin/logout" class="nav-link">Logout <i class="icon-logout"></i></a>
           </div>
         </div>
       </div>
-      <footer class="footer">
-        <div class="footer__block block no-margin-bottom"></div>
-      </footer>
+    </nav>
+  </header>
+  <div class="d-flex align-items-stretch">
+    <!-- Sidebar Navigation-->
+    <nav id="sidebar">
+      <!-- Sidebar Header-->
+      <div class="sidebar-header d-flex align-items-center">
+        <div class="avatar">
+          <img src="/images/logo.png" alt="..." class="img-fluid rounded-circle" />
+        </div>
+        <div class="title">
+          <h1 class="h5">Binel</h1>
+          <p>Web Designer</p>
+        </div>
+      </div>
+      <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
+      <ul class="list-unstyled">
+        <li>
+          <a href="/admin/adminHome"> <i class="icon-home"></i>Dashboard</a>
+        </li>
+        <li>
+          <a href="/admin/Product"> <i class="icon-grid"></i>Product</a>
+        </li>
+        <li>
+          <a href="/admin/User"> <i class="fa fa-bar-chart"></i>user</a>
+        </li>
+        <li>
+          <a href="/admin/Category"> <i class="icon-padnote"></i>Category</a>
+        </li>
+        <li>
+          <a href="/admin/order">
+            <i class="icon-paper-and-pencil"></i>Order</a>
+        </li>
+        <li>
+          <a href="/admin/coupons">
+            <i class="icon-three-cells"></i>Coupons</a>
+        </li>
+        <li class="active">
+          <a href="/admin/sales"> <i class="icon-info"></i>Sales Report</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="page-content">
+      <div class="page-header">
+        <div class="container-fluid">
+          <h2 class="h5 no-margin-bottom">Sales Report</h2>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <div class="container">
+          <h1>Sales Report</h1>
+          <div class="form-group">
+            <label for="sortOption">Sort by:</label>
+            <select id="sortOption" class="form-control">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+              <option value="custom">Custom Date Range</option>
+            </select>
+          </div>
+          <div id="customDateRange" style="display: none">
+            <div class="form-group">
+              <label for="startDate">Start Date:</label>
+              <input type="date" id="startDate" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="endDate">End Date:</label>
+              <input type="date" id="endDate" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="sortStatus">Sort by Status:</label>
+            <select id="sortStatus" class="form-control">
+              <option value="default">Default</option>
+              <option value="pending">Pending First</option>
+              <option value="completed">Completed First</option>
+              <option value="paymentpending">
+                Payment pending order First
+              </option>
+              <option value="returned">Returned First</option>
+              <option value="cancelled">Cancelled First</option>
+              <option value="Dispatched">Dispatched First</option>
+              <option value="In Transit">In Transit First</option>
+            </select>
+          </div>
+
+          <button id="generateReport" class="btn btn-primary">
+            Generate Report
+          </button>
+          <button id="downloadReportPDF" class="btn btn-secondary">
+            Download PDF
+          </button>
+          <div id="reportContainer"></div>
+        </div>
+
+        <!-- Order Details Report -->
+        <div id="orderDetailsReport" style="display: none" class="container-fluid">
+          <h2>Order Details Report</h2>
+          <div id="orderDetailsPagination"></div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Products</th>
+                <th>Total Price</th>
+                <th>Payment Method</th>
+                <th>Address</th>
+                <th>Coupon</th>
+                <th>Status</th>
+                <th>Ordered Date</th>
+              </tr>
+            </thead>
+            <tbody id="orderDetailsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    <!-- JavaScript files-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/popper.js/umd/popper.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="vendor/jquery.cookie/jquery.cookie.js"></script>
-    <script src="vendor/chart.js/Chart.min.js"></script>
-    <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
-    <script src="js/charts-home.js"></script>
-    <script src="js/front.js"></script>
+    <footer class="footer">
+      <div class="footer__block block no-margin-bottom"></div>
+    </footer>
+  </div>
+  <!-- JavaScript files-->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/popper.js/umd/popper.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="vendor/jquery.cookie/jquery.cookie.js"></script>
+  <script src="vendor/chart.js/Chart.min.js"></script>
+  <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+  <script src="js/charts-home.js"></script>
+  <script src="js/front.js"></script>
 
-    <script>
-      // JavaScript code for handling sorting and report generation
-      const sortOptionSelect = document.getElementById("sortOption");
-      const customDateRange = document.getElementById("customDateRange");
-      const startDateInput = document.getElementById("startDate");
-      const endDateInput = document.getElementById("endDate");
-      const generateReportBtn = document.getElementById("generateReport");
-      const reportContainer = document.getElementById("reportContainer");
-      const orderDetailsReport = document.getElementById("orderDetailsReport");
-      const orderDetailsTableBody = document.getElementById(
-        "orderDetailsTableBody"
-      );
-      const productSalesReport = document.getElementById("productSalesReport");
-      const productSalesTableBody = document.getElementById(
-        "productSalesTableBody"
-      );
-      const sortStatusSelect = document.getElementById("sortStatus");
+  <script>
+    // JavaScript code for handling sorting and report generation
+    const sortOptionSelect = document.getElementById("sortOption");
+    const customDateRange = document.getElementById("customDateRange");
+    const startDateInput = document.getElementById("startDate");
+    const endDateInput = document.getElementById("endDate");
+    const generateReportBtn = document.getElementById("generateReport");
+    const reportContainer = document.getElementById("reportContainer");
+    const orderDetailsReport = document.getElementById("orderDetailsReport");
+    const orderDetailsTableBody = document.getElementById(
+      "orderDetailsTableBody"
+    );
+    const productSalesReport = document.getElementById("productSalesReport");
+    const productSalesTableBody = document.getElementById(
+      "productSalesTableBody"
+    );
+    const sortStatusSelect = document.getElementById("sortStatus");
 
-      sortOptionSelect.addEventListener("change", () => {
-        if (sortOptionSelect.value === "custom") {
-          customDateRange.style.display = "block";
-        } else {
-          customDateRange.style.display = "none";
+    sortOptionSelect.addEventListener("change", () => {
+      if (sortOptionSelect.value === "custom") {
+        customDateRange.style.display = "block";
+      } else {
+        customDateRange.style.display = "none";
+      }
+    });
+
+    generateReportBtn.addEventListener("click", async () => {
+      const sortOption = sortOptionSelect.value;
+      let startDate, endDate;
+
+      if (sortOption === "custom") {
+        startDate = new Date(startDateInput.value);
+        endDate = new Date(endDateInput.value);
+        endDate.setDate(endDate.getDate() + 1); // Include the end date in the range
+      } else {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        const date = today.getDate();
+
+        switch (sortOption) {
+          case "daily":
+            startDate = new Date(year, month, date);
+            endDate = new Date(year, month, date + 1);
+            break;
+          case "weekly":
+            const firstDayOfWeek = today.getDate() - 6;
+            const lastDayOfWeek = firstDayOfWeek + 6;
+            startDate = new Date(year, month, firstDayOfWeek);
+            endDate = new Date(year, month, lastDayOfWeek + 1);
+            break;
+          case "monthly":
+            startDate = new Date(year, month, 1);
+            endDate = new Date(year, month + 1, 1);
+            break;
+          case "yearly":
+            startDate = new Date(year, 0, 1);
+            endDate = new Date(year + 1, 0, 1);
+            break;
         }
-      });
+      }
 
-      generateReportBtn.addEventListener("click", async () => {
+      const downloadReportPDFBtn =
+        document.getElementById("downloadReportPDF");
+      downloadReportPDFBtn.addEventListener("click", async () => {
         const sortOption = sortOptionSelect.value;
         let startDate, endDate;
 
@@ -311,148 +305,126 @@
           }
         }
 
-        const downloadReportPDFBtn =
-          document.getElementById("downloadReportPDF");
-        downloadReportPDFBtn.addEventListener("click", async () => {
-          const sortOption = sortOptionSelect.value;
-          let startDate, endDate;
-
-          if (sortOption === "custom") {
-            startDate = new Date(startDateInput.value);
-            endDate = new Date(endDateInput.value);
-            endDate.setDate(endDate.getDate() + 1); // Include the end date in the range
-          } else {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = today.getMonth();
-            const date = today.getDate();
-
-            switch (sortOption) {
-              case "daily":
-                startDate = new Date(year, month, date);
-                endDate = new Date(year, month, date + 1);
-                break;
-              case "weekly":
-                const firstDayOfWeek = today.getDate() - 6;
-                const lastDayOfWeek = firstDayOfWeek + 6;
-                startDate = new Date(year, month, firstDayOfWeek);
-                endDate = new Date(year, month, lastDayOfWeek + 1);
-                break;
-              case "monthly":
-                startDate = new Date(year, month, 1);
-                endDate = new Date(year, month + 1, 1);
-                break;
-              case "yearly":
-                startDate = new Date(year, 0, 1);
-                endDate = new Date(year + 1, 0, 1);
-                break;
-            }
-          }
-
-          const downloadUrl = `/admin/salesReport/download?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
-          window.open(downloadUrl, "_blank");
-        });
-        const reportData = await fetchReportData(startDate, endDate);
-        renderReport(reportData);
+        const downloadUrl = `/admin/salesReport/download?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+        window.open(downloadUrl, "_blank");
       });
+      const reportData = await fetchReportData(startDate, endDate);
+      renderReport(reportData);
+    });
 
-      async function fetchReportData(startDate, endDate) {
-        try {
-          const response = await fetch(
-            `/admin/salesReport/data?startDate=${startDate}&endDate=${endDate}`
-          );
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error("Error fetching report data:", error);
-          return null;
-        }
+    async function fetchReportData(startDate, endDate) {
+      try {
+        const response = await fetch(
+          `/admin/salesReport/data?startDate=${startDate}&endDate=${endDate}`
+        );
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching report data:", error);
+        return null;
+      }
+    }
+
+    function renderReport(reportData) {
+      if (!reportData) {
+        reportContainer.innerHTML = "Error fetching report data.";
+        return;
       }
 
-      function renderReport(reportData) {
-        if (!reportData) {
-          reportContainer.innerHTML = "Error fetching report data.";
-          return;
-        }
-
-        reportContainer.innerHTML = `
+      reportContainer.innerHTML = `
     <h2>Overall Sales Report</h2>
     <p>Overall Sales Count: ${reportData.overallSalesCount}</p>
     <p>Overall Order Amount: ${reportData.overallOrderAmount}</p>
     <p>Overall Discount: ${reportData.overallDiscount}</p>
   `;
 
-        // Render order details report
-        renderOrderDetailsReport(reportData.orders);
+      // Render order details report
+      renderOrderDetailsReport(reportData.orders);
 
-        orderDetailsReport.style.display = "block";
-      }
+      orderDetailsReport.style.display = "block";
+    }
 
-      function renderOrderDetailsReport(orders) {
-        const itemsPerPage = 10; // Number of items to display per page
-        const totalItems = orders.length;
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        let currentPage = 1;
+    function renderOrderDetailsReport(orders) {
+      const itemsPerPage = 10; // Number of items to display per page
+      const totalItems = orders.length;
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      let currentPage = 1;
 
-        const renderPage = (page) => {
-          const startIndex = (page - 1) * itemsPerPage;
-          const endIndex = startIndex + itemsPerPage;
+      const renderPage = (page) => {
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
 
-          // Sort orders based on the selected option
-          const sortOption = sortStatusSelect.value;
-          let sortedOrders = [...orders]; // Create a copy of the orders array
+        // Sort orders based on the selected option
+        const sortOption = sortStatusSelect.value;
+        let sortedOrders = [...orders]; // Create a copy of the orders array
 
-          if (sortOption === "pending") {
-            sortedOrders.sort((a, b) => {
-              const statusA = a.status.toLowerCase();
-              const statusB = b.status.toLowerCase();
-              if (statusA === "pending" && statusB !== "pending") return -1;
-              if (statusA !== "pending" && statusB === "pending") return 1;
-              return 0;
-            });
-          } else if (sortOption === "completed") {
-            sortedOrders.sort((a, b) => {
-              const statusA = a.status.toLowerCase();
-              const statusB = b.status.toLowerCase();
-              if (statusA === "completed" && statusB !== "completed") return -1;
-              if (statusA !== "completed" && statusB === "completed") return 1;
-              return 0;
-            });
-          } else if (sortOption === "paymentpending") {
-            sortedOrders.sort((a, b) => {
-              const statusA = a.status.toLowerCase();
-              const statusB = b.status.toLowerCase();
-              if (statusA === "paymentpending" && statusB !== "paymentpending")
-                return -1;
-              if (statusA !== "paymentpending" && statusB === "paymentpending")
-                return 1;
-              return 0;
-            });
-          } else if (sortOption === "cancelled") {
-            sortedOrders.sort((a, b) => {
-              const statusA = a.status.toLowerCase();
-              const statusB = b.status.toLowerCase();
-              if (statusA === "cancelled" && statusB !== "cancelled") return -1;
-              if (statusA !== "cancelled" && statusB === "cancelled") return 1;
-              return 0;
-            });
-          } else if (sortOption === "returned") {
-            sortedOrders.sort((a, b) => {
-              const statusA = a.status.toLowerCase();
-              const statusB = b.status.toLowerCase();
-              if (statusA === "returned" && statusB !== "returned") return -1;
-              if (statusA !== "returned" && statusB === "returned") return 1;
-              return 0;
-            });
-          }
+        if (sortOption === "pending") {
+          sortedOrders.sort((a, b) => {
+            const statusA = a.status.toLowerCase();
+            const statusB = b.status.toLowerCase();
+            if (statusA === "pending" && statusB !== "pending") return -1;
+            if (statusA !== "pending" && statusB === "pending") return 1;
+            return 0;
+          });
+        } else if (sortOption === "completed") {
+          sortedOrders.sort((a, b) => {
+            const statusA = a.status.toLowerCase();
+            const statusB = b.status.toLowerCase();
+            if (statusA === "completed" && statusB !== "completed") return -1;
+            if (statusA !== "completed" && statusB === "completed") return 1;
+            return 0;
+          });
+        } else if (sortOption === "paymentpending") {
+          sortedOrders.sort((a, b) => {
+            const statusA = a.status.toLowerCase();
+            const statusB = b.status.toLowerCase();
+            if (statusA === "paymentpending" && statusB !== "paymentpending")
+              return -1;
+            if (statusA !== "paymentpending" && statusB === "paymentpending")
+              return 1;
+            return 0;
+          });
+        } else if (sortOption === "cancelled") {
+          sortedOrders.sort((a, b) => {
+            const statusA = a.status.toLowerCase();
+            const statusB = b.status.toLowerCase();
+            if (statusA === "cancelled" && statusB !== "cancelled") return -1;
+            if (statusA !== "cancelled" && statusB === "cancelled") return 1;
+            return 0;
+          });
+        } else if (sortOption === "returned") {
+          sortedOrders.sort((a, b) => {
+            const statusA = a.status.toLowerCase();
+            const statusB = b.status.toLowerCase();
+            if (statusA === "returned" && statusB !== "returned") return -1;
+            if (statusA !== "returned" && statusB === "returned") return 1;
+            return 0;
+          });
+        } else if (sortOption === "Dispatched") {
+          sortedOrders.sort((a, b) => {
+            const statusA = a.status.toLowerCase();
+            const statusB = b.status.toLowerCase();
+            if (statusA === "dispatched" && statusB !== "dispatched") return -1;
+            if (statusA !== "dispatched" && statusB === "dispatched") return 1;
+            return 0;
+          });
+        } else if (sortOption === "In Transit") {
+          sortedOrders.sort((a, b) => {
+            const statusA = a.status.toLowerCase();
+            const statusB = b.status.toLowerCase();
+            if (statusA === "in transit" && statusB !== "in transit") return -1;
+            if (statusA !== "in transit" && statusB === "in transit") return 1;
+            return 0;
+          });
+        }
 
-          const ordersToDisplay = sortedOrders.slice(startIndex, endIndex);
+        const ordersToDisplay = sortedOrders.slice(startIndex, endIndex);
 
-          orderDetailsTableBody.innerHTML = "";
+        orderDetailsTableBody.innerHTML = "";
 
-          ordersToDisplay.forEach((order) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
+        ordersToDisplay.forEach((order) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
         <td>${order._id}</td>
         <td>${order.user ? order.user.fullname : "-"}</td>
         <td>
@@ -465,50 +437,51 @@
               .join("")}
           </ul>
         </td>
-        <td>${order.totalPrice}</td>
+        <td>${order.totalPrice+order.walletAmount}</td>
         <td>${order.paymentMethod}</td>
         <td>${order.address ? order.address.address : "-"}</td>
         <td>${order.coupon ? order.coupon.code : "None"}</td>
         <td>${order.status}</td>
         <td>${new Date(order.createdAt).toDateString()}</td>
       `;
-            orderDetailsTableBody.appendChild(row);
+          orderDetailsTableBody.appendChild(row);
+        });
+      };
+
+      const renderPagination = () => {
+        const orderDetailsPagination = document.getElementById(
+          "orderDetailsPagination"
+        );
+        orderDetailsPagination.innerHTML = "";
+
+        const paginationUl = document.createElement("ul");
+        paginationUl.classList.add("pagination");
+
+        for (let i = 1; i <= totalPages; i++) {
+          const li = document.createElement("li");
+          li.classList.add("page-item");
+
+          const a = document.createElement("a");
+          a.classList.add("page-link");
+          a.textContent = i;
+          a.href = "#";
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentPage = i;
+            renderPage(currentPage);
           });
-        };
 
-        const renderPagination = () => {
-          const orderDetailsPagination = document.getElementById(
-            "orderDetailsPagination"
-          );
-          orderDetailsPagination.innerHTML = "";
+          li.appendChild(a);
+          paginationUl.appendChild(li);
+        }
 
-          const paginationUl = document.createElement("ul");
-          paginationUl.classList.add("pagination");
+        orderDetailsPagination.appendChild(paginationUl);
+      };
 
-          for (let i = 1; i <= totalPages; i++) {
-            const li = document.createElement("li");
-            li.classList.add("page-item");
+      renderPage(currentPage);
+      renderPagination();
+    }
+  </script>
+</body>
 
-            const a = document.createElement("a");
-            a.classList.add("page-link");
-            a.textContent = i;
-            a.href = "#";
-            a.addEventListener("click", (e) => {
-              e.preventDefault();
-              currentPage = i;
-              renderPage(currentPage);
-            });
-
-            li.appendChild(a);
-            paginationUl.appendChild(li);
-          }
-
-          orderDetailsPagination.appendChild(paginationUl);
-        };
-
-        renderPage(currentPage);
-        renderPagination();
-      }
-    </script>
-  </body>
 </html>

@@ -100,7 +100,7 @@
         <li><a href="/admin/Product"> <i class="icon-grid"></i>Product</a></li>
         <li><a href="/admin/User"> <i class="fa fa-bar-chart"></i>user</a></li>
         <li><a href="/admin/Category"> <i class="icon-padnote"></i>Category</a></li>
-        <li  class="active"><a href="/admin/order"> <i class="icon-paper-and-pencil"></i>Order</a></li>
+        <li class="active"><a href="/admin/order"> <i class="icon-paper-and-pencil"></i>Order</a></li>
         <li><a href="/admin/coupons"> <i class="icon-three-cells"></i>Coupons</a></li>
         <li>
           <a href="/admin/sales">
@@ -222,7 +222,9 @@
                                     <%= order[i].products[j].status %>
                                   </td>
                                   <td>
-                                    <% if (order[i].products[j].status==='pending'||order[i].products[j].status==='Dispatched'||order[i].products[j].status==='In Transit' ) { %>
+                                    <% if (order[i].products[j].status==='pending'
+                                      ||order[i].products[j].status==='Dispatched'
+                                      ||order[i].products[j].status==='In Transit' ) { %>
                                       <button class="btn btn-danger btn-sm cancel-product"
                                         data-order-id="<%= order[i]._id %>"
                                         data-product-id="<%= order[i].products[j].product._id %>">Cancel
@@ -344,20 +346,21 @@
                               <td style="text-align: left">Subtotal</td>
                               <td style="text-align: left">
                                 <%=
-                                  ((order[i].grandTotalPrice-order[i].reducedPrice-order[i].returnedPrice-45-order[i].discountedAmount)-((order[i].grandTotalPrice-order[i].reducedPrice-order[i].returnedPrice-45)/21)).toFixed(2)
+                                order[i].status=='cancelled' ||order[i].status=='returned' ?0: ((order[i].grandTotalPrice-order[i].reducedPrice-order[i].returnedPrice-45-order[i].discountedAmount)-((order[i].grandTotalPrice-order[i].reducedPrice-order[i].returnedPrice-45)/21)).toFixed(2)
                                   %>
                               </td>
                             </tr>
                             <tr>
                               <td style="text-align: left">Shipping Fee</td>
                               <td style="text-align: left">
-                                <%= 45 %>
+                                <%= order[i].status=='cancelled' ||order[i].status=='returned' ?0:45 %>
                               </td>
                             </tr>
                             <tr>
                               <td style="text-align: left">Tax</td>
                               <td style="text-align: left">
-                                <%= ((order[i].grandTotalPrice-order[i].reducedPrice-order[i].returnedPrice-45)/21).toFixed(2) %>
+                                <%=
+                                order[i].status=='cancelled' ||order[i].status=='returned' ?0:((order[i].grandTotalPrice-order[i].reducedPrice-order[i].returnedPrice-45)/21).toFixed(2)%>
                               </td>
                             </tr>
                             <% if(order[i].coupon) { %>
@@ -378,7 +381,7 @@
                                   <% } else if(order[i].walletAmount> 0) { %>
                                     <tr>
                                       <th style="text-align: left">
-                                        <%= "For the order[i], used wallet amount" %>
+                                        <%= "For the order, used wallet amount" %>
                                       </th>
                                       <th style="text-align: left">
                                         <%= order[i].walletAmount %>
@@ -397,17 +400,17 @@
                                           <tr>
                                             <th style="text-align: left">Total</th>
                                             <th style="text-align: left">
-                                              <%=
-                                                (order[i].grandTotalPrice-order[i].reducedPrice-order[i].returnedPrice-order[i].discountedAmount).toFixed(2)
+                                              <%= order[i].status=='cancelled' ||order[i].status=='returned' ?
+                                                0:(order[i].grandTotalPrice-order[i].reducedPrice-order[i].returnedPrice-order[i].discountedAmount).toFixed(2)
                                                 %>
                                             </th>
                                           </tr>
-                                        <tr>
+                                          <tr>
                                             <th style="text-align: left">payment Method</th>
                                             <th style="text-align: left">
                                               <%= order[i].paymentMethod %>
                                             </th>
-                                           
+
                                           </tr>
                           </tbody>
                         </table>
@@ -424,14 +427,17 @@
               </td>
 
               <td>
-                <% if (order[i].status==='pending'||order[i].status==='Dispatched'||order[i].status==='In Transit' ) { %>
+                <% if (order[i].status==='pending' ||order[i].status==='Dispatched' ||order[i].status==='In Transit' ) {
+                  %>
                   <!-- Show dropdown only if current status is 'pending' -->
                   <select name="status" class="order-status" data-order-id="<%= order[i]._id %>"
                     onchange="changeStatus(this)">
                     <option value="pending" <% if (order[i].status==='pending' ) { %>selected<% } %>>Pending</option>
                     <option value="completed">Completed</option>
-                    <option value="Dispatched" <% if (order[i].status==='Dispatched' ) { %>selected<% } %>>Dispatched</option>
-                      <option value="In Transit" <% if (order[i].status==='In Transit' ) { %>selected<% } %>>In Transit</option>
+                    <option value="Dispatched" <% if (order[i].status==='Dispatched' ) { %>selected<% } %>>Dispatched
+                    </option>
+                    <option value="In Transit" <% if (order[i].status==='In Transit' ) { %>selected<% } %>>In Transit
+                    </option>
                   </select>
                   <% } else if(order[i].status=='completed' ) { %>
                     <!-- Display current status if not 'pending' -->
@@ -458,7 +464,8 @@
               </td>
 
               <td>
-                <% if(order[i].status=='pending'||order[i].status==='Dispatched'||order[i].status==='In Transit' ) { %>
+                <% if(order[i].status=='pending' ||order[i].status==='Dispatched' ||order[i].status==='In Transit' ) {
+                  %>
                   <button type="button" class="btn btn-danger cancel-order" data-order-id="<%= order[i]._id %>">Cancel
                     Order</button>
                   <% } else if(order[i].status=='completed' ) { %>
@@ -469,7 +476,9 @@
                         <span class="text-warning">Requested for Return</span>
                         <% } else if(order[i].status=='paymentpending' ){ %>
                           <span class="text-danger">Payment pending</span>
-                          <% }%>
+                          <% } else if(order[i].status=='cancelled' ){ %>
+                            <span class="text-danger">Order Cancelled</span>
+                            <% }%>
               </td>
               <td>
                 <% if (order[i].status==='returnrequest' ) { %>

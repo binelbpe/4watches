@@ -306,7 +306,7 @@ const downloadSalesReportPDF = async (req, res) => {
       status: "completed",
     })
       .sort({ createdAt: -1 })
-      .populate("products.product", "name price")
+      .populate("products.product")
       .populate("coupon")
       .populate("user");
 
