@@ -13,19 +13,19 @@ const changeOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // // Check if the current order status is 'pending'
-    // if (order.status !== "pending"||"Dispatched"||"In Transit") {
-    //   return res.status(400).json({
-    //     message:
-    //       "Order status can only be changed from 'pending' to 'completed'",
-    //   });
-    // }
+    // Check if the current order status is 'pending'
+    if (order.status !== "pending"&& order.status !== "Dispatched" && order.status !== "In Transit") {
+      return res.status(400).json({
+        message:
+          "Order status can only be changed from 'pending' to 'completed'",
+      });
+    }
 
     // Set new status if the validation passes
     order.status = newStatus;
 
     order.products.forEach((product) => {
-      if (product.status === "pending"||"Dispatched"||"In Transit") {
+      if (product.status === "pending"||product.status ==="Dispatched"||product.status ==="In Transit") {
         product.status = newStatus;
       }
     });
@@ -67,7 +67,7 @@ const cancelOrder = async (req, res) => {
     order.status = "cancelled";
 
     order.products.forEach((product) => {
-      if (product.status === "pending") {
+      if (product.status === "pending"|| product.status ==="Dispatched" || product.status ==="In Transit") {
         product.status = "cancelled";
       }
     });
@@ -115,9 +115,7 @@ const cancelOrder = async (req, res) => {
       // Save the updated wallet
       await user.wallet.save();
     } else if (order.paymentMethod == "pay_by_wallet") {
-      const user = await User.findById(req.session.userData._id).populate(
-        "wallet"
-      );
+      const user = await User.findById(order.user).populate("wallet");
 
       if (!user || !user.wallet) {
         return res.status(404).json({ error: "User or wallet not found" });
@@ -136,10 +134,10 @@ const cancelOrder = async (req, res) => {
       // Save the updated wallet
       await user.wallet.save();
     }
-
-    const userId = req.session.userData._id;
-    const fullName = req.session.userData.fullname;
-    const orders = await Order.find({ user: userId })
+    const user = await User.findById(order.user);
+    // const userId = req.session.userData._id;
+    // const fullName = req.session.userData.fullname;
+    const orders = await Order.find({ user: user._id })
       .populate("address")
       .populate("products.product")
       .sort({ createdAt: -1 });
@@ -190,11 +188,12 @@ const getOrdersWithPagination = async (req, res) => {
 const cancelProductAsAdmin = async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId);
+    const productId=req.params.productId
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    if (order.status !== "pending") {
+    if (order.status !=="pending" && order.status !=="Dispatched"&&order.status !=="In Transit") {
       return res
         .status(400)
         .json({ error: "Cannot cancel product for this order" });
