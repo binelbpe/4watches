@@ -105,11 +105,13 @@
         <div class="col-md-4 mb-4">
           <div class="card cardwishlist" data-stock="<%= product.stock %>">
             <a href="/product/<%= product._id %>">
-              <img
-                class="img-fluid"
-                src="<%= product.image[0].path %>"
-                alt="product image"
-              />
+              <% if (product.image && product.image.length > 0) { %>
+                <img
+                  class="img-fluid"
+                  src="<%= product.image[0].path %>"
+                  alt="product image"
+                />
+              <% } %>
             </a>
 
             <div class="card-body">
@@ -145,7 +147,7 @@
                 <!-- Example form to remove a product from the wishlist -->
                 <form
                   id="removeFromWishlistForm"
-                  action="/remove-from-wishlist/662110e769375a5fdb3615be"
+                  action="/remove-from-wishlist/<%= product._id %>"
                   method="DELETE"
                 >
                   <input type="hidden" name="_method" value="DELETE" />

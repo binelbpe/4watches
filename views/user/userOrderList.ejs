@@ -190,7 +190,7 @@
                   </button>
                   <br />
                   <br />
-                  <% } else if (order.status=='pending' ||'Dispatched'||'In Transit') { %>
+                  <% } else if (order.status=='pending' ||order.status=='Dispatched'||order.status=='In Transit') { %>
                     <form action="/orders/cancel/<%= order._id %>" method="POST" class="d-inline">
                       <button type="button" class="btn btn-warning" onclick="confirmCancelOrder('<%= order._id %>')">
                         Cancel Order

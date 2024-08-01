@@ -180,7 +180,7 @@ router.post(
   checkUserStatus,
   wishlistController.addToWishlist
 );
-router.delete(
+router.get(
   "/remove-from-wishlist/:productId",
   isAuth,
   checkUserStatus,

@@ -65,7 +65,9 @@ const verifyOTP = async (req, res) => {
         let fullName = newUser.fullname;
 
         // Clear session data
-
+        const user=await User.findById(newUser._id)
+        req.session.userData = user;
+        req.session.user = email;
         delete req.session.otp;
         delete req.session.currentTimestamp;
 

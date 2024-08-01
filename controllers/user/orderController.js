@@ -183,16 +183,18 @@ const addAddressorder = async (req, res) => {
       return res.status(403).redirect("/login");
     }
 
+    const user = await User.findById(userId).populate('addresses');
+    const isFirstAddress = !user.addresses || user.addresses.length === 0;
     const newAddress = new Address({
       address,
       addressline2,
       city,
       state,
       pincode,
+      status:isFirstAddress,
     });
 
     await newAddress.save();
-
     // Add the new address to the user's addresses array
     await User.findByIdAndUpdate(userId, {
       $push: { addresses: newAddress._id },
