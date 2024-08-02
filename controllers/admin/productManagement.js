@@ -8,39 +8,49 @@ const mongoose = require("mongoose");
 //function for render product list page in admin side
 const getProduct = async (req, res) => {
   try {
-    let page = +req.query.page || 1; // Get page number from query parameters or default to 1
+    let page = +req.query.page || 1;
     const ITEMS_PER_PAGE = 8;
-    const totalProducts = await productModel.countDocuments(); // Get total number of products
-    let totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE); // Calculate total number of pages
+    let query = {};
+    let searchQuery = '';
 
-    // Adjust totalPages to at least 1 to prevent calculation errors when there are no products
+    if (req.query.search) {
+      searchQuery = req.query.search.trim();
+      // Check if the search query is a valid MongoDB ObjectId
+      if (mongoose.Types.ObjectId.isValid(searchQuery)) {
+        query = { _id: searchQuery };
+      } else {
+        query = { 
+          $or: [
+            { product: { $regex: searchQuery, $options: 'i' } },
+            { category: { $regex: searchQuery, $options: 'i' } }
+          ]
+        };
+      }
+    }
+
+    const totalProducts = await productModel.countDocuments(query);
+    let totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
     totalPages = Math.max(totalPages, 1);
 
-    // Ensure the page number is within the valid range
     if (page < 1) {
       page = 1;
     } else if (page > totalPages) {
       page = totalPages;
     }
 
-    // Calculate skip only after adjusting page and totalPages
     const skipAmount = Math.max(0, (page - 1) * ITEMS_PER_PAGE);
 
-    // Find products with pagination
     const products = await productModel
-      .find()
+      .find(query)
       .skip(skipAmount)
       .limit(ITEMS_PER_PAGE);
 
-    // Calculate previous and next page numbers
     let prev = page > 1 ? page - 1 : null;
     let next = page < totalPages ? page + 1 : null;
 
-    // Retrieve categories and message, if any
     let msg = req.query.msg || "";
     const category = await categoryModel.find({});
 
-    // Render the adminProduct page with all the necessary data
     res.render("adminProduct", {
       data: products,
       prev: prev,
@@ -49,6 +59,7 @@ const getProduct = async (req, res) => {
       currentPage: page,
       CatData: category,
       msg: msg,
+      searchQuery: searchQuery
     });
   } catch (error) {
     console.log("Error in getProduct:", error);

@@ -5,7 +5,7 @@ const Address = require("../../models/addressModel");
 const Coupon = require("../../models/couponModel");
 const razorpay = require("../../helpers/razorpay");
 const Wallet = require("../../models/walletModel");
-const Cart = require("../../models/addtocartModel")
+const Cart = require("../../models/addtocartModel");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
@@ -128,12 +128,14 @@ const cancelOrder = async (req, res) => {
       }
 
       user.wallet.balance =
-        user.wallet.balance + order.walletAmount - parseFloat(reducedPrice);
+        user.wallet.balance +
+        order.walletAmount -
+        parseFloat(order.reducedPrice);
 
       // Add a new transaction to the wallet
       user.wallet.transactions.push({
         type: "credit",
-        amount: order.walletAmount - parseFloat(reducedPrice),
+        amount: order.walletAmount - parseFloat(order.reducedPrice),
         description: `Order ${order._id} cancelled`,
       });
 
@@ -183,7 +185,7 @@ const addAddressorder = async (req, res) => {
       return res.status(403).redirect("/login");
     }
 
-    const user = await User.findById(userId).populate('addresses');
+    const user = await User.findById(userId).populate("addresses");
     const isFirstAddress = !user.addresses || user.addresses.length === 0;
     const newAddress = new Address({
       address,
@@ -191,7 +193,7 @@ const addAddressorder = async (req, res) => {
       city,
       state,
       pincode,
-      status:isFirstAddress,
+      status: isFirstAddress,
     });
 
     await newAddress.save();
@@ -386,7 +388,7 @@ const placeOrder = async (req, res) => {
       // Handle unauthenticated user
       return res.redirect("/login");
     }
-    
+
     req.session.checkout = false;
     const cart = req.session.cart;
     const userId = req.session.userData._id;
@@ -403,7 +405,9 @@ const placeOrder = async (req, res) => {
     });
 
     if (user.addresses.length === 0) {
-      return res.status(400).json({ success: false, message: "No active address found" });
+      return res
+        .status(400)
+        .json({ success: false, message: "No active address found" });
     }
 
     const activeAddress = user.addresses[0];
@@ -426,8 +430,9 @@ const placeOrder = async (req, res) => {
     }
 
     const grandtotalPrice = req.session.totalPrice;
-    const difference = grandtotalPrice - totalPrice - parseInt(discountedAmount);
-    
+    const difference =
+      grandtotalPrice - totalPrice - parseInt(discountedAmount);
+
     const order = await Order.create({
       grandTotalPrice: grandtotalPrice,
       user: userId,
@@ -443,37 +448,31 @@ const placeOrder = async (req, res) => {
       coupon: coupon ? coupon._id : null,
     });
 
-    let walletUpdate = null;
-    if (paymentMethod === "pay_by_wallet" || difference > 0) {
-      const debitAmount = paymentMethod === "pay_by_wallet" ? totalPrice : difference.toFixed(2);
-      
-      walletUpdate = User.findOneAndUpdate(
-        { _id: userId },
-        {
-          $inc: { "wallet.balance": -debitAmount },
-          $push: {
-            "wallet.transactions": {
-              type: "debit",
-              amount: debitAmount,
-              description: `Order ${order._id} placed with wallet balance`
-            }
-          }
-        },
-        { new: true }
-      );
-    }
+//     let walletUpdate = null;
+//     if (paymentMethod === "pay_by_wallet" || difference > 0) {
+//       const debitAmount =
+//         paymentMethod === "pay_by_wallet" ? totalPrice : difference.toFixed(2);
+// console.log(paymentMethod, difference, totalPrice);
+//       walletUpdate = User.findOneAndUpdate(
+//         { _id: userId },
+//         {
+//           $inc: { "wallet.balance": -debitAmount },
+//           $push: {
+//             "wallet.transactions": {
+//               type: "debit",
+//               amount: debitAmount,
+//               description: `Order ${order._id} placed with wallet balance`,
+//             },
+//           },
+//         },
+//         { new: true }
+//       );
+//     }
 
-    if (totalPrice != 0 && totalPrice != grandtotalPrice && discountedAmount == 0) {
+    if (difference > 0 ) {
       const userWithWallet = await User.findById(userId).populate("wallet");
       const wallet = userWithWallet.wallet;
-
-      wallet.balance -= difference;
-      await wallet.save();  // Save the wallet balance update
-
-      if (walletUpdate) {
-        await walletUpdate; // Ensure previous wallet update is finished
-      }
-      
+     
       await wallet.debitBalance(
         difference.toFixed(2),
         `Order ${order._id} placed with wallet balance`
@@ -501,7 +500,7 @@ const placeOrder = async (req, res) => {
     );
 
     req.session.cart = [];
-    
+
     // Clear cart in the database
     await Cart.findOneAndUpdate({ userId: userId }, { cartItems: [] });
 
@@ -561,8 +560,6 @@ const processpayment = async (req, res) => {
     ) {
       const user = await User.findById(userId).populate("wallet");
       const wallet = user.wallet;
-      user.wallet.balance = user.wallet.balance - difference.toFixed(2);
-      user.wallet.save();
       await wallet.debitBalance(
         difference.toFixed(2),
         `Order ${order._id} placed along with wallet balance`
@@ -678,16 +675,18 @@ const invoice = async (req, res) => {
       50,
       150 // Adjust vertical position
     );
-    doc.moveDown(3);
+    doc.moveDown(2);
 
     // Draw a box around order details with a heading
     const boxTop = 200; // Adjust vertical position
     const boxHeight = 250;
+
     doc
-      .fillColor("#333333")
+      .fillColor("#bca374")
       .fontSize(16)
       .text(`Invoice for Order #${order._id}`, { align: "center" });
-    doc.rect(50, boxTop, 500, boxHeight).stroke("#bca374");
+     
+    doc.rect(50, boxTop, 500, boxHeight).stroke("#bca374").moveDown(1);
 
     // Add order details table inside the box
     const completedAndReturnedProducts = order.products.filter(
@@ -772,10 +771,19 @@ const invoice = async (req, res) => {
         .fillColor("#333333")
         .fontSize(12)
         .text(
-          `Wallet Balance Used: Rs.${total.toFixed(2)}`,
+          `Wallet Balance Used: Rs.${order.walletAmount-order.discountedAmount-order.returnedPrice.toFixed(2)}`,
           350,
           boxTop + boxHeight + 120
         );
+    }else if(order.walletAmount>0){
+      doc
+      .fillColor("#333333")
+      .fontSize(12)
+      .text(
+        `Wallet Balance Used: Rs.${order.walletAmount.toFixed(2)}`,
+        350,
+        boxTop + boxHeight + 120
+      );
     }
 
     doc
@@ -1048,7 +1056,7 @@ const orderAbort = async (req, res) => {
         parseFloat(user.wallet.balance) +
         (order.walletAmount ? parseFloat(order.walletAmount) : 0)
       ).toFixed(2);
-      if (order.walletAmount!=0) {
+      if (order.walletAmount != 0) {
         // Add a new transaction to the wallet
         user.wallet.transactions.push({
           type: "credit",
