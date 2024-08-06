@@ -61,7 +61,7 @@
   border: none; /* Remove border around the icon */
 }
 
-.wishlist-icon,
+/* .wishlist-icon, */
 .cart-icon {
   color: #bca374;
   font-size: 1.5vw;

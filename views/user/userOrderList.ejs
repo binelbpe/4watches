@@ -5,49 +5,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>4Watch Store</title>
-  <link rel="stylesheet" href="/css/style.css" />
+
   <!-- Bootstrap CSS -->
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Font Awesome CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="/css/style.css" />
-  <style>
-    th {
-      text-align: center;
-    }
 
-    .ordertable {
-      align-items: center !important;
-      border: none;
-      margin-left: 8%;
-    }
-
-    table {
-      width: 100%;
-    }
-
-    .cardbody {
-      height: 500px;
-    }
-
-    body {
-      white-space: nowrap;
-    }
-
-    .container {
-      width: max-content !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    tr,
-    td {
-      width: max-content !important;
-      margin: 0;
-      align-items: left;
-    }
-  </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.min.css" />
+  <link rel="stylesheet" href="/css/order.css" />
 </head>
 
 <body>
@@ -129,113 +94,129 @@
                           <% } %>
       </ul>
     </div>
+    <h1 class="mb-4">Your Orders</h1>
 
-    <h1>User Order List</h1>
-    <table class="table ordertable">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Date</th>
-          <th>Address</th>
-          <th>Status</th>
-          <th>price Breakdown</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% orders.forEach(order=> { %>
-          <tr>
-            <td>
-              <%= order._id %>
-            </td>
-            <td>
-              <%= order.createdAt.toDateString() %>
-            </td>
-            <td>
-              <%= order.address.address %>
-            </td>
-            <td>
-              <% if (order.status==='completed' ) { %>Completed<% } else if (order.status=='returned' ) { %>Returned<% }
-                    else if (order.status==='cancelled' ) { %>Cancelled<% } else if (order.status=='returnrequest' ) {
-                      %>Requested for return<% } else if (order.status=='paymentpending' ) { %>Payment pending <% } else
-                          if (order.status=='pending' ){ %>Pending<% } else { %>
-                            <%= order.status %>
-                              <% } %>
+    <div class="row">
+      <% orders.forEach(order=> { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card order-card">
+            <div class="card-header">
+              Order #<%= order._id %>
+            </div>
+            <div class="card-body">
+              <p><strong>Date:</strong>
+                <%= order.createdAt.toDateString() %>
+              </p>
+              <p><strong>Status:</strong>
+                <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %>
+              </p>
+              <p><strong>Address:</strong>
+                <%= order.address.address %>
+              </p>
+              <p><strong>Total:</strong> ₹<%= (order.grandTotalPrice - order.reducedPrice - order.returnedPrice -
+                  order.discountedAmount).toFixed(2) %>
+              </p>
 
-            </td>
-            <td>
-              <!-- Add the new button here -->
-              <button class="btn btn-primary" data-toggle="modal" data-target="#priceBreakdownModal-<%= order._id %>">
-                View Price
-                <details></details>
-              </button>
-            </td>
-            <td>
-              <button class="btn btn-primary" data-toggle="modal" data-target="#productDetailsModal-<%= order._id %>">
-                View Products
-              </button>
-              <br />
-              <br />
-              <% if (order.status=='completed' ) { %>
-                <form action="/orders/return/<%= order._id %>" method="POST" class="d-inline">
-                  <button type="button" class="btn btn-warning" onclick="confirmReturnOrder('<%= order._id %>')">
-                    Return Order
-                  </button>
-                  <br />
-                  <br />
-                </form>
-                <% } else if (order.status=='returned' ) { %>
-                  <button type="button" class="btn btn-secondary" disabled>
-                    Order Returned
-                  </button>
-                  <br />
-                  <br />
-                  <% } else if (order.status=='pending' ||order.status=='Dispatched'||order.status=='In Transit') { %>
-                    <form action="/orders/cancel/<%= order._id %>" method="POST" class="d-inline">
-                      <button type="button" class="btn btn-warning" onclick="confirmCancelOrder('<%= order._id %>')">
-                        Cancel Order
-                      </button>
-                      <br />
-                      <br />
-                    </form>
-                    <% } else if (order.status=='cancelled' ) { %>
-                      <button type="button" class="btn btn-secondary" disabled>
-                        Order Cancelled
-                      </button>
-                      <br />
-                      <br />
-                      <% } else if (order.status=='returnrequest' ) { %>
-                        <button type="button" class="btn btn-secondary" disabled>
-                          Requested for Return
-                        </button>
-                        <br />
-                        <br />
-                        <% } else if (order.status=='paymentpending' ) { %>
-                          <form action="/repayment/process" method="POST" class="d-inline">
-                            <input type="hidden" name="orderId" value="<%= order._id %>" />
-                            <input type="hidden" name="amount" value="<%= order.totalPrice %>" />
-                            <button type="submit" class="btn btn-warning">
-                              Proceed to Payment
-                            </button>
-                            <br />
-                            <br />
-                          </form>
-                          <form action="/orderAbort/<%= order._id %>" method="POST" class="d-inline">
-                            <input type="hidden" name="orderId" value="<%= order._id %>" />
-                            <input type="hidden" name="amount" value="<%= order.totalPrice %>" />
-                            <button type="submit" class="btn btn-warning">Abort</button>
-                            <br />
-                            <br />
-                          </form>
+              <div class="order-actions">
+                <button class="btn btn-sm btn-primary" data-toggle="modal"
+                  data-target="#productDetailsModal-<%= order._id %>">
+                  View Products
+                </button>
+                <button class="btn btn-sm btn-info" data-toggle="modal"
+                  data-target="#priceBreakdownModal-<%= order._id %>">
+                  Price Breakdown
+                </button>
+              </div>
+
+              <div class="mt-3">
+                <% if (order.status==='completed' ) { %>
+                  <button class="btn btn-sm btn-warning" onclick="confirmReturnOrder('<%= order._id %>')">Return
+                    Order</button>
+                  <% } else if (order.status==='pending' || order.status==='Dispatched' || order.status==='In Transit' )
+                    { %>
+                    <button class="btn btn-sm btn-danger" onclick="confirmCancelOrder('<%= order._id %>')">Cancel
+                      Order</button>
+                    <% } else if (order.status==='paymentpending' ) { %>
+                      <form action="/repayment/process" method="POST" class="d-inline">
+                        <input type="hidden" name="orderId" value="<%= order._id %>">
+                        <input type="hidden" name="amount" value="<%= order.totalPrice %>">
+                        <button type="submit" class="btn btn-sm btn-warning">Proceed to Payment</button>
+                      </form>
+                      <% } %>
+
+                        <% if (order.status==='completed' ) { %>
+                          <a href="/orders/<%= order._id %>/invoice" class="btn btn-sm btn-secondary">Invoice</a>
                           <% } %>
-                            <% if (order.status==='completed' ) { %>
-                              <a href="/orders/<%= order._id %>/invoice" class="btn btn-primary">Invoice</a>
-                              <% } %>
-            </td>
-          </tr>
-          <% }); %>
-      </tbody>
-    </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <% orders.forEach(order=> { %>
       <div class="modal fade" id="productDetailsModal-<%= order._id %>" tabindex="-1" role="dialog"
         aria-labelledby="productDetailsModal-<%= order._id %>" aria-hidden="true">

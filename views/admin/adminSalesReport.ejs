@@ -165,6 +165,9 @@
           <button id="downloadReportPDF" class="btn btn-secondary">
             Download PDF
           </button>
+          <button id="downloadReportExcel" class="btn btn-secondary">
+            Download Excel
+          </button>
           <div id="reportContainer"></div>
         </div>
 
@@ -308,9 +311,55 @@
         const downloadUrl = `/admin/salesReport/download?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
         window.open(downloadUrl, "_blank");
       });
-      const reportData = await fetchReportData(startDate, endDate);
-      renderReport(reportData);
-    });
+
+      const downloadReportExcelBtn = document.getElementById("downloadReportExcel");
+      downloadReportExcelBtn.addEventListener("click", async () => {
+        const sortOption = sortOptionSelect.value;
+        let startDate, endDate;
+
+        if (sortOption === "custom") {
+          startDate = new Date(startDateInput.value);
+          endDate = new Date(endDateInput.value);
+          endDate.setDate(endDate.getDate() + 1); // Include the end date in the range
+        } else {
+          // ... (keep the existing date range logic)
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = today.getMonth();
+          const date = today.getDate();
+
+          switch (sortOption) {
+            case "daily":
+              startDate = new Date(year, month, date);
+              endDate = new Date(year, month, date + 1);
+              break;
+            case "weekly":
+              const firstDayOfWeek = today.getDate() - 6;
+              const lastDayOfWeek = firstDayOfWeek + 6;
+              startDate = new Date(year, month, firstDayOfWeek);
+              endDate = new Date(year, month, lastDayOfWeek + 1);
+              break;
+            case "monthly":
+              startDate = new Date(year, month, 1);
+              endDate = new Date(year, month + 1, 1);
+              break;
+            case "yearly":
+              startDate = new Date(year, 0, 1);
+              endDate = new Date(year + 1, 0, 1);
+              break;
+          }
+        }
+        const downloadUrl = `/admin/salesReport/downloadExcel?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+  try {
+    window.open(downloadUrl, "_blank");
+  } catch (error) {
+    console.error("Error downloading Excel report:", error);
+    alert("An error occurred while downloading the Excel report. Please try again.");
+  }
+});
+    const reportData = await fetchReportData(startDate, endDate);
+    renderReport(reportData);
+    });
 
     async function fetchReportData(startDate, endDate) {
       try {
@@ -437,7 +486,7 @@
               .join("")}
           </ul>
         </td>
-        <td>${order.totalPrice+order.walletAmount}</td>
+        <td>${order.totalPrice + order.walletAmount}</td>
         <td>${order.paymentMethod}</td>
         <td>${order.address ? order.address.address : "-"}</td>
         <td>${order.coupon ? order.coupon.code : "None"}</td>

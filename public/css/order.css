@@ -1,0 +1,283 @@
+
+body {
+  background-color: #f8f9fa;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Navbar styles */
+/* CSS for Navbar */
+.nav-link {
+  color: #bca374 !important;
+}
+
+.navbar {
+  padding: 0% 2%;
+  background-color: #f0f1f0 !important;
+  justify-content: space-between; /* Ensure items are spread out */
+  align-items: center; /* Center items vertically */
+  border-bottom: 1px solid #ccc; /* Add a border at the bottom of the navbar */
+}
+
+.navbar-brand img {
+  height: 5vw; /* Adjust as needed */
+  width: auto; /* Allow image to scale */
+}
+
+.navbar .nav-link {
+  color: #bca374;
+  font-weight: bold;
+  font-size: 1.3vw;
+}
+
+.navbar .login {
+  color: #bca374;
+  font-weight: bold;
+  font-size: 1.3vw;
+  margin-left: 10px; /* Add margin to separate from other links */
+}
+
+.navbar-toggler {
+  color: #bca374;
+  font-size: 1.3vw;
+}
+
+.search-form {
+  flex-grow: 1; /* Expand to fill the remaining space */
+  display: flex;
+  justify-content: center; /* Center the search bar */
+  align-items: center;
+  margin-left: auto;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 15vw;
+  border: none;
+  border-bottom: 2px solid #bca374;
+  background-color: transparent;
+  color: #bca374;
+  padding: 1%;
+  font-size: 1.3vw;
+}
+
+.search-icon {
+  color: #bca374;
+  font-size: 1.5vw;
+  cursor: pointer;
+  background: transparent; /* Remove background color */
+  border: none; /* Remove border around the icon */
+}
+
+.wishlist-icon,
+.cart-icon {
+  color: #bca374;
+  font-size: 1.5vw;
+  margin-right: 10px;
+}
+
+.filter-toggle {
+  display: none; /* Hide the filter toggle by default */
+  color: #bca374;
+  font-size: 1vw;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.filter-toggle-icon {
+  color: #bca374; /* Set the color of the filter toggle icon */
+  font-size: 1vw;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.filter-sidebar {
+  display: none; /* Hide the filter sidebar by default */
+  background-color: #f0f1f0;
+  width: 13vw;
+  height: auto; /* Height of viewport minus navbar height */
+  position: absolute;
+  left: 0;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 10px;
+  border-right: 1px solid #ccc; /* Add a border between navbar and sidebar */
+}
+
+.filter-title {
+  color: #bca374;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.filter-options {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.filter-options li {
+  margin-bottom: 10px;
+}
+
+.filter-options li label {
+  color: #bca374;
+  margin-right: 5px;
+}
+
+.filter-options li input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.filter-options li input[type="range"] {
+  width: 100%;
+}
+
+.filter-title,
+.filter-options li label,
+.price-display,
+#price-display {
+  font-size: 1vw;
+}
+
+input[type="checkbox"],
+input[type="range"] {
+  transform: scale(75%);
+}
+/* Order card styles */
+.order-card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.order-card .card-header {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  padding: 15px;
+}
+
+.order-card .card-body {
+  padding: 20px;
+}
+
+.order-card p {
+  margin: 10px 0;
+}
+
+.order-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+/* Button styles */
+.btn {
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #212529;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+/* Modal styles */
+.modal-content {
+  border-radius: 10px;
+}
+
+.modal-header {
+  border-bottom: none;
+  padding: 20px;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  border-top: none;
+  padding: 20px;
+}
+
+/* Table styles */
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Pagination styles */
+.pagination {
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.page-link {
+  color: #007bff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .order-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .modal-dialog {
+    margin: 10px;
+  }
+}
