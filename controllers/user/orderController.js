@@ -984,7 +984,7 @@ const repaymentOrderCreation = async (req, res) => {
   try {
     const orderId = req.session.orderPaymentPending._id;
     const order = await Order.findById(orderId);
-
+const userId=req.session.userData._id
     order.status = "pending";
 
     order.products.forEach((product) => {
@@ -993,7 +993,13 @@ const repaymentOrderCreation = async (req, res) => {
       }
     });
     await order.save();
-    res.status(201).redirect("/orders");
+    req.session.cart = [];
+
+    // Clear cart in the database
+    await Cart.findOneAndUpdate({ userId: userId }, { cartItems: [] });
+    console.log("sxdascfdvgth",userId)
+
+    res.redirect("/orders");
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong" });
