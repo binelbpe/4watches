@@ -2,7 +2,7 @@ const User = require("../models/userModel");
 const checkUserStatus = async (req, res, next) => {
   try {
     const userId = req.session.userData ? req.session.userData._id : null;
-    if (!userId) {
+    if (!userId&&!req.session.isAuth) {
       req.flash("error_msg", "Please log in");
       return res.status(403).redirect("/login");
     }

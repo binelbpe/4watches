@@ -23,13 +23,13 @@ const { checkUserStatus } = require("../middleware/blockedStatus"); // Import mi
 // Routes for adding and editing user addresses
 router.get(
   "/add-address",
-  isAuth,
+  
   checkUserStatus,
   profileController.renderAddAddressPage
 );
 router.post(
   "/add-address",
-  isAuth,
+  
   checkUserStatus,
   profileController.addAddress
 );
@@ -100,54 +100,46 @@ router.get("/about", userProductController.about);
 router.post("/search", userProductController.search);
 
 // Routes for user profile management
-router.get("/profile", isAuth, checkUserStatus, profileController.profile);
+router.get("/profile", checkUserStatus, profileController.profile);
 router.get(
   "/view-addresses",
-  isAuth,
   checkUserStatus,
   profileController.viewAddresses
 );
 router.get(
   "/edit-address/:id",
-  isAuth,
   checkUserStatus,
   profileController.editAddress
 );
 router.get(
   "/delete-address/:id",
-  isAuth,
   checkUserStatus,
   profileController.deleteAddress
 );
 router.get(
   "/set-active/:id",
-  isAuth,
   checkUserStatus,
   profileController.setActiveAddress
 );
-router.post('/update-address-status/:id', isAuth, checkUserStatus, profileController.updateAddressStatus);
+router.post('/update-address-status/:id', checkUserStatus, profileController.updateAddressStatus);
 router.post(
   "/edit-address/:id",
-  isAuth,
   checkUserStatus,
   profileController.editedAddress
 );
-router.get("/edit-profile", isAuth, profileController.renderEditProfilePage);
+router.get("/edit-profile",  checkUserStatus, profileController.renderEditProfilePage);
 router.post(
   "/edit-profile",
-  isAuth,
   checkUserStatus,
   profileController.updateProfile
 );
 router.get(
   "/change-password",
-  isAuth,
   checkUserStatus,
   profileController.renderchangepassPage
 );
 router.post(
   "/password-change",
-  isAuth,
   checkUserStatus,
   profileController.passschangevalid
 );
@@ -176,19 +168,16 @@ router.post(
 // Routes for wishlist
 router.post(
   "/add-to-wishlist/:productId",
-  isAuth,
   checkUserStatus,
   wishlistController.addToWishlist
 );
 router.get(
   "/remove-from-wishlist/:productId",
-  isAuth,
   checkUserStatus,
   wishlistController.removeFromWishlist
 );
 router.get(
   "/wishlist",
-  isAuth,
   checkUserStatus,
   wishlistController.renderWishlistPage
 );
@@ -196,149 +185,126 @@ router.get(
 // Routes for cart
 router.get(
   "/add-to-cart",
-  isAuth,
   checkUserStatus,
   addToCartController.renderCartPage
 );
 router.post(
   "/add-to-cart/:productId",
-  isAuth,
   checkUserStatus,
   addToCartController.addToCart
 );
 router.post(
   "/remove-from-cart/:productId",
-  isAuth,
   checkUserStatus,
   addToCartController.removeFromCart
 );
 router.post(
   "/checkout",
   checkoutMiddleware,
-  isAuth,
   checkUserStatus,
 
   addToCartController.checkout
 );
 router.patch('/update-cart-quantity/:productId', checkoutMiddleware,
-  isAuth,
   checkUserStatus,
   addToCartController.updateCartQuantity
 )
 // Routes for checkout and orders
 router.get(
   "/orderviewaddresses",
-  isAuth,
   checkUserStatus,
   orderController.orderviewaddresses
 );
 router.get(
   "/checkout",
-  isAuth,
   checkUserStatus,
   checkoutMiddleware,
   checkoutController.renderCheckoutPage
 );
 router.post(
   "/place-order",
-  isAuth,
   checkUserStatus,
   orderController.placeOrder
 );
 router.get(
   "/set-activeorder/:id",
-  isAuth,
   checkUserStatus,
   profileController.setActiveAddressorder
 );
 router.get(
   "/add-addressorder",
-  isAuth,
   checkUserStatus,
   profileController.renderAddAddressPageorder
 );
 router.post(
   "/add-addressorder",
-  isAuth,
   checkUserStatus,
   orderController.addAddressorder
 );
 router.post(
   "/checkout/place-order",
-  isAuth,
   checkUserStatus,
   orderController.placeOrder
 );
 router.get(
   "/orders",
-  isAuth,
   checkUserStatus,
   orderController.renderOrderListPage
 );
 router.post(
   "/orders/cancel/:id",
-  isAuth,
   checkUserStatus,
   orderController.cancelOrder
 );
 router.post(
   "/apply-coupon",
-  isAuth,
   checkUserStatus,
   checkoutController.validateAndApplyCoupon
 );
 router.post(
   "/orders/cancel-product/:orderId/:productId",
-  isAuth,
   checkUserStatus,
   orderController.cancelProduct
 );
 
 // Routes for wallet and payment
-router.get("/wallet", isAuth, checkUserStatus, walletController.getWalletPage);
+router.get("/wallet", checkUserStatus, walletController.getWalletPage);
 router.post(
   "/orders/return/:orderId",
-  isAuth,
   checkUserStatus,
   orderController.returnOrderRequest
 );
 router.post(
   "/orders/return-product/:orderId/:productId",
-  isAuth,
   checkUserStatus,
   orderController.returnProductRequest
 );
 router.post(
   "/process-payment",
-  isAuth,
   checkUserStatus,
   orderController.processpayment
 );
 router.post(
   "/create-order",
-  isAuth,
   checkUserStatus,
   orderController.createorder
 );
 router.get(
   "/orders/:orderId/invoice",
-  isAuth,
   checkUserStatus,
   orderController.invoice
 );
 router.post(
   "/repayment/process",
-  isAuth,
   checkUserStatus,
   orderController.repayment
 );
 router.post(
   "/repayment/success",
-  isAuth,
   checkUserStatus,
   orderController.repaymentOrderCreation
 );
-router.post("/payment-fail", isAuth, orderController.paymentFail);
-router.post("/orderAbort/:orderId", isAuth, orderController.orderAbort);
+router.post("/payment-fail",  checkUserStatus, orderController.paymentFail);
+router.post("/orderAbort/:orderId",  checkUserStatus, orderController.orderAbort);
 
 module.exports = router;

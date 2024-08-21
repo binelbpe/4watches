@@ -1009,9 +1009,9 @@ const userId=req.session.userData._id
 //function for abort the order which is in payment pending status
 const orderAbort = async (req, res) => {
   try {
-    const orderId = req.params.id;
+    const orderId = req.params.orderId;
     const order = await Order.findById(orderId);
-
+    console.log(order)
     // Check if the order is already cancelled
     if (order.status === "cancelled") {
       return res
