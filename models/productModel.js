@@ -35,16 +35,16 @@ const productSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now, // Set default value to current date and time
+    default: Date.now, 
   },
   updatedAt: {
     type: Date,
-    default: Date.now, // Set default value to current date and time
+    default: Date.now, 
   },
   offerPrice: { type: Number, default: 0 },
 });
 
-// Middleware to update updatedAt timestamp on every save
+
 productSchema.pre("save", function (next) {
   this.updatedAt = new Date();
   next();

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4Watch Store - Order Addresses</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      .golden-gradient {
+        background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+      }
+      .address-card {
+        transition: all 0.3s ease;
+      }
+      .address-card:hover {
+        border-color: #bca374;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .nav-link {
+        color: #333;
+        transition: color 0.3s ease;
+      }
+      .nav-link:hover {
+        color: #bca374;
+      }
+      .nav-link.active {
+        color: #bca374;
+        font-weight: bold;
+      }
+      .btn-brand {
+        background-color: #bca374;
+        color: white;
+        transition: all 0.3s ease;
+      }
+      .btn-brand:hover {
+        background-color: #a38d64;
+        transform: translateY(-1px);
+      }
+      .btn-outline-brand {
+        border: 1px solid #bca374;
+        color: #bca374;
+        transition: all 0.3s ease;
+      }
+      .btn-outline-brand:hover {
+        background-color: #bca374;
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50">
+    <%- include('../layouts/header.ejs', { fullName: fullName }) %>
+
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Select Delivery Address</h1>
+        <div class="flex space-x-4">
+          <a href="/add-addressorder" 
+             class="btn-brand px-4 py-2 rounded-md flex items-center">
+            <i class="fas fa-plus mr-2"></i>Add New Address
+          </a>
+          <a href="/checkout" 
+             class="btn-outline-brand px-4 py-2 rounded-md flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Checkout
+          </a>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <% if (addresses.length > 0) { %>
+          <% addresses.forEach((address) => { %>
+            <div class="address-card bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <div class="flex justify-between items-start">
+                <div class="space-y-2">
+                  <div class="flex items-center">
+                    <p class="text-gray-800 font-medium"><%= address.address %></p>
+                    <% if (address.status) { %>
+                      <span class="ml-3 px-2 py-1 bg-green-100 text-green-600 text-sm rounded-full">
+                        <i class="fas fa-check-circle mr-1"></i>Default
+                      </span>
+                    <% } %>
+                  </div>
+                  <% if (address.addressline2) { %>
+                    <p class="text-gray-600"><%= address.addressline2 %></p>
+                  <% } %>
+                  <p class="text-gray-600"><%= address.city %>, <%= address.state %></p>
+                  <p class="text-[#bca374]">PIN: <%= address.pincode %></p>
+                </div>
+                <div class="flex flex-col space-y-2">
+                  <% if (!address.status) { %>
+                    <a href="/set-activeorder/<%= address._id %>?status=active" 
+                       class="btn-outline-brand px-3 py-1 rounded-md text-center">
+                      Set as Default
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="text-center py-12 bg-white rounded-xl shadow-lg border border-gray-200">
+            <div class="mb-4">
+              <i class="fas fa-map-marker-alt text-4xl text-[#bca374]"></i>
+            </div>
+            <p class="text-gray-600 mb-6">No addresses found</p>
+            <a href="/add-addressorder" 
+               class="btn-brand px-6 py-2 rounded-md inline-flex items-center">
+              <i class="fas fa-plus-circle mr-2"></i>
+              Add Your First Address
+            </a>
+          </div>
+        <% } %>
+      </div>
+
+      <% if (addresses.length > 0) { %>
+        <div class="mt-8 flex justify-end">
+          <a href="/checkout" 
+             class="btn-brand px-6 py-3 rounded-md flex items-center">
+            <i class="fas fa-shopping-cart mr-2"></i>
+            Proceed to Checkout
+          </a>
+        </div>
+      <% } %>
+    </main>
+
+    <%- include('../layouts/footer.ejs', { fullName: fullName }) %>
+
+    <script>
+      // Add animation for new addresses
+      document.querySelectorAll('.address-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.5s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 100);
+      });
+    </script>
+  </body>
+</html> 

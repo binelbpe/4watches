@@ -1,6 +1,7 @@
 const express = require("express"); // Import the Express.js framework
 const router = express.Router(); // Create a new router instance
 const passport = require("passport"); // Import the Passport.js authentication middleware
+const mongoose = require('mongoose'); // Add this import
 const User = require("../models/userModel"); // Import the User model
 const {
   checkoutMiddleware,
@@ -19,17 +20,21 @@ const checkoutController = require("../controllers/user/checkoutController"); //
 const orderController = require("../controllers/user/orderController"); // Import the order controller
 const walletController = require("../controllers/user/walletController"); // Import the wallet controller
 const { checkUserStatus } = require("../middleware/blockedStatus"); // Import middleware to check user's blocked status
+const asyncHandler = require('../utils/asyncHandler');
+const createError = require('http-errors');
+
+console.log('Auth Controller Methods:', Object.keys(authController));
+console.log('OTP Controller Methods:', Object.keys(otpController));
+console.log('Profile Controller Methods:', Object.keys(profileController));
 
 // Routes for adding and editing user addresses
 router.get(
   "/add-address",
-  
   checkUserStatus,
   profileController.renderAddAddressPage
 );
 router.post(
   "/add-address",
-  
   checkUserStatus,
   profileController.addAddress
 );
@@ -63,7 +68,12 @@ router.get("/signup", nocacheMiddleware(), isAuthSIGNUP, (req, res) => {
 router.get("/login", nocacheMiddleware(), isAuth, (req, res) => {
   res.redirect("/");
 });
-router.post("/login", isAuthcommon, nocacheMiddleware(), authController.login);
+router.post(
+  "/login", 
+  isAuthcommon, 
+  nocacheMiddleware(), 
+  authController.login
+);
 router.post(
   "/signup",
   isAuthcommon,
@@ -72,6 +82,12 @@ router.post(
 );
 
 // Routes for OTP verification and resend
+router.get(
+  "/otp", 
+  isAuthcommon, 
+  nocacheMiddleware(), 
+  otpController.otppage
+);
 router.post(
   "/verifyOTP",
   isAuthcommon,
@@ -84,10 +100,17 @@ router.post(
   nocacheMiddleware(),
   otpController.resendOTP
 );
-router.get("/otp", isAuthcommon, nocacheMiddleware(), otpController.otppage);
 
 // Routes for products and categories
-router.get("/product/:productId", userProductController.getProductView);
+router.get("/product/:productId",
+  asyncHandler(async (req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.productId)) {
+      throw createError(400, 'Invalid product ID');
+    }
+    next();
+  }),
+  userProductController.getProductView
+);
 router.get("/men", userProductController.getMenProducts);
 router.get("/menfilter", userProductController.menfilterProduct);
 router.get("/women", userProductController.getwomenProducts);
@@ -100,17 +123,18 @@ router.get("/about", userProductController.about);
 router.post("/search", userProductController.search);
 
 // Routes for user profile management
-router.get("/profile", checkUserStatus, profileController.profile);
-router.get(
-  "/view-addresses",
+router.get("/profile",
+  asyncHandler(async (req, res, next) => {
+    if (!req.session.userData) {
+      throw createError(401, 'Please login to view profile');
+    }
+    next();
+  }),
   checkUserStatus,
-  profileController.viewAddresses
+  profileController.profile
 );
-router.get(
-  "/edit-address/:id",
-  checkUserStatus,
-  profileController.editAddress
-);
+router.get("/view-addresses", checkUserStatus, profileController.viewAddresses);
+router.get("/edit-address/:id", checkUserStatus, profileController.editAddress);
 router.get(
   "/delete-address/:id",
   checkUserStatus,
@@ -121,13 +145,21 @@ router.get(
   checkUserStatus,
   profileController.setActiveAddress
 );
-router.post('/update-address-status/:id', checkUserStatus, profileController.updateAddressStatus);
+router.post(
+  "/update-address-status/:id",
+  checkUserStatus,
+  profileController.updateAddressStatus
+);
 router.post(
   "/edit-address/:id",
   checkUserStatus,
   profileController.editedAddress
 );
-router.get("/edit-profile",  checkUserStatus, profileController.renderEditProfilePage);
+router.get(
+  "/edit-profile",
+  checkUserStatus,
+  profileController.renderEditProfilePage
+);
 router.post(
   "/edit-profile",
   checkUserStatus,
@@ -148,10 +180,22 @@ router.post(
 router.get(
   "/changepassword",
   nocacheMiddleware(),
+  asyncHandler(async (req, res, next) => {
+    if (!req.session.userData) {
+      return next(createError(401, 'Please login to change password'));
+    }
+    next();
+  }),
   otpController.otppagepasschange
 );
 router.post("/verifyOTPpass", nocacheMiddleware(), otpController.verifyOTPpass);
-router.post("/resendOTPpass", nocacheMiddleware(), otpController.resendOTPpass);
+router.post("/resendOTPpass", nocacheMiddleware(), async (req, res, next) => {
+  // Ensure user is authenticated
+  if (!req.session.userData) {
+    return res.status(401).json({ success: false, message: "Not authenticated" });
+  }
+  next();
+}, otpController.resendOTPpass);
 
 // Routes for forgot password
 router.get("/forgot-password", isAuthcommon, authController.forgotpassword);
@@ -171,30 +215,27 @@ router.post(
   checkUserStatus,
   wishlistController.addToWishlist
 );
-router.get(
+router.delete(
   "/remove-from-wishlist/:productId",
   checkUserStatus,
   wishlistController.removeFromWishlist
 );
-router.get(
-  "/wishlist",
+router.post(
+  "/remove-from-wishlist/:productId",
   checkUserStatus,
-  wishlistController.renderWishlistPage
+  wishlistController.removeFromWishlist
 );
+router.get("/wishlist", checkUserStatus, wishlistController.renderWishlistPage);
 
 // Routes for cart
-router.get(
-  "/add-to-cart",
-  checkUserStatus,
-  addToCartController.renderCartPage
-);
+router.get("/add-to-cart", checkUserStatus, addToCartController.renderCartPage);
 router.post(
   "/add-to-cart/:productId",
   checkUserStatus,
   addToCartController.addToCart
 );
-router.post(
-  "/remove-from-cart/:productId",
+router.delete(
+  "/remove-from-cart/:id",
   checkUserStatus,
   addToCartController.removeFromCart
 );
@@ -205,10 +246,12 @@ router.post(
 
   addToCartController.checkout
 );
-router.patch('/update-cart-quantity/:productId', checkoutMiddleware,
+router.patch(
+  "/update-cart-quantity/:productId",
+  checkoutMiddleware,
   checkUserStatus,
   addToCartController.updateCartQuantity
-)
+);
 // Routes for checkout and orders
 router.get(
   "/orderviewaddresses",
@@ -221,11 +264,7 @@ router.get(
   checkoutMiddleware,
   checkoutController.renderCheckoutPage
 );
-router.post(
-  "/place-order",
-  checkUserStatus,
-  orderController.placeOrder
-);
+router.post("/place-order", checkUserStatus, orderController.placeOrder);
 router.get(
   "/set-activeorder/:id",
   checkUserStatus,
@@ -246,16 +285,8 @@ router.post(
   checkUserStatus,
   orderController.placeOrder
 );
-router.get(
-  "/orders",
-  checkUserStatus,
-  orderController.renderOrderListPage
-);
-router.post(
-  "/orders/cancel/:id",
-  checkUserStatus,
-  orderController.cancelOrder
-);
+router.get("/orders", checkUserStatus, orderController.renderOrderListPage);
+router.post("/orders/cancel/:id", checkUserStatus, orderController.cancelOrder);
 router.post(
   "/apply-coupon",
   checkUserStatus,
@@ -284,27 +315,43 @@ router.post(
   checkUserStatus,
   orderController.processpayment
 );
-router.post(
-  "/create-order",
-  checkUserStatus,
-  orderController.createorder
-);
+router.post("/create-order", checkUserStatus, orderController.createorder);
 router.get(
   "/orders/:orderId/invoice",
   checkUserStatus,
   orderController.invoice
 );
-router.post(
-  "/repayment/process",
-  checkUserStatus,
-  orderController.repayment
-);
+router.post("/repayment/process", checkUserStatus, orderController.repayment);
 router.post(
   "/repayment/success",
   checkUserStatus,
   orderController.repaymentOrderCreation
 );
-router.post("/payment-fail",  checkUserStatus, orderController.paymentFail);
-router.post("/orderAbort/:orderId",  checkUserStatus, orderController.orderAbort);
+router.post("/payment-fail", checkUserStatus, orderController.paymentFail);
+router.post(
+  "/orderAbort/:orderId",
+  checkUserStatus,
+  orderController.orderAbort
+);
+
+// Add this route for order confirmation
+router.get(
+  "/order-confirmation/:orderId",
+  checkUserStatus,
+  orderController.showOrderConfirmation
+);
+
+// Add these routes for order confirmation and failure
+router.get(
+  "/order-success/:orderId",
+  checkUserStatus,
+  orderController.showOrderSuccess
+);
+
+router.get(
+  "/order-failure/:orderId",
+  checkUserStatus,
+  orderController.showOrderFailure
+);
 
 module.exports = router;

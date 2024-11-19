@@ -11,7 +11,7 @@ const adminCouponManagement = require("../../controllers/admin/adminCouponManage
 
 // Importing the required middleware
 const adminAuth = require("../../middleware/adminAuth");
-const storage = require("../../middleware/multer");
+const upload = require("../../middleware/multer");
 const nocacheMiddleware = require("../../middleware/noCache");
 
 // Admin routes
@@ -54,14 +54,16 @@ router.get("/Product", adminAuth.isLogin, productManagement.getProduct);
 router.get("/Product-add", adminAuth.isLogin, productManagement.productAddPage);
 router.post(
   "/addProduct",
-  storage.array("images", 5),
+  adminAuth.isLogin,
+  upload.array("images", 5),
   productManagement.addProduct
 );
 router.get("/productstatus", adminAuth.isLogin, productManagement.changeStatus);
 router.get("/productDelete", adminAuth.isLogin, productManagement.deleteProduct);
 router.post(
   "/editProduct/:id",
-  storage.array("images", 5),
+  adminAuth.isLogin,
+  upload.array("images", 5),
   productManagement.editProduct
 );
 

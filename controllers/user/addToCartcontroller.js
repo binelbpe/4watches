@@ -2,6 +2,7 @@ const User = require("../../models/userModel");
 const Product = require("../../models/productModel");
 const Address = require("../../models/addressModel");
 const Cart = require("../../models/addtocartModel");
+const createError = require('http-errors');
 // Function to add or update product in the cart
 const addToCart = async (req, res) => {
   try {
@@ -68,65 +69,63 @@ const addToCart = async (req, res) => {
 //function for remove product from cart
 const removeFromCart = async (req, res) => {
   try {
-    const productId = req.params.productId;
+    const productId = req.params.id;
     const userId = req.session.userData._id;
 
-    // Find the cart for the user
-    let cart = await Cart.findOne({ userId: userId });
+    // Remove the item from cart
+    await Cart.findOneAndUpdate(
+      { userId: userId },
+      { $pull: { cartItems: { product: productId } } }
+    );
 
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
-    }
-
-    // Find the index of the product in the cart
-    const cartItemIndex = cart.cartItems.findIndex(item => item.product.toString() === productId);
-
-    if (cartItemIndex > -1) {
-      // Remove the product from the cart
-      cart.cartItems.splice(cartItemIndex, 1);
-
-      // Save the updated cart
-      await cart.save();
-
-     
-      return res.redirect("/add-to-cart");
-    } else {
-      return res.status(404).json({ message: "Product not found in cart" });
-    }
+    res.json({ success: true, message: 'Product removed from cart' });
   } catch (error) {
-    console.error("Error removing product from cart:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error('Error removing product from cart:', error);
+    res.status(500).json({ success: false, message: 'Failed to remove product from cart' });
   }
 };
 
 // Function to render the cart page
-const renderCartPage = async (req, res) => {
+const renderCartPage = async (req, res, next) => {
   try {
+    if (!req.session.userData) {
+      return next(createError(401, 'Please login to view cart'));
+    }
+
     const userId = req.session.userData._id;
     const fullName = req.session.userData.fullname;
 
-    // Find the user's cart
-    const cart = await Cart.findOne({ userId: userId }).populate("cartItems.product");
+    const cart = await Cart.findOne({ userId: userId })
+      .populate({
+        path: "cartItems.product",
+        select: "product price image status stock"
+      });
 
-    if (!cart || cart.cartItems.length === 0) {
-      // Render the template with an empty array if there are no cart items
-      return res.render("addtocart", { fullName, products: [] });
+    if (!cart || !cart.cartItems.length) {
+      return res.render("addtocart", { 
+        fullName, 
+        products: [] 
+      });
     }
 
-    // Filter out products with status true and prepare the cart items for rendering
-    const filteredProducts = cart.cartItems.filter(item => item.product.status === true);
+    // Filter out products that are either null or have status false
+    const filteredProducts = cart.cartItems.filter(item => 
+      item.product && item.product.status === true
+    );
 
-    // Prepare the data to render, including quantities
     const cartData = filteredProducts.map((item) => ({
       product: item.product,
       quantity: item.quantity
     }));
-    req.session.checkout=true;
-    // Render the cart page with the updated cart items and their quantities
-    res.render("addtocart", { fullName, products: cartData });
+
+    req.session.checkout = true;
+    res.render("addtocart", { 
+      fullName, 
+      products: cartData 
+    });
   } catch (error) {
-    console.error("Error rendering cart page:", error);
-    res.status(500).send("Internal Server Error");
+    console.error('Error rendering cart page:', error);
+    next(createError(500, 'Error loading cart'));
   }
 };
 

@@ -3,111 +3,109 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forgot Password Change</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
-    <link rel="stylesheet" href="/css/login.css" />
+    <title>4Watch Store - Reset Password</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      .golden-gradient {
+        background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+      }
+    </style>
   </head>
-  <body class="loginbody">
-    <div class="container logincontainer mt-5">
-      <h2 class="text-center mb-4">Forgot Password Change</h2>
-      <!-- Forgot Password Change form -->
-      <form
-        id="forgotPasswordChangeForm"
-        action="/forgot-password/change"
-        method="POST"
-      >
-        <div class="mb-3">
-          <label for="newPassword" class="form-label">New Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="newPassword"
-            name="newPassword"
-            required
-          />
-          <div id="newPasswordError" class="invalid-feedback"></div>
+
+  <body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-4">
+      <div class="bg-white rounded-xl shadow-lg p-8 border border-[#bca374]">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <div class="golden-gradient w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <i class="fas fa-key text-white text-2xl"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-800">Reset Password</h1>
+          <p class="text-gray-600 mt-2">Enter your new password</p>
         </div>
-        <div class="mb-3">
-          <label for="confirmNewPassword" class="form-label"
-            >Confirm New Password</label
-          >
-          <input
-            type="password"
-            class="form-control"
-            id="confirmNewPassword"
-            name="confirmNewPassword"
-            required
-          />
-          <div id="confirmNewPasswordError" class="invalid-feedback"></div>
+
+        <!-- Form -->
+        <form id="forgotPasswordChangeForm" action="/forgot-password/change" method="POST" onsubmit="return validateForm()">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="newPassword">New Password</label>
+              <input type="password" 
+                     id="newPassword" 
+                     name="newPassword" 
+                     class="w-full px-4 py-3 border border-[#bca374] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#bca374]"
+                     required />
+              <div id="newPasswordError" class="text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="confirmNewPassword">Confirm New Password</label>
+              <input type="password" 
+                     id="confirmNewPassword" 
+                     name="confirmNewPassword" 
+                     class="w-full px-4 py-3 border border-[#bca374] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#bca374]"
+                     required />
+              <div id="confirmNewPasswordError" class="text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+
+            <button type="submit" 
+                    class="w-full bg-[#bca374] text-white py-3 rounded-lg hover:bg-[#a38f5f] transition-colors">
+              Reset Password
+            </button>
+          </div>
+        </form>
+
+        <!-- Back to Login Link -->
+        <div class="text-center mt-6">
+          <a href="/login" class="text-[#bca374] hover:text-[#a38f5f] font-medium">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Login
+          </a>
         </div>
-        <div class="d-grid mb-3">
-          <button class="btn btn-primary btn-lg btn-submit" type="submit">
-            Change Password
-          </button>
-        </div>
-      </form>
-      <!-- Back to Login link -->
-      <p class="text-center mb-0">
-        <a href="/login" class="back-to-login-link">Back to Login</a>
-      </p>
-      <% if(errorMessage) { %>
-      <!-- Error message display -->
-      <div class="alert alert-danger mt-3" role="alert">
-        <%= errorMessage %>
+
+        <% if(errorMessage) { %>
+          <div class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            <%= errorMessage %>
+          </div>
+        <% } %>
       </div>
-      <% } %>
     </div>
-    <!-- JavaScript includes -->
+
     <script>
       function validateForm() {
         const newPassword = document.getElementById("newPassword");
-        const confirmNewPassword =
-          document.getElementById("confirmNewPassword");
+        const confirmNewPassword = document.getElementById("confirmNewPassword");
         const newPasswordError = document.getElementById("newPasswordError");
-        const confirmNewPasswordError = document.getElementById(
-          "confirmNewPasswordError"
-        );
-
+        const confirmNewPasswordError = document.getElementById("confirmNewPasswordError");
         let isValid = true;
 
-        // Validate New Password
-        const passwordRegex =
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        // Password regex pattern
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        // Validate new password
         if (!newPassword.value.match(passwordRegex)) {
-          newPassword.classList.add("is-invalid");
-          newPasswordError.textContent =
-            "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one digit.";
-          newPasswordError.style.display = "block";
+          newPassword.classList.add("border-red-500");
+          newPasswordError.textContent = "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character";
+          newPasswordError.classList.remove("hidden");
           isValid = false;
         } else {
-          newPassword.classList.remove("is-invalid");
-          newPasswordError.style.display = "none";
+          newPassword.classList.remove("border-red-500");
+          newPasswordError.classList.add("hidden");
         }
 
-        // Validate Confirm New Password
+        // Validate confirm password
         if (confirmNewPassword.value !== newPassword.value) {
-          confirmNewPassword.classList.add("is-invalid");
-          confirmNewPasswordError.textContent = "Passwords do not match.";
-          confirmNewPasswordError.style.display = "block";
+          confirmNewPassword.classList.add("border-red-500");
+          confirmNewPasswordError.textContent = "Passwords do not match";
+          confirmNewPasswordError.classList.remove("hidden");
           isValid = false;
         } else {
-          confirmNewPassword.classList.remove("is-invalid");
-          confirmNewPasswordError.style.display = "none";
+          confirmNewPassword.classList.remove("border-red-500");
+          confirmNewPasswordError.classList.add("hidden");
         }
 
         return isValid;
       }
-
-      // Attach form validation function to form submission event
-      const form = document.getElementById("forgotPasswordChangeForm");
-      form.addEventListener("submit", function (event) {
-        if (!validateForm()) {
-          event.preventDefault(); // Prevent form submission if validation fails
-        }
-      });
     </script>
   </body>
 </html>

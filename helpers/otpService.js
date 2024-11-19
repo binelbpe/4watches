@@ -1,4 +1,3 @@
-// services/otpService.js
 const twilio = require("twilio");
 
 require("dotenv").config();
@@ -9,12 +8,14 @@ const twilioClient = twilio(accountSid, authToken);
 
 const sendOTP = async (to, otp) => {
   try {
+    console.log("to",to)
     const message = await twilioClient.messages.create({
       body: `Your OTP for verification is: ${otp}`,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: "+918075537372",
+      
+      to: `+919074465607`,
     });
-    console.log(`otp:${otp}`);
+    console.log(`otp: ${otp}`);
 
     console.log("OTP sent successfully:", message.sid);
   } catch (error) {

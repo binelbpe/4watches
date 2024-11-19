@@ -19,12 +19,12 @@ const getAllCoupons = async (req, res) => {
       coupons: coupons,
       currentPage: page,
       totalPages: totalPages,
-      messages: req.flash() // Pass flash messages to the template
+      messages: req.flash(), // Pass flash messages to the template
     });
   } catch (error) {
     console.error("Error fetching coupons:", error);
-    req.flash('error', 'Error fetching coupons'); // Set error flash message
-    res.redirect('/admin/coupons'); // Redirect back to coupons page
+    req.flash("error", "Error fetching coupons"); // Set error flash message
+    res.redirect("/admin/coupons"); // Redirect back to coupons page
   }
 };
 
@@ -61,8 +61,8 @@ const createCoupon = async (req, res) => {
     res.redirect("/admin/coupons");
   } catch (error) {
     console.error("Error creating coupon:", error);
-    req.flash('error', 'Error creating coupon'); // Set error flash message
-    res.redirect('/admin/coupons'); // Redirect back to coupons page
+    req.flash("error", "Error creating coupon"); // Set error flash message
+    res.redirect("/admin/coupons"); // Redirect back to coupons page
   }
 };
 
@@ -128,8 +128,8 @@ const updateCoupon = async (req, res) => {
     res.redirect("/admin/coupons");
   } catch (error) {
     console.error("Error updating coupon:", error);
-    req.flash('error', 'Error updating coupon'); // Set error flash message
-    res.redirect('/admin/coupons'); // Redirect back to coupons page
+    req.flash("error", "Error updating coupon"); // Set error flash message
+    res.redirect("/admin/coupons"); // Redirect back to coupons page
   }
 };
 
@@ -140,16 +140,16 @@ const deleteCoupon = async (req, res) => {
     const deletedCoupon = await Coupon.findByIdAndDelete(couponId);
 
     if (!deletedCoupon) {
-      req.flash('error', 'Coupon not found'); // Set error flash message
+      req.flash("error", "Coupon not found"); // Set error flash message
     } else {
-      req.flash('success', 'Coupon deleted successfully'); // Set success flash message
+      req.flash("success", "Coupon deleted successfully"); // Set success flash message
     }
 
     res.redirect("/admin/coupons");
   } catch (error) {
     console.error("Error deleting coupon:", error);
-    req.flash('error', 'Error deleting coupon'); // Set error flash message
-    res.redirect('/admin/coupons'); // Redirect back to coupons page
+    req.flash("error", "Error deleting coupon"); // Set error flash message
+    res.redirect("/admin/coupons"); // Redirect back to coupons page
   }
 };
 

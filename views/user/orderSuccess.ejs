@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success - 4Watch Store</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        @keyframes checkmark {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .checkmark {
+            animation: checkmark 0.8s ease-in-out forwards;
+        }
+        .countdown {
+            font-size: 1.2rem;
+            color: #666;
+            background: #f3f4f6;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        .countdown-number {
+            color: #bca374;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const countdownElement = document.getElementById('countdown');
+            let timeLeft = 5;
+
+            function updateCountdown() {
+                if (countdownElement) {
+                    countdownElement.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        window.location.href = '/orders';
+                    } else {
+                        timeLeft--;
+                        setTimeout(updateCountdown, 1000);
+                    }
+                }
+            }
+
+            updateCountdown();
+        });
+    </script>
+</head>
+<body class="bg-gray-50">
+    <%- include('../layouts/header.ejs', { fullName: locals.fullName || null }) %>
+
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-xl shadow-lg p-8 border border-[#bca374]">
+            <div class="text-center mb-8">
+                <img src="/images/logo.png" alt="4Watches Logo" class="h-16 mx-auto mb-6">
+                <div class="checkmark text-6xl text-green-500 mb-4">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Order Placed Successfully!</h1>
+                <p class="text-gray-600">Thank you for shopping with 4Watch Store</p>
+                <p class="text-[#bca374] font-medium mt-2">Order ID: #<%= order._id %></p>
+                <div class="countdown text-center mt-4">
+                    Redirecting to orders in <span id="countdown" class="countdown-number">5</span> seconds...
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-6">
+                <div class="flex justify-center space-x-4">
+                    <a href="/orders" 
+                       class="px-6 py-3 bg-[#bca374] text-white rounded-lg hover:bg-[#a38d64] transition-colors flex items-center">
+                        <i class="fas fa-shopping-bag mr-2"></i>
+                        View Orders
+                    </a>
+                    <a href="/" 
+                       class="px-6 py-3 border border-[#bca374] text-[#bca374] rounded-lg hover:bg-[#bca374] hover:text-white transition-colors flex items-center">
+                        <i class="fas fa-home mr-2"></i>
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../layouts/footer.ejs', { fullName: locals.fullName || null }) %>
+</body>
+</html> 

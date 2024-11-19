@@ -520,22 +520,32 @@ const collectionfilterProduct = async (req, res) => {
 //function for search option
 const search = async (req, res) => {
   try {
-    const { search } = req.body; // Retrieve the search query from request query parameters
+    const { search } = req.body;
     let fullName = "";
+
     if (req.session.userData) {
       const { email } = req.session.userData;
       const user = await User.findOne({ email, status: false });
-
       if (user) {
         fullName = user.fullname;
       }
     }
-    // Perform a case-insensitive search for product names containing the search query
+
+    // Improved search query using multiple fields and case-insensitive search
     const products = await Product.find({
-      product: { $regex: search, $options: "i" },
-      status: true,
+      $and: [
+        { status: true },
+        {
+          $or: [
+            { product: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } },
+            { category: { $regex: search, $options: "i" } },
+          ],
+        },
+      ],
     });
-    res.render("searchResult", { products, fullName }); // Render a separate view for displaying search results
+
+    res.render("searchResult", { products, fullName, searchQuery: search });
   } catch (error) {
     console.error("Error occurred while searching for products:", error);
     res.status(500).send("Internal Server Error");

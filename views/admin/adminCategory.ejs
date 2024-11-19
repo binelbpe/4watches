@@ -1,351 +1,533 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Admin </title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <!-- Bootstrap CSS-->
-  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
-  <!-- Font Awesome CSS-->
-  <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
-  <!-- Custom Font Icons CSS-->
-  <link rel="stylesheet" href="css/font.css">
-  <!-- Google fonts - Muli-->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:300,400,700">
-  <!-- theme stylesheet-->
-  <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
-  <!-- Custom stylesheet - for your changes-->
-  <link rel="stylesheet" href="css/custom.css">
-  <style> 
- .swal2-container {
-  z-index: 9999 !important;
-}
-</style>
- </head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>4WATCHES Admin - Category Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <style>
+      :root {
+        --primary-color: #bca374;
+        --primary-dark: #a68b5b;
+        --secondary-color: #2c3e50;
+        --light-bg: #f8f9fa;
+      }
 
+      body {
+        background-color: var(--light-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      /* Sidebar Styling */
+      #sidebar {
+        background: var(--secondary-color);
+        min-width: 250px;
+        max-width: 250px;
+        min-height: 100vh;
+        transition: all 0.3s;
+      }
+
+      #sidebar .sidebar-header {
+        padding: 15px;
+        background: var(--primary-color);
+        display: flex;
+        align-items: center;
+      }
+
+      #sidebar ul li a {
+        padding: 10px 20px;
+        display: block;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.3s;
+      }
+
+      #sidebar ul li a:hover {
+        background: var(--primary-color);
+      }
+
+      #sidebar ul li.active > a {
+        background: var(--primary-color);
+      }
+
+      /* Table Container */
+      .table-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin: 20px;
+      }
+
+      /* Table Styling */
+      .table thead th {
+        background-color: var(--light-bg);
+        border-bottom: 2px solid var(--primary-color);
+        color: var(--secondary-color);
+      }
+
+      .table tbody tr:hover {
+        background-color: rgba(188, 163, 116, 0.1);
+      }
+
+      /* Modal Styling */
+      .modal-content {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .modal-header {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      /* Button Styling */
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+      }
+
+      /* Error Messages */
+      .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+
+      /* Navbar Styling */
+      .admin-navbar {
+        background-color: var(--primary-color);
+        padding: 15px 0;
+      }
+
+      .navbar-logo {
+        height: 40px;
+        width: auto;
+        border-radius: 5px;
+      }
+
+      .sidebar-logo {
+        height: 45px;
+        width: auto;
+        border-radius: 5px;
+        margin-right: 10px;
+      }
+
+      /* Pagination Styling */
+      .pagination .page-link {
+        color: var(--primary-color);
+      }
+
+      .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        #sidebar {
+          margin-left: -250px;
+        }
+        #sidebar.active {
+          margin-left: 0;
+        }
+        .table-container {
+          margin: 10px;
+          padding: 15px;
+        }
+      }
+    </style>
+</head>
 <body>
-  <header class="header">
-    <nav class="navbar navbar-expand-lg">
-      <div class="search-panel">
-        <div class="search-inner d-flex align-items-center justify-content-center">
-          <div class="close-btn">Close <i class="fa fa-close"></i></div>
-          <form id="searchForm" action="#">
-            <div class="form-group">
-              <input type="search" name="search" placeholder="What are you searching for...">
-              <button type="submit" class="submit">Search</button>
+    <!-- Navbar -->
+    <nav class="navbar admin-navbar">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <img src="/images/logo.png" alt="4WATCHES Logo" class="navbar-logo me-2">
+          <span class="text-white">4WATCHES</span>
+        </a>
+        <div class="d-flex">
+          <a href="/admin/logout" class="btn btn-outline-light">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="d-flex">
+      <!-- Sidebar -->
+      <nav id="sidebar">
+        <div class="sidebar-header">
+          <img src="/images/logo.png" alt="4WATCHES Logo" class="sidebar-logo">
+          <h3 class="text-white mb-0">4WATCHES</h3>
+        </div>
+        <ul class="list-unstyled components">
+          <li>
+            <a href="/admin/adminHome">
+              <i class="fas fa-home me-2"></i>Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/admin/Product">
+              <i class="fas fa-box me-2"></i>Products
+            </a>
+          </li>
+          <li>
+            <a href="/admin/User">
+              <i class="fas fa-users me-2"></i>Users
+            </a>
+          </li>
+          <li class="active">
+            <a href="/admin/Category">
+              <i class="fas fa-tags me-2"></i>Categories
+            </a>
+          </li>
+          <li>
+            <a href="/admin/order">
+              <i class="fas fa-shopping-cart me-2"></i>Orders
+            </a>
+          </li>
+          <li>
+            <a href="/admin/coupons">
+              <i class="fas fa-ticket-alt me-2"></i>Coupons
+            </a>
+          </li>
+          <li>
+            <a href="/admin/sales">
+              <i class="fas fa-chart-line me-2"></i>Sales Report
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main Content -->
+      <div class="flex-grow-1">
+        <div class="container-fluid">
+          <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2>Category Management</h2>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                <i class="fas fa-plus me-2"></i>Add New Category
+              </button>
+            </div>
+
+            <% if (error && error.length > 0) { %>
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            <% } %>
+
+            <!-- Category Table -->
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for(let i=0; i < data.length; i++) { %>
+                    <tr>
+                      <td><%= data[i].category %></td>
+                      <td>
+                        <% if(data[i].status) { %>
+                          <button class="btn btn-danger btn-sm" onclick="confirmAndRedirect('<%= data[i]._id %>', event)">
+                            <i class="fas fa-ban me-1"></i>Unlist
+                          </button>
+                        <% } else { %>
+                          <button class="btn btn-success btn-sm" onclick="confirmAndRedirect('<%= data[i]._id %>', event)">
+                            <i class="fas fa-check me-1"></i>List
+                          </button>
+                        <% } %>
+                      </td>
+                      <td>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<%= i %>">
+                          <i class="fas fa-edit me-1"></i>Edit
+                        </button>
+                      </td>
+                      <td>
+                        <button class="btn btn-danger btn-sm" onclick="confirmAndRedirectDelete('<%= data[i]._id %>', event)">
+                          <i class="fas fa-trash me-1"></i>Delete
+                        </button>
+                      </td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center mt-4">
+              <ul class="pagination">
+                <% if (totalPages > 1) { %>
+                  <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                      <a class="page-link" href="/admin/Category?page=<%= currentPage - 1 %>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                  <% } %>
+                  
+                  <% let startPage = Math.max(1, currentPage - 2); %>
+                  <% let endPage = Math.min(startPage + 3, totalPages); %>
+                  
+                  <% for(let i = startPage; i <= endPage; i++) { %>
+                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                      <a class="page-link" href="/admin/Category?page=<%= i %>"><%= i %></a>
+                    </li>
+                  <% } %>
+                  
+                  <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                      <a class="page-link" href="/admin/Category?page=<%= currentPage + 1 %>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  <% } %>
+                <% } %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Category</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="/admin/category" method="post" onsubmit="return validateCategoryForm(this)">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Category Name</label>
+                <input type="text" name="category" class="form-control">
+                <div class="error-message" id="category-error"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Add Category</button>
             </div>
           </form>
         </div>
       </div>
-      <div class="container-fluid d-flex align-items-center justify-content-between">
-        <div class="navbar-header">
-          <!-- Navbar Header--><a href="/admin" class="navbar-brand">
-            <div class="brand-text brand-big visible text-uppercase"><strong
-                class="text-primary">4WATCHES</strong><strong>Admin</strong></div>
-            <div class="brand-text brand-sm"><strong class="text-primary">D</strong><strong>A</strong></div>
-          </a>
-         
-          
-          <!-- Languages dropdown    -->
-          <div class="list-inline-item dropdown"><a id="languages" rel="nofollow" data-target="#" href="#"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-              class="nav-link language dropdown-toggle"><img src="img/flags/16/GB.png" alt="English"><span
-                class="d-none d-sm-inline-block">English</span></a>
-            <div aria-labelledby="languages" class="dropdown-menu"><a rel="nofollow" href="#" class="dropdown-item">
-                <img src="img/flags/16/DE.png" alt="English" class="mr-2"><span>German</span></a><a rel="nofollow"
-                href="#" class="dropdown-item"> <img src="img/flags/16/FR.png" alt="English" class="mr-2"><span>French
-                </span></a></div>
-          </div>
-          <!-- Log out               -->
-          <div class="list-inline-item logout"> <a id="logout" href="/admin/logout" class="nav-link">Logout <i
-                class="icon-logout"></i></a></div>
-        </div>
-      </div>
-    </nav>
-  </header>
-  <div class="d-flex align-items-stretch">
-    <!-- Sidebar Navigation-->
-    <nav id="sidebar">
-      <!-- Sidebar Header-->
-      <div class="sidebar-header d-flex align-items-center">
-        <div class="avatar"><img src="/images/logo.png" alt="..." class="img-fluid rounded-circle"></div>
-        <div class="title">
-          <h1 class="h5">Binel</h1>
-          <p>Web Designer</p>
-        </div>
-      </div>
-      <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
-      <ul class="list-unstyled">
-        <li><a href="/admin/adminHome"> <i class="icon-home"></i>Dashboard</a></li>
-        <li><a href="/admin/Product"> <i class="icon-grid"></i>Product</a></li>
-        <li><a href="/admin/User"> <i class="fa fa-bar-chart"></i>user</a></li>
-        <li class="active"><a class="active" href="/admin/Category"> <i class="icon-padnote "></i>Category</a></li>
-        <li><a href="/admin/order"> <i class="icon-paper-and-pencil"></i>Order</a></li>
-        <li><a href="/admin/coupons"> <i class="icon-three-cells"></i>Coupons</a></li>
-        <li>
-          <a href="/admin/sales">
-            <i class="icon-info"></i>Sales Report</a
-          >
-          </li>
-      </ul>
-    </nav>
-    <!-- Sidebar Navigation end-->
-    <div class="page-content">
-      <div class="page-header">
-        <div class="container-fluid">
-          <h2 class="h5 no-margin-bottom">Category</h2>
-        </div>
-      </div>
+    </div>
 
-      <div class="title" style="margin-left: 80%;"><!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Add New Category
-        </button>
-
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <form action="/admin/category" method="post" onsubmit="return validateCategoryForm(this)">
-                <div class="modal-header">
-                  <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-
-
-                  <label class="col-sm-3 form-control-label">Enter the Cateogy</label>
-                  <br>
-
-                  <input type="text" name="category" class="form-control">
-
-
-
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Save changes</button>
-                </div>
-              </form>
+    <!-- Edit Category Modals -->
+    <% for(let i=0; i < data.length; i++) { %>
+      <div class="modal fade" id="editModal<%= i %>" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Category</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form action="/admin/editCategory" method="post" onsubmit="return validateCategoryForm(this)">
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label class="form-label">Category Name</label>
+                  <input type="hidden" name="oldCat" value="<%= data[i].category %>">
+                  <input type="text" name="category" class="form-control" value="<%= data[i].category %>">
+                  <input type="hidden" name="id" value="<%= data[i]._id %>">
+                  <div class="error-message" id="category-error-<%= i %>"></div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
+    <% } %>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+      // Category validation
+      function validateCategoryForm(form) {
+        const categoryInput = form.querySelector('input[name="category"]');
+        const category = categoryInput.value.trim();
+        const oldCategory = form.querySelector('input[name="oldCat"]')?.value?.trim();
 
+        // Clear any existing error messages
+        clearErrorMessage(categoryInput);
 
-      <div class="table-responsive" style="padding: 5%;">
-        <!-- Example EJS template -->
-<% if (error) { %>
-  <div class="alert" style="color: red;" role="alert">
-      <%= error %>
-  </div>
-<% } %>
-<!-- Pagination section -->
-<ul class="pagination justify-content-center">
-  <% if (totalPages > 1) { %> <% if (currentPage > 1) { %>
-  <li class="page-item">
-    <a
-      class="page-link"
-      href="/admin/Category?page=<%= currentPage - 1 %>"
-      aria-label="Previous"
-    >
-      <span aria-hidden="true">&laquo;</span>
-      <span class="sr-only">Previous</span>
-    </a>
-  </li>
-  <% } %> <% let startPage = Math.max(1, currentPage - 2); %> <% let
-  endPage = Math.min(startPage + 3, totalPages); %> <% for(let i =
-  startPage; i <= endPage; i++) { %>
-  <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-    <a class="page-link" href="/admin/Category?page=<%= i %>"><%= i %></a>
-  </li>
-  <% } %> <% if (currentPage < totalPages) { %>
-  <li class="page-item">
-    <a
-      class="page-link"
-      href="/admin/Category?page=<%= currentPage + 1 %>"
-      aria-label="Next"
-    >
-      <span aria-hidden="true">&raquo;</span>
-      <span class="sr-only">Next</span>
-    </a>
-  </li>
-  <% } %> <% } %>
-</ul>
-</div>
+        // Regular expressions for validation
+        const categoryRegex = /^[a-zA-Z\s]+$/; // Only letters and spaces
+        const minLength = 3;
+        const maxLength = 30;
 
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Edit</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% for(let i=0; i < data.length; i++) {%>
-              <tr>
-                <td>
-                  <%= data[i].category %>
-                </td>
-                <td>
-                  <% if(data[i].status) { %>
+        // Check if empty
+        if (category === "") {
+          showError(categoryInput, "Category name cannot be empty");
+          return false;
+        }
 
-                    <a href="/admin/categoryStatus?id=<%= data[i]._id %>" class="btn btn-danger"
-                      onclick="confirmAndRedirect('<%= data[i]._id %>',event)">Unlist</a>
-                    <% } else { %>
-                      <a href="/admin/categoryStatus?id=<%= data[i]._id %>" class="btn btn-success"
-                        onclick="confirmAndRedirect('<%= data[i]._id %>',event)">List</a>
-                      <% } %>
+        // Check length
+        if (category.length < minLength) {
+          showError(categoryInput, `Category name must be at least ${minLength} characters long`);
+          return false;
+        }
 
-                </td>
+        if (category.length > maxLength) {
+          showError(categoryInput, `Category name cannot exceed ${maxLength} characters`);
+          return false;
+        }
 
-                <td>
-                  <!-- Button triggering the modal with unique identifier -->
-                  <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#staticBackdrop<%= i %>">
-                    Edit
-                  </button>
+        // Check if contains only letters and spaces
+        if (!categoryRegex.test(category)) {
+          showError(categoryInput, "Category name can only contain letters and spaces");
+          return false;
+        }
 
-                  <!-- Modal with unique identifier -->
-                  <div class="modal fade" id="staticBackdrop<%= i %>" data-bs-backdrop="static" data-bs-keyboard="false"
-                    tabindex="-1" aria-labelledby="staticBackdropLabel<%= i %>" aria-hidden="true">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <form action="/admin/editCategory" method="post" onsubmit="return validateCategoryForm(this)">
-                
-                          <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="staticBackdropLabel<%= i %>">Change the category</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <label class="col-sm-3 form-control-label">Enter the Category</label>
-                            <br>
-                            <input type="text" name="oldCat" value="<%= data[i].category %>" hidden>
-                            <input type="text" name="category" class="form-control"
-                              placeholder="<%= data[i].category %>" >
-                              <input type="hidden" id="edit-category-id" value="<%= data[i].id %>" name="id">
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Change</button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- <a href="" class="btn btn-secondary">Edit</a> -->
-                </td>
-                <td>
-                  <a href="/admin/categoryDelete?id=<%= data[i]._id %>" class="btn btn-danger"
-                    onclick="confirmAndRedirectDelete('<%= data[i]._id %>',event)">Delete</a>
-                </td>
-              </tr>
-              <%} %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+        // Check if only spaces
+        if (category.trim().length === 0) {
+          showError(categoryInput, "Category name cannot contain only spaces");
+          return false;
+        }
 
-  <footer class="footer">
-    <div class="footer__block block no-margin-bottom">
-     
-    </div>
-  </footer>
-  </div>
-  </div>
+        // Get all existing categories (case-insensitive)
+        const existingCategories = Array.from(document.querySelectorAll('tbody tr'))
+          .map(row => row.cells[0].textContent.trim());
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        // For edit form
+        if (oldCategory) {
+          // Check if name is unchanged (case-sensitive)
+          if (category === oldCategory) {
+            return true;
+          }
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+          // Check for duplicates (case-insensitive)
+          if (existingCategories.some(existingCat => 
+            existingCat.toLowerCase() === category.toLowerCase() && 
+            existingCat !== oldCategory
+          )) {
+            showError(categoryInput, "This category name already exists");
+            return false;
+          }
+        } else {
+          // For new category: check for duplicates (case-insensitive)
+          if (existingCategories.some(existingCat => 
+            existingCat.toLowerCase() === category.toLowerCase()
+          )) {
+            showError(categoryInput, "This category already exists");
+            return false;
+          }
+        }
 
-  <script>
-    async function confirmAndRedirect(userId, event) {
-      event.preventDefault(); // Prevent the default behavior
+        return true;
+      }
 
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You want to change the status of the category",
-        icon: "warning",
-        showCancelButton: true
+      function showError(input, message) {
+        // Remove any existing error message
+        clearErrorMessage(input);
+
+        // Create and show error using SweetAlert2
+        Swal.fire({
+          title: 'Validation Error',
+          text: message,
+          icon: 'error',
+          confirmButtonColor: '#bca374'
+        });
+
+        // Also add inline error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        input.parentNode.appendChild(errorDiv);
+
+        // Add error class to input
+        input.classList.add('is-invalid');
+      }
+
+      function clearErrorMessage(input) {
+        // Remove existing error message if any
+        const errorMessage = input.parentNode.querySelector('.error-message');
+        if (errorMessage) {
+          errorMessage.remove();
+        }
+        
+        // Remove error class from input
+        input.classList.remove('is-invalid');
+      }
+
+      // Status change confirmation
+      async function confirmAndRedirect(categoryId, event) {
+        event.preventDefault();
+        
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: "You want to change the status of this category?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#bca374',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, change it!'
+        });
+
+        if (result.isConfirmed) {
+          window.location.href = "/admin/categoryStatus?id=" + categoryId;
+        }
+      }
+
+      // Delete confirmation
+      async function confirmAndRedirectDelete(categoryId, event) {
+        event.preventDefault();
+        
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: "You want to delete this category? This action cannot be undone!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+          window.location.href = "/admin/categoryDelete?id=" + categoryId;
+        }
+      }
+
+      // Mobile sidebar toggle
+      document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.createElement('button');
+        sidebarToggle.classList.add('btn', 'btn-primary', 'd-md-none', 'position-fixed');
+        sidebarToggle.style.cssText = 'top: 10px; left: 10px; z-index: 1000;';
+        sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        document.body.appendChild(sidebarToggle);
+
+        sidebarToggle.addEventListener('click', function() {
+          const sidebar = document.getElementById('sidebar');
+          sidebar.classList.toggle('active');
+        });
       });
-
-      if (result.isConfirmed) {
-        window.location.href = "/admin/categoryStatus?id=" + userId;
-      }
-    }
-    async function confirmAndRedirectDelete(userId, event) {
-      event.preventDefault(); // Prevent the default behavior
-
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You want to delete the category",
-        icon: "warning",
-        showCancelButton: true
-      });
-
-      if (result.isConfirmed) {
-        window.location.href = "/admin/categoryDelete?id=" + userId;
-      }
-    }
-  </script>
-  <!-- JavaScript files-->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/popper.js/umd/popper.min.js"> </script>
-  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-  <script src="vendor/jquery.cookie/jquery.cookie.js"> </script>
-  <script src="vendor/chart.js/Chart.min.js"></script>
-  <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
-  <script src="js/charts-home.js"></script>
-  <script src="js/front.js"></script>
-  <script>
-   function validateCategoryForm(form) {
-  console.log("Form submitted"); // Check if the function is being called
-  var categoryInput = form.querySelector('input[name="category"]');
-  var category = categoryInput.value;
-
-  console.log("Category value:", category); // Check the value of the category input
-
-  // Regular expression for validation
-  var categoryRegex = /^[a-zA-Z\s]+$/; // Matches only alphabets and spaces
-
-  if (category.trim() === "") {
-    Swal.fire({
-      title: 'Error',
-      text: 'Please enter a category',
-      icon: 'error',
-      customClass: {
-        container: 'swal2-container'
-      }
-    });
-    return false;
-  }
-
-  if (!categoryRegex.test(category)) {
-    Swal.fire({
-      title: 'Error',
-      text: 'Category name can only contain letters and spaces',
-      icon: 'error',
-      customClass: {
-        container: 'swal2-container'
-      }
-    });
-    return false;
-  }
-
-  console.log("Validation successful"); // Check if validation passes
-  return true;
-}
-
-  </script>
-  
+    </script>
 </body>
-
 </html>

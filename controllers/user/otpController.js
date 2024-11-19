@@ -65,7 +65,7 @@ const verifyOTP = async (req, res) => {
         let fullName = newUser.fullname;
 
         // Clear session data
-        const user=await User.findById(newUser._id)
+        const user = await User.findById(newUser._id);
         req.session.userData = user;
         req.session.user = email;
         delete req.session.otp;
@@ -101,48 +101,57 @@ const verifyOTP = async (req, res) => {
 //function for resend otp
 const resendOTP = async (req, res) => {
   try {
-    const { email, phone } = req.body;
+    const { email } = req.body;
+
+    // For signup, we should use the userData from session
+    const userData = req.session.userData;
+    if (!userData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User data not found in session" });
+    }
+
     const otp = generateOTP();
+    const phone = userData.phone; // Get phone from session data
 
     // Update session with new OTP
     req.session.otp = otp;
-
-    // Resend OTP to user's phone
-    await sendOTP(phone, otp);
     req.session.currentTimestamp = Date.now();
 
-    // Respond with success message or redirect to OTP page
-    res.render("otp", { showTimer: true, email, otp, errorMessage: null });
+    // Send OTP to user's phone
+    await sendOTP(phone, otp);
+    console.log("New OTP generated for signup:", otp); // For debugging
+
+    // Send success response
+    res.status(200).json({ success: true });
   } catch (error) {
     console.error("OTP resend error:", error);
-    res.status(500).render("otp", { errorMessage: "Failed to resend OTP" });
+    res.status(500).json({ success: false, message: "Failed to resend OTP" });
   }
 };
 
 const resendOTPpass = async (req, res) => {
   try {
-    const { email, phone } = req.session.userData;
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
     const otp = generateOTP();
+    const phone = user.phone;
 
-    // Update session with new OTP
     req.session.otp = otp;
-
-    // Resend OTP to user's phone
-    await sendOTP(phone, otp);
     req.session.currentTimestamp = Date.now();
 
-    // Respond with success message or redirect to OTP page
-    res.render("changepassword", {
-      showTimer: true,
-      email,
-      otp,
-      errorMessage: null,
-    });
+    await sendOTP(phone, otp);
+    res.status(200).json({ success: true });
   } catch (error) {
     console.error("OTP resend error:", error);
-    res
-      .status(500)
-      .render("changepassword", { errorMessage: "Failed to resend OTP" });
+    res.status(500).json({ success: false, message: "Failed to resend OTP" });
   }
 };
 
@@ -237,24 +246,26 @@ const otppagepasschange = async (req, res) => {
 //function for resend otp of forgot password
 const resendOTPforgot = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.session.email });
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
 
     const otp = generateOTP();
     const phone = user.phone;
-    // Update session with new OTP
-    req.session.otp = otp;
 
-    // Resend OTP to user's phone
-    await sendOTP(phone, otp);
+    req.session.otp = otp;
     req.session.currentTimestamp = Date.now();
 
-    // Respond with success message or redirect to OTP page
-    res.redirect("/forgototp");
+    await sendOTP(phone, otp);
+    res.status(200).json({ success: true });
   } catch (error) {
     console.error("OTP resend error:", error);
-    res
-      .status(500)
-      .render("forgototp", { errorMessage: "Failed to resend OTP" });
+    res.status(500).json({ success: false, message: "Failed to resend OTP" });
   }
 };
 

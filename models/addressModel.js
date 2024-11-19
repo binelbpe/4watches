@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   addressline2: {
-    type: String, // Capitalized "String"
+    type: String, 
   },
   city: {
     type: String,
@@ -21,10 +21,10 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   userid: {
-    type: String, // Capitalized "String"
+    type: String, 
   },
   status: {
-    type: Boolean, // Capitalized "Boolean"
+    type: Boolean, 
     default: false,
   },
 });

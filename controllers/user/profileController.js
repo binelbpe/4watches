@@ -70,7 +70,14 @@ const profile = async (req, res) => {
       path: "addresses",
       match: { status: true }, // Only populate addresses with status true
     });
-    res.render("userprofile", { user, fullName: req.session.fullname });
+    
+    // Get fullName from session or user object
+    const fullName = req.session.userData.fullname || user.fullname;
+    
+    res.render("userprofile", { 
+      user, 
+      fullName // Pass fullName explicitly
+    });
   } catch (error) {
     console.error("Error rendering profile page:", error);
     res.status(500).send("Internal Server Error");
@@ -219,14 +226,43 @@ const editAddress = async (req, res) => {
 //function for delete user address
 const deleteAddress = async (req, res) => {
   try {
-    const address = await Address.findByIdAndDelete(req.params.id);
-    if (!address) {
-      return res.status(404).send("Address not found");
+    const addressId = req.params.id;
+    const userId = req.session.userData._id;
+
+    // Find the address to be deleted
+    const addressToDelete = await Address.findById(addressId);
+    if (!addressToDelete) {
+      return res.status(404).json({ message: "Address not found" });
     }
+
+    // Check if this is the default address
+    if (addressToDelete.status) {
+      // Find another address to set as default
+      const user = await User.findById(userId).populate('addresses');
+      const otherAddresses = user.addresses.filter(addr => 
+        addr._id.toString() !== addressId
+      );
+
+      if (otherAddresses.length > 0) {
+        // Set the first available address as default
+        const newDefaultAddress = otherAddresses[0];
+        await Address.findByIdAndUpdate(newDefaultAddress._id, { status: true });
+      }
+    }
+
+    // Remove address from user's addresses array
+    await User.findByIdAndUpdate(userId, {
+      $pull: { addresses: addressId }
+    });
+
+    // Delete the address
+    await Address.findByIdAndDelete(addressId);
+
+    // Redirect back to addresses page
     res.redirect("/view-addresses");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    console.error("Error deleting address:", error);
+    res.status(500).json({ message: "Failed to delete address" });
   }
 };
 
@@ -234,33 +270,21 @@ const deleteAddress = async (req, res) => {
 const setActiveAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
-    const userId = req.session.userData ? req.session.userData._id : null;
+    const userId = req.session.userData._id;
 
-    if (!userId) {
-      return res.status(403).redirect("/login");
-    }
+    // First, set all addresses to inactive
+    const user = await User.findById(userId).populate('addresses');
+    await Promise.all(user.addresses.map(async (address) => {
+      await Address.findByIdAndUpdate(address._id, { status: false });
+    }));
 
-    const address = await Address.findById(addressId);
-    if (!address) {
-      return res.status(404).send("Address not found");
-    }
+    // Then set the selected address as active
+    await Address.findByIdAndUpdate(addressId, { status: true });
 
-    const user = await User.findById(userId);
-    // Set active status of all addresses belonging to the user to false
-    for (const addressId of user.addresses) {
-      await Address.findByIdAndUpdate(addressId, { status: false });
-    }
-
-    // Set the selected address as active
-    const addr = await Address.findByIdAndUpdate(addressId, {
-      $set: { status: true },
-    });
-
-    console.log("addr:", addr);
     res.redirect("/view-addresses");
-  } catch (err) {
-    console.error("Error setting active address:", err);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    console.error("Error setting active address:", error);
+    res.status(500).json({ message: "Failed to set active address" });
   }
 };
 

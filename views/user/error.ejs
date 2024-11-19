@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - 4Watch Store</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .brand-gradient {
+            background: linear-gradient(135deg, #bca374, #d4c4a1, #bca374, #d4c4a1);
+        }
+        .brand-color {
+            color: #bca374;
+        }
+        .brand-border {
+            border-color: #bca374;
+        }
+        .hover-brand:hover {
+            background-color: #bca374;
+            color: white;
+        }
+        .brand-bg {
+            background-color: #bca374;
+        }
+        .error-icon {
+            font-size: 5rem;
+            color: #bca374;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <%- include('../layouts/header.ejs', { fullName: locals.fullName || null }) %>
+
+    <main class="container mx-auto px-4 py-8 max-w-6xl min-h-screen flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg p-8 border brand-border text-center max-w-2xl w-full">
+            <!-- Logo -->
+            <div class="mb-6">
+                <img src="/images/logo.png" alt="4Watches Logo" class="h-16 mx-auto mb-4">
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Oops! Something Went Wrong</h1>
+            <p class="text-gray-600 mb-4"><%= error?.message || 'An unexpected error occurred' %></p>
+
+            <% if (process.env.NODE_ENV !== 'production' && error?.stack) { %>
+                <div class="bg-gray-100 p-4 rounded-lg mt-4 mb-6 text-left overflow-x-auto">
+                    <pre class="text-sm text-gray-700"><%= error.stack %></pre>
+                </div>
+            <% } %>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-center space-x-4 mt-6">
+                <a href="/" 
+                   class="px-6 py-3 brand-bg text-white rounded-lg hover-brand transition-colors flex items-center">
+                    <i class="fas fa-home mr-2"></i>
+                    Go Home
+                </a>
+                <button onclick="history.back()" 
+                        class="px-6 py-3 border brand-border brand-color rounded-lg hover-brand transition-colors flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Go Back
+                </button>
+            </div>
+
+            <!-- Support Information -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-gray-600">Need help? Contact our support team</p>
+                <div class="flex justify-center space-x-4 mt-2">
+                    <a href="mailto:support@4watches.com" class="brand-color hover:opacity-75">
+                        <i class="fas fa-envelope mr-1"></i>
+                        support@4watches.com
+                    </a>
+                    <span class="text-gray-300">|</span>
+                    <a href="tel:+1234567890" class="brand-color hover:opacity-75">
+                        <i class="fas fa-phone mr-1"></i>
+                        +1 (234) 567-890
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../layouts/footer.ejs', { fullName: locals.fullName || null }) %>
+</body>
+</html> 

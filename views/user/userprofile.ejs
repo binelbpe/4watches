@@ -1,149 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>4Watch Store</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
 
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/css/style.css" />
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/">
-        <img src="/images/logo.png" alt="Logo" />
-      </a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4Watch Store - User Profile</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .golden-gradient {
+      background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+    }
 
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
-      </div>
+    .hover-golden:hover {
+      background: linear-gradient(135deg, #bf953f, #fcf6ba);
+    }
 
-      <% if (fullName) { %>
-      <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-        <a href="/logout" class="nav-link logout nav-linklogout">
-          <i class="fas fa-sign-out-alt"></i>
-        </a>
-      </div>
-      <% } %>
+    .address-actions {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
 
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
+    .address-card:hover .address-actions {
+      opacity: 1;
+    }
 
-    <main class="container mt-5">
-      <div class="profile-box p-4 mb-4">
-        <h1 class="mb-4">User Profile</h1>
-        <div class="profile-details mb-4">
-          <!-- Display user details here -->
-          <p>Name: <%= user.fullname %></p>
-          <p>Email: <%= user.email %></p>
-          <p>Phone Number: <%= user.phone %></p>
-          <!-- Added phone number field -->
+    .action-button {
+      transition: transform 0.2s ease;
+    }
+
+    .action-button:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <%- include('../layouts/header.ejs', { fullName: fullName }) %>
+
+    <main class="container mx-auto px-4 py-8 max-w-6xl">
+      <!-- Profile Header -->
+      <div class="mb-8 text-center">
+        <div class="golden-gradient w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+          <span class="text-3xl text-white font-bold">
+            <%= fullName[0] %>
+          </span>
         </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+          <%= fullName %>
+        </h1>
+        <p class="text-gray-600">Member since <%= new Date(user.createdAt).toLocaleDateString() %>
+        </p>
       </div>
-      <div class="profile-box p-4 mb-4">
-        <h2 class="mb-4">Address</h2>
-        <div class="profile-address mb-4">
-          <!-- Display user addresses -->
-          <% if (user.addresses.length > 0) { %> <%
-          user.addresses.forEach((addr) => { %>
-          <div class="card addcard mb-3">
-            <div class="card-body">
-              <div class="row">
-              <!-- Inside the card-body -->
-<!-- Inside the card-body -->
-<div class="row">
-  <div class="col-md-12">
-    <p class="card-text"><span style="font-weight: bold;">Address:</span></p>
-    <p class="card-text"><%= addr.address %></p>
-    <p class="card-text"><%= addr.addressline2 %></p>
-    <p class="card-text"><%= addr.city %>, <%= addr.state %><br><br> PIN CODE:<%= addr.pincode %></p>
-  </div>
-</div>
 
-
-            </div>
-          </div>
-          <% }); %> <% } else { %>
-          <p>No address found. <a href="/add-address">Add Address</a></p>
-          <% } %>
-        </div>
-        <!-- Buttons for managing addresses -->
-        <div class="btn-group">
-          <!-- Add new address -->
-          <a href="/add-address" class="btn btn-primary">Add Address</a>
-          <!-- View addresses -->
-          <a href="/view-addresses" class="btn btn-secondary">
-            <i class="fas fa-eye"></i> View Addresses
+      <!-- Profile Information -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-amber-200">
+        <div class="flex justify-between items-center mb-4 border-b border-amber-200 pb-2">
+          <h2 class="text-xl font-semibold text-gray-800">Personal Information</h2>
+          <a href="/edit-profile" class="text-amber-600 hover:text-amber-700 flex items-center">
+            <i class="fas fa-edit mr-2"></i>
+            Edit Profile
           </a>
         </div>
-      </div>
-      <div class="profile-box p-4 mb-4">
-        <div class="profile-orders mb-4">
-          <!-- Display user orders here -->
-          <h2 class="mb-4">Orders</h2>
-          <!-- Add logic to display user orders -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="space-y-3">
+            <div class="flex items-center">
+              <span class="text-amber-700 w-24">Email:</span>
+              <span class="text-gray-700">
+                <%= user.email %>
+              </span>
+            </div>
+            <div class="flex items-center">
+              <span class="text-amber-700 w-24">Phone:</span>
+              <span class="text-gray-700">
+                <%= user.phone %>
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="profile-options">
-          <!-- Edit Profile -->
-          <a href="/edit-profile" class="btn btn-primary mr-2">Edit Profile</a>
-          <!-- Cancel Orders -->
-          <a href="/orders" class="btn btn-danger mr-2">Orders</a>
-          <!-- Forgot Password -->
-          <a href="/change-password" class="btn btn-warning">Change Password</a>
-          <!-- Inside the .profile-options div -->
-          <a href="/wallet" class="btn btn-success">Wallet</a>
+      </div>
+
+      <!-- Addresses -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-amber-200">
+        <div class="flex justify-between items-center mb-4 border-b border-amber-200 pb-2">
+          <h2 class="text-xl font-semibold text-gray-800">Addresses</h2>
+          <a href="/add-address" class="text-amber-600 hover:text-amber-700 flex items-center">
+            <i class="fas fa-plus-circle mr-2"></i>
+            Add New Address
+          </a>
+        </div>
+
+        <div class="space-y-4">
+          <% if (user.addresses.length> 0) { %>
+            <% user.addresses.forEach((addr)=> { %>
+              <div
+                class="address-card border border-gray-200 rounded-lg p-4 hover:border-amber-300 transition-colors relative">
+                <div class="flex justify-between items-start">
+                  <div class="space-y-1">
+                    <p class="text-gray-700 font-medium">
+                      <%= addr.address %>
+                    </p>
+                    <p class="text-gray-700">
+                      <%= addr.addressline2 %>
+                    </p>
+                    <p class="text-gray-700">
+                      <%= addr.city %>, <%= addr.state %>
+                    </p>
+                    <p class="text-amber-700">PIN: <%= addr.pincode %>
+                    </p>
+                  </div>
+                  <div class="address-actions flex space-x-2">
+                    <a href="/edit-address/<%= addr._id %>" class="text-amber-600 hover:text-amber-800 p-2">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <button onclick="deleteAddress('<%= addr._id %>')" class="text-red-600 hover:text-red-800 p-2">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <% }); %>
+                <% } else { %>
+                  <div class="text-center py-8">
+                    <p class="text-gray-600 mb-4">No addresses found</p>
+                    <a href="/add-address"
+                      class="inline-flex items-center px-4 py-2 border border-amber-300 text-amber-700 rounded-md hover:bg-amber-50 transition-colors">
+                      <i class="fas fa-plus-circle mr-2"></i>
+                      Add Your First Address
+                    </a>
+                  </div>
+                  <% } %>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b border-amber-200 pb-2">Quick Actions</h2>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <a href="/orders"
+            class="action-button flex flex-col items-center p-4 rounded-lg hover:bg-amber-50 transition-colors">
+            <i class="fas fa-shopping-bag text-2xl text-amber-600 mb-2"></i>
+            <span class="text-gray-700">My Orders</span>
+          </a>
+          <a href="/wallet"
+            class="action-button flex flex-col items-center p-4 rounded-lg hover:bg-amber-50 transition-colors">
+            <i class="fas fa-wallet text-2xl text-amber-600 mb-2"></i>
+            <span class="text-gray-700">Wallet</span>
+          </a>
+          <a href="/change-password"
+            class="action-button flex flex-col items-center p-4 rounded-lg hover:bg-amber-50 transition-colors">
+            <i class="fas fa-key text-2xl text-amber-600 mb-2"></i>
+            <span class="text-gray-700">Change Password</span>
+          </a>
+          <a href="/wishlist"
+            class="action-button flex flex-col items-center p-4 rounded-lg hover:bg-amber-50 transition-colors">
+            <i class="fas fa-heart text-2xl text-amber-600 mb-2"></i>
+            <span class="text-gray-700">Wishlist</span>
+          </a>
+          <a href="/view-addresses" class="action-button flex flex-col items-center p-4 rounded-lg hover:bg-amber-50 transition-colors">
+            <i class="fas fa-address-book text-2xl text-amber-600 mb-2"></i>
+            <span class="text-gray-700">View Addresses</span>
+          </a>
         </div>
       </div>
     </main>
 
-    <footer class="main-footer mt-5">
-      <!-- Footer content -->
-    </footer>
+    <%- include('../layouts/footer.ejs', { fullName: fullName }) %>
 
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-  </body>
+      <script>
+        function deleteAddress(addressId) {
+          if (confirm('Are you sure you want to delete this address?')) {
+            window.location.href = `/delete-address/${addressId}`;
+          }
+        }
+      </script>
+</body>
+
 </html>

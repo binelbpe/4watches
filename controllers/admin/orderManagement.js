@@ -1,6 +1,41 @@
 const Order = require("../../models/orderModel");
 const Product = require("../../models/productModel");
 const User = require("../../models/userModel");
+const mongoose = require("mongoose");
+
+// Add this function at the top of the file
+function calculateOrderPrices(order) {
+  // Base subtotal (before tax and shipping)
+  const subtotal = order.grandTotalPrice - 45;
+  const baseAmount = subtotal / 1.05; // Remove 5% tax to get base amount
+  const tax = subtotal * 0.05; // 5% tax
+  const shipping = 45; // Fixed shipping
+
+  // Discounts and wallet
+  const discountAmount = order.discountedAmount || 0;
+  const walletAmount = order.walletAmount || 0;
+  const reducedAmount = order.reducedPrice || 0;
+  const returnedAmount = order.returnedPrice || 0;
+
+  // Calculate final amount based on order status
+  let finalAmount = order.grandTotalPrice;
+  if (order.status === "cancelled" || order.status === "returned") {
+    finalAmount = 0;
+  } else {
+    finalAmount = finalAmount - discountAmount - reducedAmount - returnedAmount;
+  }
+
+  return {
+    baseAmount: baseAmount.toFixed(2),
+    tax: tax.toFixed(2),
+    shipping: shipping.toFixed(2),
+    discountAmount: discountAmount.toFixed(2),
+    walletAmount: walletAmount.toFixed(2),
+    reducedAmount: reducedAmount.toFixed(2),
+    returnedAmount: returnedAmount.toFixed(2),
+    finalAmount: finalAmount.toFixed(2),
+  };
+}
 
 //function to change order status
 const changeOrderStatus = async (req, res) => {
@@ -164,305 +199,363 @@ const cancelOrder = async (req, res) => {
 //function for rendering order list page in admin
 const getOrdersWithPagination = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1; // Get page number from query parameter, default to 1
-    const pageSize = parseInt(req.query.pageSize) || 10; // Get page size from query parameter, default to 10
-
-    // Calculate skip value for pagination
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
     const skip = (page - 1) * pageSize;
 
-    // Fetch orders for the current page with pagination
-    const order = await Order.find()
+    // Fetch orders with populated fields
+    const orders = await Order.find()
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageSize)
-      .populate("user")
-      .populate("products.product")
-      .populate("address");
+      .populate({
+        path: "user",
+        select: "fullname phone email", // Select only needed fields
+      })
+      .populate({
+        path: "products.product",
+        select: "product price image status",
+      })
+      .populate("address")
+      .lean(); // Convert to plain JavaScript objects
 
-    // Count total number of orders for pagination
+    // Validate and sanitize order data
+    const validatedOrders = orders.map((order) => ({
+      ...order,
+      user: order.user || {
+        fullname: "User Not Found",
+        phone: "N/A",
+        email: "N/A",
+      },
+      products: order.products.map((product) => ({
+        ...product,
+        product: product.product || {
+          product: "Product Not Available",
+          price: 0,
+          image: [],
+          status: false,
+        },
+      })),
+      address: order.address || {
+        address: "Address Not Available",
+        city: "N/A",
+        state: "N/A",
+        pincode: "N/A",
+      },
+    }));
+
     const totalOrders = await Order.countDocuments();
-
-    // Calculate total pages
     const totalPages = Math.ceil(totalOrders / pageSize);
 
     res.render("adminOrder", {
-      order,
+      order: validatedOrders,
       currentPage: page,
       totalPages,
+      calculateOrderPrices,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching orders:", err);
     res.status(500).send("Internal Server Error");
   }
 };
 
 //function for cancel products in order in admin side
 const cancelProductAsAdmin = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const order = await Order.findById(req.params.orderId);
-    const productId = req.params.productId;
+    const order = await Order.findById(req.params.orderId)
+      .populate('products.product')
+      .session(session);
+
     if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+      throw new Error('Order not found');
     }
 
-    if (
-      order.status !== "pending" &&
-      order.status !== "Dispatched" &&
-      order.status !== "In Transit"
-    ) {
-      return res
-        .status(400)
-        .json({ error: "Cannot cancel product for this order" });
+    const productId = req.params.productId;
+    const orderProduct = order.products.find(p => p.product._id.toString() === productId);
+
+    if (!orderProduct || orderProduct.status !== 'pending') {
+      throw new Error('Product cannot be cancelled');
     }
 
-    const productIndex = order.products.findIndex(
-      (p) => p.product.toString() === productId
+    // Calculate refund amount
+    const refundAmount = calculateRefundAmount(order, orderProduct);
+
+    // Update product stock
+    await Product.findByIdAndUpdate(
+      productId,
+      { $inc: { stock: orderProduct.quantity } },
+      { session }
     );
 
-    if (productIndex === -1) {
-      return res.status(404).json({ error: "Product not found in the order" });
-    }
+    // Update product status
+    orderProduct.status = 'cancelled';
 
-    const product = order.products[productIndex];
-    const productObj = await Product.findById(product.product);
-    const productPrice = parseFloat(productObj.price) || 0;
-    const productQuantity = product.quantity;
-
-    if (isNaN(productPrice) || isNaN(productQuantity)) {
-      return res
-        .status(400)
-        .json({ error: "Invalid product price or quantity" });
-    }
-
-    const discountedAmount = parseFloat(order.discountedAmount) || 0;
-    const totalPrice = parseFloat(order.grandTotalPrice)
-      ? parseFloat(order.grandTotalPrice)
-      : 0;
-    const reducedPrice = calculateReducedPrice(
-      productPrice * productQuantity,
-      discountedAmount,
-      totalPrice
+    // Check if this is the last active product
+    const remainingActiveProducts = order.products.filter(
+      p => p.status !== 'cancelled' && p.status !== 'returned'
     );
 
-    const isLastCompleted =
-      order.products.filter(
-        (p) => p.status === "completed" && p.product.toString() !== productId
-      ).length === 0;
-    product.status = "cancelled";
-
-    const updatedOrder = await order.save();
-
-    productObj.stock += productQuantity;
-    await productObj.save();
-
-    const remainingProducts = order.products.filter(
-      (p) => p.status !== "cancelled"
-    );
-
-    if (remainingProducts.length === 0) {
-      order.status = "cancelled";
-
-      await order.save();
+    // If this was the last active product, cancel the entire order
+    if (remainingActiveProducts.length === 0) {
+      order.status = 'cancelled';
     }
-    if (order.paymentMethod !== "cash_on_delivery") {
-      const user = await User.findById(order.user).populate("wallet");
 
-      if (!user || !user.wallet) {
-        return res.status(404).json({ error: "User or wallet not found" });
+    // Process refund if payment was made
+    if (order.paymentMethod !== 'cash_on_delivery') {
+      const user = await User.findById(order.user)
+        .populate('wallet')
+        .session(session);
+
+      if (!user.wallet) {
+        throw new Error('User wallet not found');
       }
-      {
-        order.reducedPrice =
-          parseFloat(order.reducedPrice) + parseFloat(reducedPrice);
-        order.totalPrice = 0;
-        order;
-        await order.save();
-      }
-      user.wallet.balance = (
-        parseFloat(user.wallet.balance) +
-        parseFloat(reducedPrice) +
-        (remainingProducts.length === 0 ? 45 : 0)
-      ).toFixed(2);
+
+      // Update wallet balance with proper number formatting
+      const currentBalance = parseFloat(user.wallet.balance);
+      const newBalance = (currentBalance + parseFloat(refundAmount)).toFixed(2);
+      user.wallet.balance = newBalance;
+
+      // Add transaction record
       user.wallet.transactions.push({
-        type: "credit",
-        amount:
-          parseFloat(reducedPrice) + (remainingProducts.length === 0 ? 45 : 0),
-        description: `Order ${order._id} cancelled`,
+        type: 'credit',
+        amount: parseFloat(refundAmount),
+        description: `Refund for cancelled product in order ${order._id} (by admin)`
       });
 
-      await user.wallet.save();
+      await user.wallet.save({ session });
     }
-    res.json({ success: true, message: "Product cancelled successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+
+    await order.save({ session });
+    await session.commitTransaction();
+
+    res.redirect('/admin/orders');
+
+  } catch (error) {
+    await session.abortTransaction();
+    console.error('Error cancelling product:', error);
+    res.status(500).json({ error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
 //function for return products which approved by admin in admin side
 const returnProductAsAdmin = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const order = await Order.findById(req.params.orderId);
-    const productId = req.params.productId;
+    const order = await Order.findById(req.params.orderId)
+      .populate('products.product')
+      .session(session);
 
     if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+      throw new Error('Order not found');
     }
 
-    const productIndex = order.products.findIndex(
-      (p) => p.product.toString() === productId
+    const productId = req.params.productId;
+    const orderProduct = order.products.find(p => 
+      p.product._id.toString() === productId && 
+      p.status === 'returnrequest'
     );
 
-    if (productIndex === -1) {
-      return res.status(404).json({ error: "Product not found in the order" });
+    if (!orderProduct) {
+      throw new Error('Product not found or not in return request status');
     }
 
-    const product = order.products[productIndex];
-    const productObj = await Product.findById(product.product);
-    const productPrice = parseFloat(productObj.price) || 0;
-    const productQuantity = product.quantity;
-
-    if (isNaN(productPrice) || isNaN(productQuantity)) {
-      return res
-        .status(400)
-        .json({ error: "Invalid product price or quantity" });
-    }
-
-    const discountedAmount = order.discountedAmount
-      ? parseFloat(order.discountedAmount)
-      : 0;
-    const totalPrice = parseFloat(order.grandTotalPrice)
-      ? parseFloat(order.grandTotalPrice)
-      : 0;
-    const reducedPrice = calculateReducedPrice(
-      productPrice * productQuantity,
-      discountedAmount,
-      totalPrice
+    // Update product stock
+    await Product.findByIdAndUpdate(
+      productId,
+      { $inc: { stock: orderProduct.quantity } },
+      { session }
     );
 
-    const isLastCompleted =
-      order.products.filter(
-        (p) => p.status === "completed" && p.product.toString() !== productId
-      ).length === 0;
-    product.status = "returned";
+    // Calculate refund amount
+    const refundAmount = calculateRefundAmount(order, orderProduct);
 
-    const updatedOrder = await order.save();
+    // Update product status
+    orderProduct.status = 'returned';
 
-    productObj.stock += productQuantity;
-    await productObj.save();
-    const remainingProducts = order.products.filter(
-      (p) => p.status !== "returned"
+    // Check if this is the last active product
+    const remainingActiveProducts = order.products.filter(
+      p => p.status !== 'returned' && p.status !== 'cancelled'
     );
-    if (remainingProducts.length === 0) {
-      order.status = "returned";
-      await order.save();
+
+    // If this was the last active product, update order status and include shipping in refund
+    if (remainingActiveProducts.length === 0) {
+      order.status = 'returned';
+      // Add shipping fee to refund amount
+      const finalRefundAmount = parseFloat(refundAmount) + 45;
+
+      // Process refund with shipping included
+      const user = await User.findById(order.user)
+        .populate('wallet')
+        .session(session);
+
+      if (!user.wallet) {
+        throw new Error('User wallet not found');
+      }
+
+      // Update wallet balance
+      const currentBalance = parseFloat(user.wallet.balance);
+      user.wallet.balance = (currentBalance + finalRefundAmount).toFixed(2);
+
+      // Add transaction record
+      user.wallet.transactions.push({
+        type: 'credit',
+        amount: finalRefundAmount,
+        description: `Refund for full order return #${order._id}`
+      });
+
+      await user.wallet.save({ session });
+    } else {
+      // Process regular refund without shipping
+      const user = await User.findById(order.user)
+        .populate('wallet')
+        .session(session);
+
+      if (!user.wallet) {
+        throw new Error('User wallet not found');
+      }
+
+      // Update wallet balance
+      const currentBalance = parseFloat(user.wallet.balance);
+      user.wallet.balance = (currentBalance + parseFloat(refundAmount)).toFixed(2);
+
+      // Add transaction record
+      user.wallet.transactions.push({
+        type: 'credit',
+        amount: parseFloat(refundAmount),
+        description: `Refund for returned product in order ${order._id}`
+      });
+
+      await user.wallet.save({ session });
     }
 
-    const user = await User.findById(order.user).populate("wallet");
-    console.log(order.user);
+    await order.save({ session });
+    await session.commitTransaction();
 
-    if (!user || !user.wallet) {
-      return res.status(404).json({ error: "User or wallet not found" });
-    }
-    {
-      order.returnedPrice =
-        parseFloat(order.returnedPrice) + parseFloat(reducedPrice);
-      await order.save();
-    }
-    user.wallet.balance = (
-      parseFloat(user.wallet.balance) +
-      parseFloat(reducedPrice) +
-      (remainingProducts.length === 0 ? 45 : 0)
-    ).toFixed(2);
-    user.wallet.transactions.push({
-      type: "credit",
-      amount:
-        parseFloat(reducedPrice) + (remainingProducts.length === 0 ? 45 : 0),
-      description: `Order ${order._id} returned`,
-    });
-
-    await user.wallet.save();
-
-    res.json({ success: true, message: "Product returned successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.redirect('/admin/orders');
+  } catch (error) {
+    await session.abortTransaction();
+    console.error('Error processing return:', error);
+    res.status(500).json({ error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
+// Helper function to calculate refund amount
+function calculateRefundAmount(order, orderProduct) {
+  // Get product price and quantity
+  const productTotal = orderProduct.product.price * orderProduct.quantity;
+
+  // Calculate proportional discount if any
+  let discountAmount = 0;
+  if (order.discountedAmount > 0) {
+    const orderSubtotal = order.products.reduce(
+      (total, p) => total + p.product.price * p.quantity,
+      0
+    );
+    discountAmount = order.discountedAmount * (productTotal / orderSubtotal);
+  }
+
+  // Calculate tax on discounted amount
+  const afterDiscount = productTotal - discountAmount;
+  const tax = afterDiscount * 0.05;
+
+  // Add shipping fee only if it's the last/only product
+  const remainingProducts = order.products.filter(
+    (p) => p.status !== "cancelled" && p.status !== "returned"
+  ).length;
+  const shippingFee = remainingProducts === 1 ? 45 : 0;
+
+  return (afterDiscount + tax + shippingFee).toFixed(2);
+}
+
+// Function to handle full order return
 const returnOrder = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const order = await Order.findById(req.params.orderId);
+    const order = await Order.findById(req.params.orderId)
+      .populate("products.product")
+      .session(session);
 
     if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+      throw new Error("Order not found");
     }
 
     if (order.status !== "returnrequest") {
-      return res.status(400).json({ error: "Order cannot be returned" });
+      throw new Error("Order is not in return request status");
     }
 
-    // Retain the product quantities
-    order.products.forEach((product) => {
-      product.quantity = product.quantity;
-    });
-
-    // Set the order status to "returned"
-    order.status = "returned";
-
-    const updateProductStatusPromises = order.products.map(
-      async (productItem) => {
-        if (productItem.status === "completed") {
-          productItem.status = "returned";
-          await productItem.save();
-        }
-      }
-    );
-
-    await order.save();
-    console.log("order", order);
-    // Restore product quantities
+    // Update product stocks
     await Promise.all(
-      order.products.map(async (orderItem) => {
-        const product = await Product.findById(orderItem.product);
-        if (product) {
-          product.stock += orderItem.quantity;
-          await product.save();
+      order.products.map(async (orderProduct) => {
+        if (orderProduct.status === "returnrequest") {
+          const product = await Product.findById(
+            orderProduct.product._id
+          ).session(session);
+          if (product) {
+            product.stock += orderProduct.quantity;
+            await product.save({ session });
+          }
+          orderProduct.status = "returned";
         }
       })
     );
-    const user = await User.findById(order.user).populate("wallet");
 
-    if (!user || !user.wallet) {
-      return res.status(404).json({ error: "User or wallet not found" });
+    // Calculate total refund amount
+    const refundAmount = order.products.reduce((total, product) => {
+      if (product.status === "returned") {
+        return total + product.product.price * product.quantity;
+      }
+      return total;
+    }, 0);
+
+    // Add tax and shipping to refund
+    const tax = refundAmount * 0.05;
+    const totalRefund = (refundAmount + tax + 45).toFixed(2); // Including shipping
+
+    // Process refund to wallet
+    const user = await User.findById(order.user)
+      .populate("wallet")
+      .session(session);
+
+    if (!user.wallet) {
+      throw new Error("User wallet not found");
     }
-    const reduceTotal =
-      (parseFloat(order.returnedPrice) ? parseFloat(order.returnedPrice) : 0) +
-      (parseFloat(order.reducedPrice) ? parseFloat(order.reducedPrice) : 0);
-    user.wallet.balance = (
-      parseFloat(user.wallet.balance) +
-      parseFloat(order.grandTotalPrice - order.discountedAmount) -
-      reduceTotal
-    ).toFixed(2);
 
-    // Add a new transaction to the wallet
+    // Update wallet balance
+    user.wallet.balance = (
+      parseFloat(user.wallet.balance) + parseFloat(totalRefund)
+    ).toFixed(2);
     user.wallet.transactions.push({
       type: "credit",
-      amount:
-        parseFloat(order.grandTotalPrice - order.discountedAmount) -
-        reduceTotal,
-      description: `Order ${order._id} returned`,
+      amount: parseFloat(totalRefund),
+      description: `Refund for returned order ${order._id}`,
     });
 
-    // Save the updated wallet
-    await user.wallet.save();
-    order.returnedPrice +=
-      parseFloat(order.grandTotalPrice - order.discountedAmount) - reduceTotal;
-    await order.save();
-    console.log("order", order);
-    return res.status(200).redirect("/admin/order");
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Internal server error" });
+    // Update order status and returned price
+    order.status = "returned";
+    order.returnedPrice = totalRefund;
+
+    // Save all changes
+    await Promise.all([order.save({ session }), user.wallet.save({ session })]);
+
+    await session.commitTransaction();
+    res.redirect("/admin/order");
+  } catch (error) {
+    await session.abortTransaction();
+    console.error("Error processing return:", error);
+    res.status(500).json({ error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -486,6 +579,7 @@ function calculateReducedPrice(price, discountedAmount, totalPrice) {
 
   return reducedPrice;
 }
+
 module.exports = {
   returnOrder,
   returnProductAsAdmin,
@@ -493,4 +587,5 @@ module.exports = {
   cancelOrder,
   getOrdersWithPagination,
   changeOrderStatus,
+  calculateOrderPrices, // Add to exports
 };

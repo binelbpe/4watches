@@ -7,3 +7,4 @@ mongoose.connect("mongodb+srv://binelbpe:7YMrJIYKKIl6UJ9L@cluster0.pjgwb9i.mongo
   console.log(err,'some error occured while connecting db');
 })
 
+module.exports = mongoose;

@@ -1,207 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>4Watch Store</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
 
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    
-    <link rel="stylesheet" href="/css/signup.css" />
-   
-    <!-- Custom CSS -->
-    <style>
-      .invalid-feedback {
-        color: red;
-        display: none;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4Watch Store - Edit Profile</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .golden-gradient {
+      background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+    }
+    .hover-golden:hover {
+      background: linear-gradient(135deg, #bf953f, #fcf6ba);
+    }
+  </style>
+</head>
 
-      .signup-container {
-        background-color: #bca374;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/">
-        <img src="/images/logo.png" alt="Logo" />
-      </a>
+<body class="bg-gray-50">
+  <%- include('../layouts/header.ejs', { fullName: fullName }) %>
 
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
+  <main class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
+      <div class="mb-6 text-center">
+        <h1 class="text-2xl font-bold text-gray-800">Edit Profile</h1>
       </div>
-      <!-- Search Bar with Link -->
-      <form class="form-inline my-2 my-lg-0 search-form" action="/womenfilter" method="GET">
-        <input
-          class="form-control mr-sm-2 search-input"
-          type="search"
-          placeholder="Search"
-          aria-label="Search"
-        />
-        <button class="search-icon" type="submit">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
-      <!-- Wishlist Icon with Link -->
-      <a href="/wishlist" class="wishlist-icon">
-        <i class="fas fa-heart"></i>
-      </a>
-      <!-- Add-to-Cart Icon with Link -->
-      <a href="/add-to-cart" class="cart-icon">
-        <i class="fas fa-shopping-cart"></i>
-      </a>
 
-      <% if (fullName) { %>
-      <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-        <a href="/logout" class="nav-link logout nav-linklogout">
-          <i class="fas fa-sign-out-alt"></i>
-        </a>
-      </div>
+      <% if(errorMessage) { %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <%= errorMessage %>
+        </div>
       <% } %>
 
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
-  <class="signupbody">
-    <div class="container mt-5">
-      <div class="row justify-content-center">
-          <div class="col-md-6">
-              <div class="signup-container">
-                  <!-- Edit Profile form -->
-                  <h2 class="text-center mb-4">Edit Profile</h2>
-                  <!-- Display error message if it exists -->
-                  <% if(errorMessage) { %>
-                  <div class="alert alert-danger" role="alert">
-                      <%= errorMessage %>
-                  </div>
-                  <% } %>
-
-                  <form id="editProfileForm" action="/edit-profile" method="POST" onsubmit="return validateForm()">
-                      <div class="mb-3">
-                          <label for="fullname" class="form-label">Full Name</label>
-                          <input type="text" class="form-control" id="fullname" name="fullname"
-                              placeholder="Enter your full name" value="<%= user.fullname %>" >
-                          <div id="fullnameError" class="invalid-feedback"></div>
-                      </div>
-                      <div class="mb-3">
-                          <label for="phone" class="form-label">Phone</label>
-                          <input type="text" class="form-control" id="phone" name="phone"
-                              placeholder="Enter your phone number" value="<%= user.phone %>">
-                          <div id="phoneError" class="invalid-feedback"></div>
-                      </div>
-                      <div class="mb-3">
-                          <label for="email" class="form-label">Email</label>
-                          <input type="text" class="form-control" id="email" name="email"
-                              placeholder="Enter your email address" value="<%= user.email %>" disabled >
-                          <div id="emailError" class="invalid-feedback"></div>
-                      </div>
-                      <div class="d-grid mb-3">
-                          <button class="btn btn-primary btn-lg btn-signup" type="submit">Update Profile</button>
-                      </div>
-                  </form>
-                  <p class="text-center mb-0">
-                      <!-- Provide link to go back or other actions -->
-                      <a href="/" class="login-link">Back to Dashboard</a>
-                  </p>
-              </div>
+      <form id="editProfileForm" action="/edit-profile" method="POST" onsubmit="return validateForm()">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="fullname">Full Name</label>
+            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                   id="fullname" name="fullname" value="<%= user.fullname %>">
+            <div id="fullnameError" class="text-red-500 text-sm mt-1 hidden"></div>
           </div>
-      </div>
-  </div>
 
-  <!-- JavaScript includes -->
-  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+          <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="phone">Phone</label>
+            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                   id="phone" name="phone" value="<%= user.phone %>">
+            <div id="phoneError" class="text-red-500 text-sm mt-1 hidden"></div>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" 
+                   id="email" name="email" value="<%= user.email %>" disabled>
+            <div id="emailError" class="text-red-500 text-sm mt-1 hidden"></div>
+          </div>
+
+          <div class="flex justify-between items-center pt-4">
+            <a href="/profile" class="text-amber-600 hover:text-amber-700">
+              <i class="fas fa-arrow-left mr-2"></i>Back to Profile
+            </a>
+            <button type="submit" class="bg-amber-500 text-white px-6 py-2 rounded-md hover:bg-amber-600 transition-colors">
+              Update Profile
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+ 
+
   <script>
-      function validateForm() {
-          const fullname = document.getElementById("fullname");
-          const phone = document.getElementById("phone");
-          const email = document.getElementById("email");
-          const fullnameError = document.getElementById("fullnameError");
-          const phoneError = document.getElementById("phoneError");
-          const emailError = document.getElementById("emailError");
+    function validateForm() {
+      const fullname = document.getElementById("fullname");
+      const phone = document.getElementById("phone");
+      const fullnameError = document.getElementById("fullnameError");
+      const phoneError = document.getElementById("phoneError");
+      let isValid = true;
 
-          let isValid = true;
-
-          // Validate Full Name
-          if (fullname.value.trim() === "" || !fullname.value.match(/^[a-zA-Z\s]+$/)) {
-              fullname.classList.add("is-invalid");
-              fullnameError.textContent = "Please enter a valid full name.";
-              fullnameError.style.display = "block";
-              isValid = false;
-          } else {
-              fullname.classList.remove("is-invalid");
-              fullnameError.style.display = "none";
-          }
-
-          // Validate Phone Number
-          if (phone.value.trim() === "" || !phone.value.match(/^\d{10}$/)) {
-              phone.classList.add("is-invalid");
-              phoneError.textContent = "Please enter a valid 10-digit phone number.";
-              phoneError.style.display = "block";
-              isValid = false;
-          } else {
-              phone.classList.remove("is-invalid");
-              phoneError.style.display = "none";
-          }
-
-          // Validate Email
-          if (email.value.trim() === "" || !email.value.match(/[^\s@]+@[^\s@]+\.[^\s@]+/)) {
-              email.classList.add("is-invalid");
-              emailError.textContent = "Please enter a valid email address.";
-              emailError.style.display = "block";
-              isValid = false;
-          } else {
-              email.classList.remove("is-invalid");
-              emailError.style.display = "none";
-          }
-
-          return isValid;
+      // Validate Full Name
+      if (!fullname.value.match(/^[a-zA-Z\s]+$/)) {
+        fullname.classList.add("border-red-500");
+        fullnameError.textContent = "Please enter a valid full name";
+        fullnameError.classList.remove("hidden");
+        isValid = false;
+      } else {
+        fullname.classList.remove("border-red-500");
+        fullnameError.classList.add("hidden");
       }
+
+      // Validate Phone
+      if (!phone.value.match(/^\d{10}$/)) {
+        phone.classList.add("border-red-500");
+        phoneError.textContent = "Please enter a valid 10-digit phone number";
+        phoneError.classList.remove("hidden");
+        isValid = false;
+      } else {
+        phone.classList.remove("border-red-500");
+        phoneError.classList.add("hidden");
+      }
+
+      return isValid;
+    }
   </script>
 </body>
+
 </html>

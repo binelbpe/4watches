@@ -1,178 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>About Us - 4Watch Store</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
 
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/css/style.css" />
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/"
-        ><img src="/images/logo.png" alt="Logo"
-      /></a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - 4Watch Store</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
-      </div>
-      <!-- Search Bar with Link -->
-      <form
-        class="form-inline my-2 my-lg-0 search-form"
-        action="/search"
-        method="POST"
-      >
-        <input
-          class="form-control mr-sm-2 search-input"
-          type="search"
-          placeholder="Search"
-          aria-label="Search"
-          name="search"
-        />
-        <button class="search-icon" type="submit">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
-      <!-- Wishlist Icon with Link -->
-      <a href="/wishlist" class="wishlist-icon">
-        <i class="fas fa-heart"></i>
-      </a>
-      <!-- Add-to-Cart Icon with Link -->
-      <a href="/add-to-cart" class="cart-icon">
-        <i class="fas fa-shopping-cart"></i>
-      </a>
+  <!-- Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    :root {
+      --gold-primary: #BCA374;
+      --gold-secondary: #A38F5F;
+      --gold-light: #D4C5A3;
+      --white: #FFFFFF;
+      --off-white: #F8F9FA;
+      --dark: #333333;
+    }
 
-      <% if (fullName) { %>
-      <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-        <a href="/logout" class="nav-link logout nav-linklogout">
-          <i class="fas fa-sign-out-alt"></i>
-        </a>
-      </div>
-      <% } else { %>
-      <!-- If user is not logged in, display login/signup -->
-      <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
-      <% } %>
+    .about-section {
+      padding: 6rem 0;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    }
 
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
+    /* Decorative elements */
+    .about-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent 45%, rgba(188, 163, 116, 0.1) 45%, rgba(188, 163, 116, 0.1) 55%, transparent 55%);
+      transform: scale(2);
+    }
 
-    <!-- About Section -->
-    <section class="about-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6">
-            <h2>Welcome to 4WATCHES - Your Time, Your Style</h2>
-            <h3>
-              <p>
-                Established in 1997, 4watch has been curating the finest
-                timepieces to adorn your wrist since our inception. We pride
-                ourselves on offering a diverse collection of watches that cater
-                to every taste, from classic elegance to contemporary flair.
-              </p>
-              <p>
-                At 4watch, we understand that a watch is more than just a
-                timekeeping device; it's a reflection of your personality and
-                style. Whether you're seeking a statement piece for a special
-                occasion or a reliable companion for everyday wear, our
-                carefully curated selection ensures there's something for
-                everyone.
-              </p>
-            </h3>
-          </div>
-          <div class="col-md-6">
-            <img src="/images/logo.png" alt="About Image" class="img-fluid" />
+    .about-content {
+      position: relative;
+      padding: 2rem;
+    }
+
+    .about-title {
+      font-size: 2.5rem;
+      color: var(--dark);
+      margin-bottom: 2rem;
+      position: relative;
+      padding-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .about-title::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 80px;
+      height: 3px;
+      background: var(--gold-primary);
+    }
+
+    .about-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 80px;
+      width: 40px;
+      height: 3px;
+      background: var(--gold-secondary);
+    }
+
+    .about-subtitle {
+      color: var(--gold-primary);
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .about-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    .about-text p {
+      margin-bottom: 1.5rem;
+    }
+
+    .about-features {
+      display: flex;
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      background: var(--gold-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .feature-text {
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .image-container {
+      position: relative;
+      padding: 2rem;
+    }
+
+    .image-frame {
+      position: relative;
+      border: 2px solid var(--gold-primary);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .image-frame::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border: 2px solid var(--gold-light);
+      border-radius: 10px;
+      transform: scale(1.05);
+      z-index: -1;
+    }
+
+    .about-image {
+      width: 100%;
+      height: auto;
+      transition: transform 0.5s ease;
+    }
+
+    .image-frame:hover .about-image {
+      transform: scale(1.05);
+    }
+
+    .experience-badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: var(--gold-primary);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: translate(20%, 20%);
+      box-shadow: 0 5px 15px rgba(188, 163, 116, 0.3);
+    }
+
+    .years-number {
+      font-size: 2rem;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .years-text {
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .about-section {
+        padding: 4rem 0;
+      }
+
+      .about-features {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .experience-badge {
+        width: 100px;
+        height: 100px;
+        padding: 1rem;
+      }
+
+      .years-number {
+        font-size: 1.5rem;
+      }
+
+      .years-text {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <%- include('../layouts/header.ejs') %>
+
+  <section class="about-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="about-content">
+            <h1 class="about-title">Welcome to 4WATCHES</h1>
+            <h2 class="about-subtitle">Your Time, Your Style</h2>
+            <div class="about-text">
+              <p>Established in 1997, 4watch has been curating the finest timepieces to adorn your wrist since our inception. We pride ourselves on offering a diverse collection of watches that cater to every taste, from classic elegance to contemporary flair.</p>
+              <p>At 4watch, we understand that a watch is more than just a timekeeping device; it's a reflection of your personality and style. Whether you're seeking a statement piece for a special occasion or a reliable companion for everyday wear, our carefully curated selection ensures there's something for everyone.</p>
+            </div>
+            <div class="about-features">
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-check"></i>
+                </div>
+                <div class="feature-text">Premium Quality</div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-star"></i>
+                </div>
+                <div class="feature-text">Luxury Collection</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Main Footer -->
-    <footer class="main-footer">
-      <div class="row">
-        <div class="col-md-4">
-          <div class="footer-section">
-            <h5>POLICIES AND ORDER</h5>
-            <ul>
-              <li>Authenticity Guarantee</li>
-              <li>Privacy Policy</li>
-              <li>Return, Exchange & Refund Policy</li>
-              <li>Terms and Conditions</li>
-              <li>Warranty Information</li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="footer-section">
-            <h5>HELP</h5>
-            <ul>
-              <li>FAQ's</li>
-              <li>My Account</li>
-              <li>Track my order</li>
-              <li>Sitemap</li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="footer-section">
-            <h5>FOLLOW US ON</h5>
-            <div class="social-media-icons">
-              <a href="#">INSTAGRAM</a>
-              <a href="#">FACEBOOK</a>
-              <a href="#">TWITTER</a>
+        <div class="col-md-6">
+          <div class="image-container">
+            <div class="image-frame">
+              <img src="/images/logo.png" alt="4WATCHES Luxury Collection" class="about-image">
+            </div>
+            <div class="experience-badge">
+              <div class="years-number">25+</div>
+              <div class="years-text">Years of Excellence</div>
             </div>
           </div>
         </div>
       </div>
-    </footer>
-    <!-- Bootstrap JS and jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="/js/main.js"></script>
-  </body>
+    </div>
+  </section>
+
+  <%- include('../layouts/footer.ejs') %>
+  <!-- Bootstrap JS and jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+
 </html>

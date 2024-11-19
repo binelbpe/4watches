@@ -4,244 +4,503 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Admin</title>
-  <meta name="description" content="" />
+  <title>4WATCHES Admin - Sales Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="robots" content="all,follow" />
-  <!-- Bootstrap CSS-->
-  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
-  <!-- Font Awesome CSS-->
-  <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css" />
-  <!-- Custom Font Icons CSS-->
-  <link rel="stylesheet" href="css/font.css" />
-  <!-- Google fonts - Muli-->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:300,400,700" />
-  <!-- theme stylesheet-->
-  <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet" />
-  <!-- Custom stylesheet - for your changes-->
-  <link rel="stylesheet" href="css/custom.css" />
-  <!-- Favicon-->
-  <link rel="shortcut icon" href="img/favicon.ico" />
-  <!-- Tweaks for older IEs-->
-  <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SweetAlert2 -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #bca374;
+      --primary-dark: #a68b5b;
+      --secondary-color: #2c3e50;
+      --light-bg: #f8f9fa;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Sidebar Styling */
+    #sidebar {
+      background: var(--secondary-color);
+      min-width: 250px;
+      max-width: 250px;
+      min-height: 100vh;
+      position: fixed;
+      z-index: 1000;
+    }
+
+    #sidebar .sidebar-header {
+      padding: 15px;
+      background: var(--primary-color);
+      display: flex;
+      align-items: center;
+    }
+
+    #sidebar ul li a {
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s;
+      border-radius: 4px;
+      margin: 4px 8px;
+    }
+
+    #sidebar ul li a:hover {
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    #sidebar ul li.active > a {
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    #sidebar ul li a i {
+      width: 24px;
+      text-align: center;
+    }
+
+    /* Content Area Adjustment */
+    .flex-grow-1 {
+      margin-left: 250px;
+      transition: margin-left 0.3s;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      #sidebar {
+        margin-left: -250px;
+        transition: margin-left 0.3s;
+      }
+
+      #sidebar.active {
+        margin-left: 0;
+      }
+
+      .flex-grow-1 {
+        margin-left: 0;
+      }
+
+      .flex-grow-1.sidebar-active {
+        margin-left: 250px;
+      }
+    }
+
+    /* Mobile Toggle Button */
+    .sidebar-toggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1050;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+    }
+
+    /* Table Container */
+    .table-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 20px;
+    }
+
+    /* Stats Cards */
+    .stats-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .stats-card h3 {
+      color: var(--secondary-color);
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .stats-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    /* Table Styling */
+    .table thead th {
+      background-color: var(--light-bg);
+      border-bottom: 2px solid var(--primary-color);
+      color: var(--secondary-color);
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(188, 163, 116, 0.1);
+    }
+
+    /* Status Badge */
+    .badge {
+      padding: 0.5em 1em;
+      border-radius: 50px;
+      font-size: 0.875rem;
+    }
+
+    /* Button Styling */
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+
+    /* Controls Section */
+    .controls-section {
+      background: var(--light-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Navbar Styling */
+    .admin-navbar {
+      background-color: var(--primary-color);
+      padding: 15px 0;
+    }
+
+    .navbar-logo {
+      height: 40px;
+      width: auto;
+      border-radius: 5px;
+    }
+
+    .sidebar-logo {
+      height: 45px;
+      width: auto;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    /* Add to your existing styles */
+    .pagination {
+      margin-bottom: 0;
+    }
+
+    .pagination .page-link {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    .pagination .page-link:hover {
+      background-color: var(--light-bg);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .pagination .page-item:first-child .page-link {
+      border-top-left-radius: 0.25rem;
+      border-bottom-left-radius: 0.25rem;
+    }
+
+    .pagination .page-item:last-child .page-link {
+      border-top-right-radius: 0.25rem;
+      border-bottom-right-radius: 0.25rem;
+    }
+  </style>
 </head>
 
 <body>
-  <header class="header">
-    <nav class="navbar navbar-expand-lg">
-      <div class="search-panel">
-        <div class="search-inner d-flex align-items-center justify-content-center">
-          <div class="close-btn">Close <i class="fa fa-close"></i></div>
-          <form id="searchForm" action="#">
-            <div class="form-group">
-              <input type="search" name="search" placeholder="What are you searching for..." />
-              <button type="submit" class="submit">Search</button>
-            </div>
-          </form>
-        </div>
+  <!-- Navbar -->
+  <nav class="navbar admin-navbar">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="/images/logo.png" alt="4WATCHES Logo" class="navbar-logo me-2">
+        <span class="text-white">4WATCHES</span>
+      </a>
+      <div class="d-flex">
+        <a href="/admin/logout" class="btn btn-outline-light">
+          <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </a>
       </div>
-      <div class="container-fluid d-flex align-items-center justify-content-between">
-        <div class="navbar-header">
-          <!-- Navbar Header--><a href="/" class="navbar-brand">
-            <div class="brand-text brand-big visible text-uppercase">
-              <strong class="text-primary">4WATCHES</strong><strong>Admin</strong>
-            </div>
-            <div class="brand-text brand-sm">
-              <strong class="text-primary">D</strong><strong>A</strong>
-            </div>
-          </a>
+    </div>
+  </nav>
 
-          <!-- Languages dropdown    -->
-          <div class="list-inline-item dropdown">
-            <a id="languages" rel="nofollow" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false" class="nav-link language dropdown-toggle"><img src="img/flags/16/GB.png"
-                alt="English" /><span class="d-none d-sm-inline-block">English</span></a>
-            <div aria-labelledby="languages" class="dropdown-menu">
-              <a rel="nofollow" href="#" class="dropdown-item">
-                <img src="img/flags/16/DE.png" alt="English" class="mr-2" /><span>German</span></a><a rel="nofollow"
-                href="#" class="dropdown-item">
-                <img src="img/flags/16/FR.png" alt="English" class="mr-2" /><span>French </span></a>
-            </div>
-          </div>
-          <!-- Log out               -->
-          <div class="list-inline-item logout">
-            <a id="logout" href="/admin/logout" class="nav-link">Logout <i class="icon-logout"></i></a>
-          </div>
-        </div>
-      </div>
-    </nav>
-  </header>
-  <div class="d-flex align-items-stretch">
-    <!-- Sidebar Navigation-->
+  <div class="d-flex">
+    <!-- Sidebar -->
     <nav id="sidebar">
-      <!-- Sidebar Header-->
-      <div class="sidebar-header d-flex align-items-center">
-        <div class="avatar">
-          <img src="/images/logo.png" alt="..." class="img-fluid rounded-circle" />
-        </div>
-        <div class="title">
-          <h1 class="h5">Binel</h1>
-          <p>Web Designer</p>
-        </div>
+      <div class="sidebar-header">
+        <img src="/images/logo.png" alt="4WATCHES Logo" class="sidebar-logo">
+        <h3 class="text-white mb-0">4WATCHES</h3>
       </div>
-      <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
-      <ul class="list-unstyled">
+      <ul class="list-unstyled components">
         <li>
-          <a href="/admin/adminHome"> <i class="icon-home"></i>Dashboard</a>
+          <a href="/admin/adminHome">
+            <i class="fas fa-home me-2"></i>Dashboard
+          </a>
         </li>
         <li>
-          <a href="/admin/Product"> <i class="icon-grid"></i>Product</a>
+          <a href="/admin/Product">
+            <i class="fas fa-box me-2"></i>Products
+          </a>
         </li>
         <li>
-          <a href="/admin/User"> <i class="fa fa-bar-chart"></i>user</a>
+          <a href="/admin/User">
+            <i class="fas fa-users me-2"></i>Users
+          </a>
         </li>
         <li>
-          <a href="/admin/Category"> <i class="icon-padnote"></i>Category</a>
+          <a href="/admin/Category">
+            <i class="fas fa-tags me-2"></i>Categories
+          </a>
         </li>
         <li>
           <a href="/admin/order">
-            <i class="icon-paper-and-pencil"></i>Order</a>
+            <i class="fas fa-shopping-cart me-2"></i>Orders
+          </a>
         </li>
         <li>
           <a href="/admin/coupons">
-            <i class="icon-three-cells"></i>Coupons</a>
+            <i class="fas fa-ticket-alt me-2"></i>Coupons
+          </a>
         </li>
         <li class="active">
-          <a href="/admin/sales"> <i class="icon-info"></i>Sales Report</a>
+          <a href="/admin/sales">
+            <i class="fas fa-chart-line me-2"></i>Sales Report
+          </a>
         </li>
       </ul>
     </nav>
-    <div class="page-content">
-      <div class="page-header">
-        <div class="container-fluid">
-          <h2 class="h5 no-margin-bottom">Sales Report</h2>
-        </div>
-      </div>
-      <div style="display: flex; flex-direction: column">
-        <div class="container">
-          <h1>Sales Report</h1>
-          <div class="form-group">
-            <label for="sortOption">Sort by:</label>
-            <select id="sortOption" class="form-control">
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-              <option value="custom">Custom Date Range</option>
-            </select>
-          </div>
-          <div id="customDateRange" style="display: none">
-            <div class="form-group">
-              <label for="startDate">Start Date:</label>
-              <input type="date" id="startDate" class="form-control" />
-            </div>
-            <div class="form-group">
-              <label for="endDate">End Date:</label>
-              <input type="date" id="endDate" class="form-control" />
+
+    <!-- Main Content -->
+    <div class="flex-grow-1">
+      <div class="container-fluid">
+        <div class="table-container">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Sales Report</h2>
+            <div class="btn-group">
+              <button id="downloadReportPDF" class="btn btn-secondary">
+                <i class="fas fa-file-pdf me-2"></i>Download PDF
+              </button>
+              <button id="downloadReportExcel" class="btn btn-secondary ms-2">
+                <i class="fas fa-file-excel me-2"></i>Download Excel
+              </button>
             </div>
           </div>
-          <div class="form-group">
-            <label for="sortStatus">Sort by Status:</label>
-            <select id="sortStatus" class="form-control">
-              <option value="default">Default</option>
-              <option value="pending">Pending First</option>
-              <option value="completed">Completed First</option>
-              <option value="paymentpending">
-                Payment pending order First
-              </option>
-              <option value="returned">Returned First</option>
-              <option value="cancelled">Cancelled First</option>
-              <option value="Dispatched">Dispatched First</option>
-              <option value="In Transit">In Transit First</option>
-            </select>
+
+          <!-- Controls Section -->
+          <div class="controls-section">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Report Period</label>
+                <select id="sortOption" class="form-select">
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                  <option value="custom">Custom Range</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Sort by Status</label>
+                <select id="sortStatus" class="form-select">
+                  <option value="default">Default</option>
+                  <option value="completed">Completed First</option>
+                  <option value="pending">Pending First</option>
+                  <option value="cancelled">Cancelled First</option>
+                  <option value="returned">Returned First</option>
+                </select>
+              </div>
+
+              <div class="col-md-4 d-flex align-items-end">
+                <button id="generateReport" class="btn btn-primary w-100">
+                  <i class="fas fa-sync-alt me-2"></i>Generate Report
+                </button>
+              </div>
+            </div>
+
+            <!-- Custom Date Range -->
+            <div id="customDateRange" class="row g-3 mt-3" style="display: none;">
+              <div class="col-md-6">
+                <label class="form-label">Start Date</label>
+                <input type="date" id="startDate" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">End Date</label>
+                <input type="date" id="endDate" class="form-control">
+              </div>
+            </div>
           </div>
 
-          <button id="generateReport" class="btn btn-primary">
-            Generate Report
-          </button>
-          <button id="downloadReportPDF" class="btn btn-secondary">
-            Download PDF
-          </button>
-          <button id="downloadReportExcel" class="btn btn-secondary">
-            Download Excel
-          </button>
-          <div id="reportContainer"></div>
-        </div>
+          <!-- Stats Cards -->
+          <div id="reportContainer" class="row g-3 mb-4">
+            <!-- Stats cards will be inserted here -->
+          </div>
 
-        <!-- Order Details Report -->
-        <div id="orderDetailsReport" style="display: none" class="container-fluid">
-          <h2>Order Details Report</h2>
-          <div id="orderDetailsPagination"></div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Products</th>
-                <th>Total Price</th>
-                <th>Payment Method</th>
-                <th>Address</th>
-                <th>Coupon</th>
-                <th>Status</th>
-                <th>Ordered Date</th>
-              </tr>
-            </thead>
-            <tbody id="orderDetailsTableBody"></tbody>
-          </table>
+          <!-- Orders Table -->
+          <div id="orderDetailsReport" style="display: none;">
+            <h3 class="mb-3">Order Details</h3>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Products</th>
+                    <th>Total Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="orderDetailsTableBody">
+                  <!-- Table content will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+            <div id="orderDetailsPagination" class="d-flex justify-content-center mt-4">
+              <!-- Pagination will be inserted here -->
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <footer class="footer">
-      <div class="footer__block block no-margin-bottom"></div>
-    </footer>
   </div>
-  <!-- JavaScript files-->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/popper.js/umd/popper.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-  <script src="vendor/jquery.cookie/jquery.cookie.js"></script>
-  <script src="vendor/chart.js/Chart.min.js"></script>
-  <script src="vendor/jquery-validation/jquery.validate.min.js"></script>
-  <script src="js/charts-home.js"></script>
-  <script src="js/front.js"></script>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Your existing JavaScript -->
+  <script>
+  let renderPage; // Declare renderPage in global scope
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.createElement('button');
+    sidebarToggle.classList.add('btn', 'btn-primary', 'd-md-none', 'sidebar-toggle');
+    sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    document.body.appendChild(sidebarToggle);
+
+    const sidebar = document.getElementById('sidebar');
+    const content = document.querySelector('.flex-grow-1');
+
+    sidebarToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('active');
+      content.classList.toggle('sidebar-active');
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(event.target) && 
+          !sidebarToggle.contains(event.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        content.classList.remove('sidebar-active');
+      }
+    });
+  });
+  </script>
 
   <script>
-    // JavaScript code for handling sorting and report generation
-    const sortOptionSelect = document.getElementById("sortOption");
-    const customDateRange = document.getElementById("customDateRange");
-    const startDateInput = document.getElementById("startDate");
-    const endDateInput = document.getElementById("endDate");
-    const generateReportBtn = document.getElementById("generateReport");
-    const reportContainer = document.getElementById("reportContainer");
-    const orderDetailsReport = document.getElementById("orderDetailsReport");
-    const orderDetailsTableBody = document.getElementById(
-      "orderDetailsTableBody"
-    );
-    const productSalesReport = document.getElementById("productSalesReport");
-    const productSalesTableBody = document.getElementById(
-      "productSalesTableBody"
-    );
-    const sortStatusSelect = document.getElementById("sortStatus");
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables
+    const sortOptionSelect = document.getElementById('sortOption');
+    const customDateRange = document.getElementById('customDateRange');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const generateReportBtn = document.getElementById('generateReport');
+    const reportContainer = document.getElementById('reportContainer');
+    const orderDetailsReport = document.getElementById('orderDetailsReport');
+    const orderDetailsTableBody = document.getElementById('orderDetailsTableBody');
+    const sortStatusSelect = document.getElementById('sortStatus');
 
-    sortOptionSelect.addEventListener("change", () => {
-      if (sortOptionSelect.value === "custom") {
-        customDateRange.style.display = "block";
-      } else {
-        customDateRange.style.display = "none";
+    // Show/hide custom date range based on sort option
+    sortOptionSelect.addEventListener('change', () => {
+      customDateRange.style.display = sortOptionSelect.value === 'custom' ? 'block' : 'none';
+    });
+
+    // Generate Report
+    generateReportBtn.addEventListener('click', async () => {
+      if (!validateDateRange()) return;
+      
+      try {
+        const { startDate, endDate } = getDateRange();
+        const reportData = await fetchReportData(startDate, endDate);
+        renderReport(reportData);
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to generate report. Please try again.',
+          confirmButtonColor: '#bca374'
+        });
       }
     });
 
-    generateReportBtn.addEventListener("click", async () => {
+    // Download PDF Report
+    document.getElementById('downloadReportPDF').addEventListener('click', async () => {
+      try {
+        const { startDate, endDate } = getDateRange();
+        const downloadUrl = `/admin/salesReport/download?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+        window.open(downloadUrl, "_blank");
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to download PDF report. Please try again.',
+          confirmButtonColor: '#bca374'
+        });
+      }
+    });
+
+    // Download Excel Report
+    document.getElementById('downloadReportExcel').addEventListener('click', async () => {
+      try {
+        const { startDate, endDate } = getDateRange();
+        const downloadUrl = `/admin/salesReport/downloadExcel?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+        window.open(downloadUrl, "_blank");
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to download Excel report. Please try again.',
+          confirmButtonColor: '#bca374'
+        });
+      }
+    });
+
+    // Helper Functions
+    function getDateRange() {
       const sortOption = sortOptionSelect.value;
       let startDate, endDate;
 
-      if (sortOption === "custom") {
+      if (sortOption === 'custom') {
         startDate = new Date(startDateInput.value);
         endDate = new Date(endDateInput.value);
-        endDate.setDate(endDate.getDate() + 1); // Include the end date in the range
+        endDate.setHours(23, 59, 59, 999);
       } else {
         const today = new Date();
         const year = today.getFullYear();
@@ -249,287 +508,254 @@
         const date = today.getDate();
 
         switch (sortOption) {
-          case "daily":
+          case 'daily':
             startDate = new Date(year, month, date);
-            endDate = new Date(year, month, date + 1);
+            endDate = new Date(year, month, date, 23, 59, 59, 999);
             break;
-          case "weekly":
-            const firstDayOfWeek = today.getDate() - 6;
-            const lastDayOfWeek = firstDayOfWeek + 6;
+          case 'weekly':
+            const firstDayOfWeek = date - today.getDay();
             startDate = new Date(year, month, firstDayOfWeek);
-            endDate = new Date(year, month, lastDayOfWeek + 1);
+            endDate = new Date(year, month, firstDayOfWeek + 6, 23, 59, 59, 999);
             break;
-          case "monthly":
+          case 'monthly':
             startDate = new Date(year, month, 1);
-            endDate = new Date(year, month + 1, 1);
+            endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
             break;
-          case "yearly":
+          case 'yearly':
             startDate = new Date(year, 0, 1);
-            endDate = new Date(year + 1, 0, 1);
+            endDate = new Date(year, 11, 31, 23, 59, 59, 999);
             break;
         }
       }
 
-      const downloadReportPDFBtn =
-        document.getElementById("downloadReportPDF");
-      downloadReportPDFBtn.addEventListener("click", async () => {
-        const sortOption = sortOptionSelect.value;
-        let startDate, endDate;
-
-        if (sortOption === "custom") {
-          startDate = new Date(startDateInput.value);
-          endDate = new Date(endDateInput.value);
-          endDate.setDate(endDate.getDate() + 1); // Include the end date in the range
-        } else {
-          const today = new Date();
-          const year = today.getFullYear();
-          const month = today.getMonth();
-          const date = today.getDate();
-
-          switch (sortOption) {
-            case "daily":
-              startDate = new Date(year, month, date);
-              endDate = new Date(year, month, date + 1);
-              break;
-            case "weekly":
-              const firstDayOfWeek = today.getDate() - 6;
-              const lastDayOfWeek = firstDayOfWeek + 6;
-              startDate = new Date(year, month, firstDayOfWeek);
-              endDate = new Date(year, month, lastDayOfWeek + 1);
-              break;
-            case "monthly":
-              startDate = new Date(year, month, 1);
-              endDate = new Date(year, month + 1, 1);
-              break;
-            case "yearly":
-              startDate = new Date(year, 0, 1);
-              endDate = new Date(year + 1, 0, 1);
-              break;
-          }
-        }
-
-        const downloadUrl = `/admin/salesReport/download?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
-        window.open(downloadUrl, "_blank");
-      });
-
-      const downloadReportExcelBtn = document.getElementById("downloadReportExcel");
-      downloadReportExcelBtn.addEventListener("click", async () => {
-        const sortOption = sortOptionSelect.value;
-        let startDate, endDate;
-
-        if (sortOption === "custom") {
-          startDate = new Date(startDateInput.value);
-          endDate = new Date(endDateInput.value);
-          endDate.setDate(endDate.getDate() + 1); // Include the end date in the range
-        } else {
-          // ... (keep the existing date range logic)
-          const today = new Date();
-          const year = today.getFullYear();
-          const month = today.getMonth();
-          const date = today.getDate();
-
-          switch (sortOption) {
-            case "daily":
-              startDate = new Date(year, month, date);
-              endDate = new Date(year, month, date + 1);
-              break;
-            case "weekly":
-              const firstDayOfWeek = today.getDate() - 6;
-              const lastDayOfWeek = firstDayOfWeek + 6;
-              startDate = new Date(year, month, firstDayOfWeek);
-              endDate = new Date(year, month, lastDayOfWeek + 1);
-              break;
-            case "monthly":
-              startDate = new Date(year, month, 1);
-              endDate = new Date(year, month + 1, 1);
-              break;
-            case "yearly":
-              startDate = new Date(year, 0, 1);
-              endDate = new Date(year + 1, 0, 1);
-              break;
-          }
-        }
-        const downloadUrl = `/admin/salesReport/downloadExcel?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
-  try {
-    window.open(downloadUrl, "_blank");
-  } catch (error) {
-    console.error("Error downloading Excel report:", error);
-    alert("An error occurred while downloading the Excel report. Please try again.");
-  }
-});
-    const reportData = await fetchReportData(startDate, endDate);
-    renderReport(reportData);
-    });
+      return { startDate, endDate };
+    }
 
     async function fetchReportData(startDate, endDate) {
-      try {
-        const response = await fetch(
-          `/admin/salesReport/data?startDate=${startDate}&endDate=${endDate}`
-        );
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error("Error fetching report data:", error);
-        return null;
+      const response = await fetch(
+        `/admin/salesReport/data?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch report data');
+      return await response.json();
+    }
+
+    function validateDateRange() {
+      if (sortOptionSelect.value === 'custom') {
+        if (!startDateInput.value || !endDateInput.value) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid Date Range',
+            text: 'Please select both start and end dates',
+            confirmButtonColor: '#bca374'
+          });
+          return false;
+        }
+
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+        const today = new Date();
+
+        if (startDate > today || endDate > today) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid Date Range',
+            text: 'Dates cannot be in the future',
+            confirmButtonColor: '#bca374'
+          });
+          return false;
+        }
+
+        if (startDate > endDate) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid Date Range',
+            text: 'Start date must be before end date',
+            confirmButtonColor: '#bca374'
+          });
+          return false;
+        }
       }
+      return true;
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR'
+      }).format(amount);
     }
 
     function renderReport(reportData) {
-      if (!reportData) {
-        reportContainer.innerHTML = "Error fetching report data.";
-        return;
+      try {
+        if (!reportData || !reportData.orders) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No data available for the selected period',
+            confirmButtonColor: '#bca374'
+          });
+          return;
+        }
+
+        // Render stats cards
+        reportContainer.innerHTML = `
+          <div class="col-md-4">
+            <div class="stats-card">
+              <h3>Total Revenue</h3>
+              <div class="stats-value">${formatCurrency(reportData.overallOrderAmount)}</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="stats-card">
+              <h3>Total Orders</h3>
+              <div class="stats-value">${reportData.overallSalesCount}</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="stats-card">
+              <h3>Total Discount</h3>
+              <div class="stats-value">${formatCurrency(reportData.overallDiscount)}</div>
+            </div>
+          </div>
+        `;
+
+        // Render order details
+        if (reportData.orders && reportData.orders.length > 0) {
+          renderOrderDetails(reportData.orders);
+          orderDetailsReport.style.display = 'block';
+        } else {
+          orderDetailsReport.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error rendering report:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to render report data',
+          confirmButtonColor: '#bca374'
+        });
       }
-
-      reportContainer.innerHTML = `
-    <h2>Overall Sales Report</h2>
-    <p>Overall Sales Count: ${reportData.overallSalesCount}</p>
-    <p>Overall Order Amount: ${reportData.overallOrderAmount}</p>
-    <p>Overall Discount: ${reportData.overallDiscount}</p>
-  `;
-
-      // Render order details report
-      renderOrderDetailsReport(reportData.orders);
-
-      orderDetailsReport.style.display = "block";
     }
 
-    function renderOrderDetailsReport(orders) {
-      const itemsPerPage = 10; // Number of items to display per page
+    function renderOrderDetails(orders) {
+      const itemsPerPage = 10;
       const totalItems = orders.length;
       const totalPages = Math.ceil(totalItems / itemsPerPage);
       let currentPage = 1;
 
-      const renderPage = (page) => {
+      // Define renderPage function
+      renderPage = function(page) {
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
 
-        // Sort orders based on the selected option
+        // Sort orders based on status if selected
         const sortOption = sortStatusSelect.value;
-        let sortedOrders = [...orders]; // Create a copy of the orders array
+        let sortedOrders = [...orders];
 
-        if (sortOption === "pending") {
+        if (sortOption !== 'default') {
           sortedOrders.sort((a, b) => {
-            const statusA = a.status.toLowerCase();
-            const statusB = b.status.toLowerCase();
-            if (statusA === "pending" && statusB !== "pending") return -1;
-            if (statusA !== "pending" && statusB === "pending") return 1;
-            return 0;
-          });
-        } else if (sortOption === "completed") {
-          sortedOrders.sort((a, b) => {
-            const statusA = a.status.toLowerCase();
-            const statusB = b.status.toLowerCase();
-            if (statusA === "completed" && statusB !== "completed") return -1;
-            if (statusA !== "completed" && statusB === "completed") return 1;
-            return 0;
-          });
-        } else if (sortOption === "paymentpending") {
-          sortedOrders.sort((a, b) => {
-            const statusA = a.status.toLowerCase();
-            const statusB = b.status.toLowerCase();
-            if (statusA === "paymentpending" && statusB !== "paymentpending")
-              return -1;
-            if (statusA !== "paymentpending" && statusB === "paymentpending")
-              return 1;
-            return 0;
-          });
-        } else if (sortOption === "cancelled") {
-          sortedOrders.sort((a, b) => {
-            const statusA = a.status.toLowerCase();
-            const statusB = b.status.toLowerCase();
-            if (statusA === "cancelled" && statusB !== "cancelled") return -1;
-            if (statusA !== "cancelled" && statusB === "cancelled") return 1;
-            return 0;
-          });
-        } else if (sortOption === "returned") {
-          sortedOrders.sort((a, b) => {
-            const statusA = a.status.toLowerCase();
-            const statusB = b.status.toLowerCase();
-            if (statusA === "returned" && statusB !== "returned") return -1;
-            if (statusA !== "returned" && statusB === "returned") return 1;
-            return 0;
-          });
-        } else if (sortOption === "Dispatched") {
-          sortedOrders.sort((a, b) => {
-            const statusA = a.status.toLowerCase();
-            const statusB = b.status.toLowerCase();
-            if (statusA === "dispatched" && statusB !== "dispatched") return -1;
-            if (statusA !== "dispatched" && statusB === "dispatched") return 1;
-            return 0;
-          });
-        } else if (sortOption === "In Transit") {
-          sortedOrders.sort((a, b) => {
-            const statusA = a.status.toLowerCase();
-            const statusB = b.status.toLowerCase();
-            if (statusA === "in transit" && statusB !== "in transit") return -1;
-            if (statusA !== "in transit" && statusB === "in transit") return 1;
+            const statusA = (a.status || '').toLowerCase();
+            const statusB = (b.status || '').toLowerCase();
+            if (statusA === sortOption && statusB !== sortOption) return -1;
+            if (statusA !== sortOption && statusB === sortOption) return 1;
             return 0;
           });
         }
 
         const ordersToDisplay = sortedOrders.slice(startIndex, endIndex);
+        
+        orderDetailsTableBody.innerHTML = ordersToDisplay.map(order => `
+          <tr>
+            <td>${order._id}</td>
+            <td>${order.user?.fullname || 'N/A'}</td>
+            <td>
+              <ul class="list-unstyled mb-0">
+                ${order.products.map(p => `${p.name} (${p.quantity})`).join('<br>')}
+              </ul>
+            </td>
+            <td>${formatCurrency(order.totalPrice)}</td>
+            <td>${order.paymentMethod}</td>
+            <td><span class="badge bg-${getStatusColor(order.status)}">${order.status}</span></td>
+            <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
 
-        orderDetailsTableBody.innerHTML = "";
-
-        ordersToDisplay.forEach((order) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-        <td>${order._id}</td>
-        <td>${order.user ? order.user.fullname : "-"}</td>
-        <td>
-          <ul>
-            ${order.products
-              .map(
-                (product) =>
-                  `<li>${product.product._id} (Quantity: ${product.quantity})</li>`
-              )
-              .join("")}
-          </ul>
-        </td>
-        <td>${order.totalPrice + order.walletAmount}</td>
-        <td>${order.paymentMethod}</td>
-        <td>${order.address ? order.address.address : "-"}</td>
-        <td>${order.coupon ? order.coupon.code : "None"}</td>
-        <td>${order.status}</td>
-        <td>${new Date(order.createdAt).toDateString()}</td>
-      `;
-          orderDetailsTableBody.appendChild(row);
-        });
+        renderPagination(page, totalPages);
       };
 
-      const renderPagination = () => {
-        const orderDetailsPagination = document.getElementById(
-          "orderDetailsPagination"
-        );
-        orderDetailsPagination.innerHTML = "";
-
-        const paginationUl = document.createElement("ul");
-        paginationUl.classList.add("pagination");
-
-        for (let i = 1; i <= totalPages; i++) {
-          const li = document.createElement("li");
-          li.classList.add("page-item");
-
-          const a = document.createElement("a");
-          a.classList.add("page-link");
-          a.textContent = i;
-          a.href = "#";
-          a.addEventListener("click", (e) => {
-            e.preventDefault();
-            currentPage = i;
-            renderPage(currentPage);
-          });
-
-          li.appendChild(a);
-          paginationUl.appendChild(li);
-        }
-
-        orderDetailsPagination.appendChild(paginationUl);
-      };
-
-      renderPage(currentPage);
-      renderPagination();
+      renderPage(1);
     }
+
+    function getStatusColor(status) {
+      switch (status?.toLowerCase()) {
+        case 'completed': return 'success';
+        case 'pending': return 'warning';
+        case 'cancelled': return 'danger';
+        case 'returned': return 'info';
+        default: return 'secondary';
+      }
+    }
+
+    function renderPagination(currentPage, totalPages) {
+      const paginationContainer = document.getElementById('orderDetailsPagination');
+      paginationContainer.innerHTML = '';
+
+      if (totalPages <= 1) return;
+
+      const ul = document.createElement('ul');
+      ul.className = 'pagination';
+
+      // Previous button
+      if (currentPage > 1) {
+        const prevLi = document.createElement('li');
+        prevLi.className = 'page-item';
+        const prevLink = document.createElement('a');
+        prevLink.className = 'page-link';
+        prevLink.href = '#';
+        prevLink.innerHTML = '&laquo;';
+        prevLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          renderPage(currentPage - 1);
+        });
+        prevLi.appendChild(prevLink);
+        ul.appendChild(prevLi);
+      }
+
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item${currentPage === i ? ' active' : ''}`;
+        const link = document.createElement('a');
+        link.className = 'page-link';
+        link.href = '#';
+        link.textContent = i;
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          renderPage(i);
+        });
+        li.appendChild(link);
+        ul.appendChild(li);
+      }
+
+      // Next button
+      if (currentPage < totalPages) {
+        const nextLi = document.createElement('li');
+        nextLi.className = 'page-item';
+        const nextLink = document.createElement('a');
+        nextLink.className = 'page-link';
+        nextLink.href = '#';
+        nextLink.innerHTML = '&raquo;';
+        nextLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          renderPage(currentPage + 1);
+        });
+        nextLi.appendChild(nextLink);
+        ul.appendChild(nextLi);
+      }
+
+      paginationContainer.appendChild(ul);
+    }
+  });
   </script>
 </body>
 

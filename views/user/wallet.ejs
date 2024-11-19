@@ -1,145 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>4Watch Store</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
 
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/css/style.css" />
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/">
-        <img src="/images/logo.png" alt="Logo" />
-      </a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4Watch Store</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
+  <!-- Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+
+
+  <style>
+    .balance-card {
+      background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+    }
+
+    .transaction-credit {
+      background: linear-gradient(to right, #4ade8050, transparent);
+    }
+
+    .transaction-debit {
+      background: linear-gradient(to right, #ef444425, transparent);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <%- include('../layouts/header.ejs') %>
+
+  <main class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Wallet Header -->
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">My Wallet</h1>
+      <button class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
+        Add Money
+      </button>
+    </div>
+
+    <!-- Balance Card -->
+    <div class="balance-card rounded-2xl shadow-lg p-8 mb-8 text-white">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <p class="text-sm opacity-80">Available Balance</p>
+          <h2 class="text-4xl font-bold">
+            ₹ <% if (wallet && wallet.balance !== undefined) { %>
+            <%= wallet.balance.toFixed(2) %>
+            <% } else { %>
+            0.00
+            <% } %>
+          </h2>
+        </div>
+        <div class="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="bg-white/20 rounded-lg p-3">
+          <p class="opacity-80">Last Transaction</p>
+          <p class="font-semibold">
+            <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
+            <%= wallet.transactions[0].amount %>
+            <% } else { %>
+            No transactions
+            <% } %>
+          </p>
+        </div>
+        <div class="bg-white/20 rounded-lg p-3">
+          <p class="opacity-80">Today's Spending</p>
+          <p class="font-semibold">₹0.00</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">Transaction History</h2>
+        <div class="flex space-x-2">
+          <select class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-amber-500">
+            <option>All Transactions</option>
+            <option>Credit</option>
+            <option>Debit</option>
+          </select>
+        </div>
       </div>
 
-      <% if (fullName) { %>
-      <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-        <a href="/logout" class="nav-link logout nav-linklogout">
-          <i class="fas fa-sign-out-alt"></i>
+      <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
+      <div class="space-y-4">
+        <% transactions.forEach(transaction => { %>
+        <div class="<%= transaction.type === 'credit' ? 'transaction-credit' : 'transaction-debit' %> rounded-lg p-4">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+              <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                <svg class="w-5 h-5 <%= transaction.type === 'credit' ? 'text-green-500' : 'text-red-500' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= transaction.type === 'credit' ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' %>" />
+                </svg>
+              </div>
+              <div>
+                <p class="font-medium text-gray-800"><%= transaction.description %></p>
+                <p class="text-sm text-gray-500">
+                  <%= new Date(transaction.date).toLocaleDateString('en-US', { 
+                                            year: 'numeric', 
+                                            month: 'short', 
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        }) %>
+                </p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-medium <%= transaction.type === 'credit' ? 'text-green-600' : 'text-red-600' %>">
+                <%= transaction.type === 'credit' ? '+' : '-' %>₹<%= transaction.amount %>
+              </p>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex justify-center mt-8 space-x-2">
+        <% if (currentPage > 1) { %>
+        <a href="/wallet?page=<%= currentPage - 1 %>" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          Previous
         </a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+        <a href="/wallet?page=<%= i %>" class="px-4 py-2 border <%= currentPage === i ? 'border-amber-500 bg-amber-50 text-amber-600' : 'border-gray-300 hover:bg-gray-50' %> rounded-lg transition-colors">
+          <%= i %>
+        </a>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+        <a href="/wallet?page=<%= currentPage + 1 %>" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          Next
+        </a>
+        <% } %>
+      </div>
+      <% } else { %>
+      <div class="text-center py-12">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        </div>
+        <p class="text-gray-500 mb-4">No transactions found</p>
+        <button class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
+          Add Your First Transaction
+        </button>
       </div>
       <% } %>
+    </div>
+  </main>
 
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
+  <footer class="main-footer mt-5">
+    <!-- Footer content -->
+  </footer>
 
-    <main class="container mt-5">
-      <div class="wallet-box p-4 mb-4">
-        <h1 class="mb-4">Wallet</h1>
-        <div class="wallet-balance mb-4">
-          <% if (wallet && wallet.balance !== undefined) { %>
-          <h2>Balance: <%= wallet.balance.toFixed(2) %></h2>
-          <% } else { %>
-          <h2>Balance: N/A</h2>
-          <% } %>
-        </div>
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
 
-        <!-- Pagination -->
-        <ul class="pagination">
-          <% if (currentPage > 1) { %>
-          <li class="page-item">
-            <a class="page-link" href="/wallet?page=<%= currentPage - 1 %>"
-              >Previous</a
-            >
-          </li>
-          <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
-          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-            <a class="page-link" href="/wallet?page=<%= i %>"><%= i %></a>
-          </li>
-          <% } %> <% if (currentPage < totalPages) { %>
-          <li class="page-item">
-            <a class="page-link" href="/wallet?page=<%= currentPage + 1 %>"
-              >Next</a
-            >
-          </li>
-          <% } %>
-        </ul>
-
-        <div class="wallet-transactions mb-4">
-          <h2>Transaction History</h2>
-          <% if (wallet && wallet.transactions && wallet.transactions.length >
-          0) { %>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Description</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% transactions.forEach(transaction => { %>
-              <tr>
-                <td><%= transaction.type %></td>
-                <td><%= transaction.amount %></td>
-                <td><%= transaction.description %></td>
-                <td><%= transaction.date.toLocaleDateString() %></td>
-              </tr>
-              <% }) %>
-            </tbody>
-          </table>
-          <% } else { %>
-          <p>No transactions found.</p>
-          <% } %>
-        </div>
-      </div>
-    </main>
-
-    <footer class="main-footer mt-5">
-      <!-- Footer content -->
-    </footer>
-
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-  </body>
 </html>

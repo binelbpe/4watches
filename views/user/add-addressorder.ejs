@@ -3,245 +3,228 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add Address</title>
+    <title>4Watch Store - Add Order Address</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
+    <style>
+      .golden-gradient {
+        background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+      }
+      .hover-golden:hover {
+        background: linear-gradient(135deg, #bf953f, #fcf6ba);
+      }
+    </style>
   </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/"
-        ><img src="/images/logo.png" alt="Logo"
-      /></a>
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
-      </div>
-      <!-- User Info -->
-      <% if (fullName) { %>
-      <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-        <a href="/logout" class="nav-link logout nav-linklogout">
-          <i class="fas fa-sign-out-alt"></i>
-        </a>
-      </div>
-      <% } %>
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
 
-    <main class="container mt-5">
-      <h1 class="mb-4">Add Address</h1>
-      <!-- Address Form -->
-      <form
-        id="addressForm"
-        action="/add-addressorder"
-        method="POST"
-        onsubmit="return validateForm(event)"
-      >
-        <div class="form-group">
-          <label for="address">Address</label>
-          <input type="text" class="form-control" id="address" name="address" />
-          <div id="addressError" class="invalid-feedback" style="display: none">
-            Please enter your address.
-          </div>
+  <body class="bg-gray-50">
+    <%- include('../layouts/header.ejs', { fullName: fullName }) %>
+
+    <main class="container mx-auto px-4 py-8 max-w-2xl">
+      <div class="bg-white rounded-xl shadow-lg p-6 border border-amber-200">
+        <div class="mb-6 text-center">
+          <h1 class="text-2xl font-bold text-gray-800">Add Delivery Address</h1>
         </div>
-        <div class="form-group">
-          <label for="addressline2">Address Line 2</label>
-          <input
-            type="text"
-            class="form-control"
-            id="addressline2"
-            name="addressline2"
-          />
-          <div
-            id="address2Error"
-            class="invalid-feedback"
-            style="display: none"
-          >
-            Please enter your address.
+
+        <form id="addressForm" action="/add-addressorder" method="POST" onsubmit="return validateForm(event)">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="address">Address</label>
+              <input type="text" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                     id="address" name="address">
+              <div id="addressError" class="text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="addressline2">Address Line 2</label>
+              <input type="text" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                     id="addressline2" name="addressline2">
+              <div id="addressline2Error" class="text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="city">City</label>
+                <input type="text" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                       id="city" name="city">
+                <div id="cityError" class="text-red-500 text-sm mt-1 hidden"></div>
+              </div>
+
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="state">State</label>
+                <input type="text" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                       id="state" name="state">
+                <div id="stateError" class="text-red-500 text-sm mt-1 hidden"></div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="pincode">Pincode</label>
+              <input type="text" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400" 
+                     id="pincode" name="pincode">
+              <div id="pincodeError" class="text-red-500 text-sm mt-1 hidden"></div>
+            </div>
+
+            <div class="flex justify-between items-center pt-4">
+              <a href="/orderviewaddresses" class="text-amber-600 hover:text-amber-700">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Checkout
+              </a>
+              <button type="submit" class="bg-amber-500 text-white px-6 py-2 rounded-md hover:bg-amber-600 transition-colors">
+                Save Address
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label for="city">City</label>
-          <input type="text" class="form-control" id="city" name="city" />
-          <div id="cityError" class="invalid-feedback" style="display: none">
-            Please enter your city.
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="state">State</label>
-          <input type="text" class="form-control" id="state" name="state" />
-          <div id="stateError" class="invalid-feedback" style="display: none">
-            Please enter your state.
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="pincode">Pincode</label>
-          <input type="text" class="form-control" id="pincode" name="pincode" />
-          <div id="pincodeError" class="invalid-feedback" style="display: none">
-            Please enter a valid 6-digit pincode.
-          </div>
-        </div>
-        <!-- Other form fields -->
-        <button type="submit" class="btn btn-primary">Save Address</button>
-      </form>
+        </form>
+      </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="main-footer mt-5">
-      <!-- Footer content -->
-    </footer>
+   
 
-    <!-- JavaScript includes -->
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
       function validateForm(event) {
-        // Prevent default form submission
         event.preventDefault();
-
-        // Validate form fields
-        const address = document.getElementById("address");
-        const addressLine2 = document.getElementById("addressline2");
-        const city = document.getElementById("city");
-        const state = document.getElementById("state");
-        const pincode = document.getElementById("pincode");
-        const addressError = document.getElementById("addressError");
-        const address2Error = document.getElementById("address2Error");
-        const cityError = document.getElementById("cityError");
-        const stateError = document.getElementById("stateError");
-        const pincodeError = document.getElementById("pincodeError");
-
+        const fields = getValidationRules();
         let isValid = true;
 
-        // Validate address field
-        const addressRegex = /^[a-zA-Z0-9\s,.'-]*$/;
-        if (address.value.trim() === "") {
-          address.classList.add("is-invalid");
-          addressError.style.display = "block";
-          addressError.textContent = "Please enter your address.";
-          isValid = false;
-        } else if (!addressRegex.test(address.value.trim())) {
-          address.classList.add("is-invalid");
-          addressError.style.display = "block";
-          addressError.textContent = "Please enter a valid address.";
-          isValid = false;
-        } else {
-          address.classList.remove("is-invalid");
-          addressError.style.display = "none";
-        }
+        // Validate all fields
+        Object.keys(fields).forEach(fieldName => {
+          const field = document.getElementById(fieldName);
+          const error = document.getElementById(`${fieldName}Error`);
+          
+          // Check if elements exist before accessing them
+          if (!field) {
+            console.error(`Field element not found: ${fieldName}`);
+            isValid = false;
+            return;
+          }
 
-        // Validate addressline2 field
-        const addressLine2Regex = /^[a-zA-Z0-9\s,.'-]*$/;
-        if (addressLine2.value.trim() === "") {
-          addressLine2.classList.add("is-invalid");
-          address2Error.style.display = "block";
-          address2Error.textContent = "Please enter your address line 2.";
-          isValid = false;
-        } else if (!addressLine2Regex.test(addressLine2.value.trim())) {
-          addressLine2.classList.add("is-invalid");
-          address2Error.style.display = "block";
-          address2Error.textContent = "Please enter a valid address line 2.";
-          isValid = false;
-        } else {
-          addressLine2.classList.remove("is-invalid");
-          address2Error.style.display = "none";
-        }
+          if (!error) {
+            console.error(`Error element not found: ${fieldName}Error`);
+            isValid = false;
+            return;
+          }
 
-        // Validate city field
-        const cityRegex = /^[a-zA-Z\s]*$/;
-        if (city.value.trim() === "") {
-          city.classList.add("is-invalid");
-          cityError.style.display = "block";
-          cityError.textContent = "Please enter your city.";
-          isValid = false;
-        } else if (!cityRegex.test(city.value.trim())) {
-          city.classList.add("is-invalid");
-          cityError.style.display = "block";
-          cityError.textContent = "Please enter a valid city.";
-          isValid = false;
-        } else {
-          city.classList.remove("is-invalid");
-          cityError.style.display = "none";
-        }
+          // Clear previous styling
+          field.classList.remove("border-red-500", "border-green-500");
+          error.classList.add("hidden");
 
-        // Validate state field
-        const stateRegex = /^[a-zA-Z\s]*$/;
-        if (state.value.trim() === "") {
-          state.classList.add("is-invalid");
-          stateError.style.display = "block";
-          stateError.textContent = "Please enter your state.";
-          isValid = false;
-        } else if (!stateRegex.test(state.value.trim())) {
-          state.classList.add("is-invalid");
-          stateError.style.display = "block";
-          stateError.textContent = "Please enter a valid state.";
-          isValid = false;
-        } else {
-          state.classList.remove("is-invalid");
-          stateError.style.display = "none";
-        }
+          const value = field.value.trim();
 
-        // Validate pincode field
-        const pincodeRegex = /^[1-9][0-9]{5}$/;
-        if (pincode.value.trim() === "") {
-          pincode.classList.add("is-invalid");
-          pincodeError.style.display = "block";
-          pincodeError.textContent = "Please enter your pincode.";
-          isValid = false;
-        } else if (!pincodeRegex.test(pincode.value.trim())) {
-          pincode.classList.add("is-invalid");
-          pincodeError.style.display = "block";
-          pincodeError.textContent = "Please enter a valid 6-digit pincode.";
-          isValid = false;
-        } else {
-          pincode.classList.remove("is-invalid");
-          pincodeError.style.display = "none";
-        }
+          // Skip validation for optional addressline2 if empty
+          if (fieldName === 'addressline2' && !value) {
+            return;
+          }
+
+          // Validate field
+          if (!validateField(fieldName, value, true)) {
+            isValid = false;
+          }
+        });
 
         if (isValid) {
-          document.getElementById("addressForm").submit();
+          // Show success message
+          const successMessage = document.createElement('div');
+          successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-50';
+          successMessage.textContent = 'Address added successfully!';
+          document.body.appendChild(successMessage);
+
+          // Submit form after brief delay
+          setTimeout(() => {
+            document.getElementById("addressForm").submit();
+          }, 1000);
+        } else {
+          // Scroll to first error
+          const firstError = document.querySelector('.border-red-500');
+          if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
         }
       }
+
+      function validateField(fieldName, value, showError = false) {
+        const fields = getValidationRules();
+        const field = document.getElementById(fieldName);
+        const error = document.getElementById(`${fieldName}Error`);
+
+        // Check if elements exist
+        if (!field || !error) {
+          console.error(`Elements not found for field: ${fieldName}`);
+          return false;
+        }
+
+        let isValid = true;
+        let errorMessage = '';
+
+        // Check if required field is empty
+        if (fields[fieldName].required && !value) {
+          isValid = false;
+          errorMessage = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
+        }
+        // Check regex pattern
+        else if (value && !fields[fieldName].regex.test(value)) {
+          isValid = false;
+          errorMessage = fields[fieldName].message;
+        }
+
+        // Apply styling based on validation
+        if (!isValid && showError) {
+          field.classList.add("border-red-500");
+          error.textContent = errorMessage;
+          error.classList.remove("hidden");
+        } else if (isValid && value) {
+          field.classList.add("border-green-500");
+        }
+
+        return isValid;
+      }
+
+      function getValidationRules() {
+        return {
+          address: { 
+            regex: /^[a-zA-Z0-9\s,.'/-]{3,50}$/, 
+            message: "Address should be 3-50 characters and can contain letters, numbers, spaces and , . ' / -",
+            required: true
+          },
+          addressline2: { 
+            regex: /^[a-zA-Z0-9\s,.'/-]{0,50}$/, 
+            message: "Address line 2 can contain letters, numbers, spaces and , . ' / - (max 50 characters)",
+            required: false
+          },
+          city: { 
+            regex: /^[a-zA-Z\s]{3,30}$/, 
+            message: "City should contain 3-30 letters only",
+            required: true
+          },
+          state: { 
+            regex: /^[a-zA-Z\s]{3,30}$/, 
+            message: "State should contain 3-30 letters only",
+            required: true
+          },
+          pincode: { 
+            regex: /^[1-9][0-9]{5}$/, 
+            message: "Please enter a valid 6-digit pincode starting with non-zero digit",
+            required: true
+          }
+        };
+      }
+
+      // Add input event listeners to all fields
+      document.addEventListener('DOMContentLoaded', function() {
+        const fields = getValidationRules();
+        Object.keys(fields).forEach(fieldName => {
+          const field = document.getElementById(fieldName);
+          if (field) {
+            field.addEventListener('input', () => validateField(fieldName, field.value));
+            field.addEventListener('blur', () => validateField(fieldName, field.value, true));
+          }
+        });
+      });
     </script>
   </body>
 </html>

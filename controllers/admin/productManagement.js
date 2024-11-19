@@ -11,7 +11,7 @@ const getProduct = async (req, res) => {
     let page = +req.query.page || 1;
     const ITEMS_PER_PAGE = 8;
     let query = {};
-    let searchQuery = '';
+    let searchQuery = "";
 
     if (req.query.search) {
       searchQuery = req.query.search.trim();
@@ -19,11 +19,11 @@ const getProduct = async (req, res) => {
       if (mongoose.Types.ObjectId.isValid(searchQuery)) {
         query = { _id: searchQuery };
       } else {
-        query = { 
+        query = {
           $or: [
-            { product: { $regex: searchQuery, $options: 'i' } },
-            { category: { $regex: searchQuery, $options: 'i' } }
-          ]
+            { product: { $regex: searchQuery, $options: "i" } },
+            { category: { $regex: searchQuery, $options: "i" } },
+          ],
         };
       }
     }
@@ -59,7 +59,7 @@ const getProduct = async (req, res) => {
       currentPage: page,
       CatData: category,
       msg: msg,
-      searchQuery: searchQuery
+      searchQuery: searchQuery,
     });
   } catch (error) {
     console.log("Error in getProduct:", error);
@@ -139,82 +139,153 @@ const editProduct = async (req, res) => {
   try {
     const proId = req.params.id;
     const product = await productModel.findById(proId);
-    const exImage = product.image || []; // Ensure exImage is an array even if it's null
-    const exImagePaths = product.image.map((img) => img.path); // Get the paths of existing images
-    const files = req.files || []; // Ensure files is an array even if it's null
-    let updImages = [...exImage]; // Start with the existing images
-    const removedImagesPaths = req.body.removeImages
-      ? req.body.removeImages.split(",").filter((path) => path)
-      : []; // Get the paths of images to be removed as an array
 
-    if (files.length > 0) {
-      // Process new uploaded images
-      for (const file of files) {
-        const resizedImageBuffer = await sharp(file.path)
-          .resize({ width: 500, height: 500 })
-          .toBuffer();
-
-        const fileName = Date.now() + "-" + file.originalname;
-        const filePath = path.join("./public/uploads/", fileName);
-        fs.writeFileSync(filePath, resizedImageBuffer);
-        let newPath = filePath.replace(/\\/g, "/").replace(/public/, "");
-        updImages.push({
-          originalname: file.originalname,
-          mimetype: file.mimetype,
-          path: newPath,
-        });
-      }
-      // Remove the paths of deleted images from the updImages array
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
     }
-    updImages = updImages.filter(
-      (img) => !removedImagesPaths.includes(img.path)
+
+    // Get existing images and removed images
+    let existingImages = product.image || [];
+    const removedImagePaths = req.body.removeImages
+      ? req.body.removeImages.split(",").filter(Boolean)
+      : [];
+
+    // Remove deleted images from existingImages array
+    existingImages = existingImages.filter(
+      (img) => !removedImagePaths.includes(img.path)
     );
 
-    const {
-      productName,
-      price,
-      description,
-      about,
-      category,
-      stock,
-      offerPrice,
-    } = req.body;
+    // Process new uploaded files
+    let newImages = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        try {
+          // Create unique filename
+          const fileName = `${Date.now()}_${file.originalname.replace(
+            /\s+/g,
+            "_"
+          )}`;
+          const filePath = path.join("./public/uploads/", fileName);
 
-    // Update the product
+          // Process and save the image
+          const resizedImageBuffer = await sharp(file.path)
+            .resize(500, 500, {
+              fit: "contain",
+              background: { r: 255, g: 255, b: 255, alpha: 1 },
+            })
+            .toBuffer();
+
+          // Write the file
+          fs.writeFileSync(filePath, resizedImageBuffer);
+
+          // Create database path
+          const dbPath = `/uploads/${fileName}`;
+
+          // Add to new images array
+          newImages.push({
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            path: dbPath,
+          });
+
+          // Clean up temp file
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+        } catch (error) {
+          console.error("Error processing image:", error);
+          continue;
+        }
+      }
+    }
+
+    // Process base64 cropped images
+    if (req.body.croppedImages) {
+      const croppedImages = Array.isArray(req.body.croppedImages)
+        ? req.body.croppedImages
+        : [req.body.croppedImages];
+
+      for (const base64String of croppedImages) {
+        try {
+          if (base64String.startsWith("data:image")) {
+            const fileName = `${Date.now()}_cropped.jpg`;
+            const filePath = path.join("./public/uploads/", fileName);
+
+            // Extract base64 data
+            const base64Data = base64String.replace(
+              /^data:image\/\w+;base64,/,
+              ""
+            );
+
+            // Save the base64 image
+            fs.writeFileSync(filePath, Buffer.from(base64Data, "base64"));
+
+            // Create database path
+            const dbPath = `/uploads/${fileName}`;
+
+            // Add to new images array
+            newImages.push({
+              originalname: "cropped-image.jpg",
+              mimetype: "image/jpeg",
+              path: dbPath,
+            });
+          }
+        } catch (error) {
+          console.error("Error processing cropped image:", error);
+        }
+      }
+    }
+
+    // Combine existing and new images
+    const updatedImages = [...existingImages, ...newImages];
+
+    // Validate total images
+    if (updatedImages.length > 5) {
+      return res.status(400).json({
+        error:
+          "Maximum 5 images allowed. Please remove some images before adding new ones.",
+      });
+    }
+
+    // Delete removed images from filesystem
+    for (const imagePath of removedImagePaths) {
+      try {
+        const cleanPath = imagePath.replace(/^\//, "");
+        const fullPath = path.join("public", cleanPath);
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+        }
+      } catch (error) {
+        console.error("Error deleting image:", error);
+      }
+    }
+
+    // Update product in database
     const updatedProduct = await productModel.findByIdAndUpdate(
       proId,
       {
-        product: productName,
-        price: price,
-        offerPrice: offerPrice || 0,
-        description: description,
-        category: category,
-        stock: stock,
-        about: about,
-        is_blocked: false,
-        image: updImages,
+        $set: {
+          product: req.body.productName,
+          price: req.body.price,
+          offerPrice: req.body.offerPrice || 0,
+          description: req.body.description,
+          category: req.body.category,
+          stock: req.body.stock,
+          about: req.body.about,
+          image: updatedImages,
+        },
       },
       { new: true }
     );
 
     if (!updatedProduct) {
-      return res.redirect("/admin/error");
+      throw new Error("Failed to update product");
     }
 
-    // Remove the images from the file system
-    const uploadsDir = path.join(__dirname, "..", "..", "public"); // Get the absolute path of the uploads directory
-    for (const imagePath of removedImagesPaths) {
-      const fullPath = path.join(uploadsDir, imagePath); // Construct the absolute path of the image file
-      fs.unlink(fullPath, (err) => {
-        if (err) {
-          console.error(`Failed to remove file: ${fullPath}`, err);
-        }
-      });
-    }
-
-    res.redirect("/admin/Product?msg=Product Edited successful");
-  } catch (e) {
-    console.log("error in the editProduct :", e);
+    console.log("Updated product:", updatedProduct); // Add this for debugging
+    res.redirect("/admin/Product?msg=Product updated successfully");
+  } catch (error) {
+    console.error("Error in editProduct:", error);
     res.redirect("/admin/error");
   }
 };
@@ -223,7 +294,7 @@ const editProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const data = await productModel.findByIdAndDelete(req.query.id);
-   
+
     res.redirect("/admin/Product");
   } catch (e) {
     console.log("error in the changeStatus", e);

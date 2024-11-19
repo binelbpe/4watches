@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gamers Paradise</title>
   <link rel="stylesheet" href="/css/style.css">
- 
+
   <!-- Bootstrap CSS -->
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
@@ -14,346 +15,365 @@
 
   <!-- Medium Zoom CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.0.6/medium-zoom.min.js" rel="stylesheet">
-<style>
-  .add-to-cart{
-    background-color: #bca374;
-  }
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
 
-  .navbar {
-  box-shadow: 0 2px 4px rgba(0,0,0,.1);
-}
+  <style>
+    :root {
+      --golden-primary: #bca374;
+      --golden-secondary: #d4af37;
+      --golden-light: #f4e4bc;
+      --golden-dark: #8b7355;
+    }
 
-.navbar-brand img {
-  max-height: 40px;
-}
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fafafa;
+    }
 
-.nav-link {
-  font-weight: 600;
-  color: #333;
-  transition: color 0.3s ease;
-}
+    /* Enhanced Navbar */
+    .navbar {
+      background-color: white !important;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      padding: 15px 0;
+    }
 
-.nav-link:hover {
-  color: #bca374;
-}
+    .navbar-brand img {
+      max-height: 45px;
+      transition: transform 0.3s ease;
+    }
 
-.user-info {
-  display: flex;
-  align-items: center;
-}
+    .navbar-brand img:hover {
+      transform: scale(1.05);
+    }
 
-.nav-linklogout {
-  margin-left: 10px;
-}
+    .nav-link {
+      font-weight: 500;
+      color: #333 !important;
+      position: relative;
+      padding: 8px 15px !important;
+    }
 
-.logout i {
-  font-size: 1.2em;
-}
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 50%;
+      background-color: var(--golden-primary);
+      transition: all 0.3s ease;
+    }
 
-.breadcrumb {
-  background-color: transparent;
-  padding: 10px 0;
-  margin-bottom: 0;
-}
+    .nav-link:hover::after {
+      width: 100%;
+      left: 0;
+    }
 
-.breadcrumb-item a {
-  color: #bca374;
-  text-decoration: none;
-}
+    /* Enhanced Product Carousel */
+    #productCarousel {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background: white;
+      margin-bottom: 30px;
+    }
 
-.breadcrumb-item.active {
-  color: #6c757d;
-}
+    .carousel-item {
+      background: white;
+      padding: 20px;
+    }
 
-  .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
+    .product-image {
+      max-height: 500px;
+      transition: transform 0.3s ease;
+    }
 
-#productCarousel {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
+    .product-image:hover {
+      transform: scale(1.02);
+    }
 
-.medium-zoom-overlay {
-    z-index: 1050;
-  }
-  .medium-zoom-image--opened {
-    z-index: 1051;
-  }
-  .carousel-item {
-    text-align: center;
-  }
-  .product-image {
-    max-height: 400px;
-    width: auto;
-    max-width: 100%;
-    cursor: zoom-in;
-  }
+    /* Enhanced Product Info */
+    .product-info {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
 
-.carousel-item img {
-  width: 100%;
-  height: 400px; /* Adjust this value as needed */
-  object-fit:scale-down; /* This will ensure the entire image is visible */
-  background-color: #f8f9fa; /* Light background for images with transparency */
-}
+    .product-info h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--golden-dark);
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      border-bottom: 3px solid var(--golden-light);
+      padding-bottom: 15px;
+    }
 
-.carousel-control-prev,
-.carousel-control-next {
-  width: 10%;
-  opacity: 0.7;
-}
+    .price-section {
+      background: linear-gradient(45deg, var(--golden-light), white);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+    }
 
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 50%;
-  padding: 15px;
-}
+    .original-price {
+      color: #666;
+      text-decoration: line-through;
+      font-size: 1.1rem;
+    }
 
-.product-info {
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-}
+    .offer-price {
+      color: var(--golden-dark);
+      font-size: 2rem;
+      font-weight: bold;
+    }
 
-.product-info h2 {
-  font-size: 2.5rem;
-  margin-bottom: 25px;
-  border-bottom: 2px solid #bca374;
-  padding-bottom: 10px;
-}
+    /* Enhanced Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
 
-.product-info p {
-  font-size: 1.1rem;
-  margin-bottom: 15px;
-}
+    .action-buttons button {
+      flex: 1;
+      padding: 15px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
 
-.original-price {
-  font-size: 1.2rem;
-  text-decoration: line-through;
-}
+    .add-to-cart {
+      background: linear-gradient(45deg, var(--golden-dark), var(--golden-primary));
+      color: white;
+    }
 
-.offer-price {
-  font-size: 1.4rem;
-  font-weight: bold;
-}
+    .wishlist-icon {
+      background: white;
+      color: var(--golden-dark);
+      border: 2px solid var(--golden-primary) !important;
+    }
 
-.action-buttons {
-  display: flex;
-  gap: 15px;
-  margin-top: 30px;
-}
+    .action-buttons button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(188, 163, 116, 0.2);
+    }
 
-.action-buttons button {
-  padding: 12px 20px;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
+    /* Enhanced Similar Products */
+    .similar-products {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      margin-top: 60px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
 
-.add-to-cart {
-  background-color: #bca374;
-  color: white;
-  border: none;
-}
+    .similar-products h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--golden-dark);
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
 
-.wishlist-icon {
-  background-color: #bca374;
-  color: white;  
-  border: none;
-}
+    .similar-products h3::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(to right, var(--golden-light), var(--golden-primary), var(--golden-light));
+    }
 
-.action-buttons button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+    .similar-product-card {
+      border: none;
+      border-radius: 15px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
 
-.similar-products {
-  margin-top: 60px;
-  padding: 30px;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-}
+    .similar-product-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(188, 163, 116, 0.2);
+    }
 
-.similar-products h3 {
-  font-size: 2rem;
-  color: #bca374;
-  margin-bottom: 30px;
-  text-align: center;
-}
+    .similar-product-card .card-img-top {
+      height: 250px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
 
-.similar-product-card {
-  border: none;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
+    .similar-product-card:hover .card-img-top {
+      transform: scale(1.05);
+    }
 
-.similar-product-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
+    .similar-product-card .card-body {
+      padding: 20px;
+      background: linear-gradient(45deg, white, var(--golden-light));
+    }
 
-.similar-product-card .card-img-top {
-  height: 200px; /* Adjust this value as needed */
-  object-fit:scale-down;
-  background-color: #f8f9fa;
-}
+    /* Enhanced Footer */
+    .main-footer {
+      background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+      color: white;
+      padding: 80px 0 40px;
+      margin-top: 80px;
+    }
 
-.similar-product-card .card-body {
-  padding: 20px;
-}
+    .footer-section h5 {
+      color: var(--golden-primary);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 25px;
+      position: relative;
+    }
 
-.similar-product-card .card-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
+    .footer-section h5::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: var(--golden-primary);
+    }
 
-.similar-product-card .btn {
-  width: 100%;
-  border-radius: 25px;
-  font-weight: 600;
-}
+    .footer-section ul li a {
+      color: #fff;
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
 
-.main-footer {
-  background-color: BLACK;
-  color: white;
-  padding: 60px 0;
-  margin-top: 60px;
-}
+    .footer-section ul li a:hover {
+      color: var(--golden-primary);
+      opacity: 1;
+      transform: translateX(5px);
+    }
 
-.footer-section h5 {
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-  padding-bottom: 10px;
-}
-.footer-section ul {
-  list-style-type: none;
-  padding: 0;
-}
+    .social-media-icons {
+      display: flex;
+      gap: 20px;
+    }
 
-.footer-section ul li {
-  margin-bottom: 12px;
-}
+    .social-media-icons a {
+      color: var(--golden-primary);
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
 
-.footer-section ul li a {
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
+    .social-media-icons a:hover {
+      color: var(--golden-light);
+      transform: translateY(-3px);
+    }
 
-.footer-section ul li a:hover {
-  color: white;
-}
+    /* Custom Animation */
+    @keyframes shine {
+      0% {
+        background-position: -100px;
+      }
 
-.social-media-icons {
-  display: flex;
-  gap: 15px;
-}
+      40%,
+      100% {
+        background-position: 140px;
+      }
+    }
 
-.social-media-icons a {
-  color: white;
-  font-weight: bold;
-  text-decoration: none;
-  transition: opacity 0.3s ease;
-}
+    .shine-effect {
+      position: relative;
+      overflow: hidden;
+    }
 
-.social-media-icons a:hover {
-  opacity: 0.8;
-}
+    .shine-effect::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0) 100%);
+      transform: rotate(30deg);
+      animation: shine 3s infinite;
+    }
 
-body {
-  font-family: 'Roboto', 'Arial', sans-serif;
-  line-height: 1.6;
-  color: #333;
-}
+    .product-images-container {
+      position: relative;
+    }
 
-.btn-primary {
-  background-color: #bca374;
-  border-color: #bca374;
-  border-radius: 25px;
-  padding: 10px 20px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
+    .main-image-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+    }
 
-.btn-primary:hover {
-  background-color: #4a2a94;
-  border-color: #4a2a94;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+    .main-product-image {
+      width: 100%;
+      height: auto;
+      cursor: zoom-in;
+      transition: transform 0.3s ease;
+    }
 
-/* Add smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
+    .thumbnail-image {
+      transition: all 0.3s ease;
+      opacity: 0.7;
+    }
 
-/* Improve spacing */
-.container {
-  padding: 40px 20px;
-}
+    .thumbnail-image:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
 
-</style>
+    .thumbnail-image.active {
+      opacity: 1;
+      border: 2px solid #bca374;
+    }
+
+    /* Zoom Container Styles */
+    .zoom-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .zoomed-image {
+      max-width: 90%;
+      max-height: 90vh;
+      object-fit: contain;
+    }
+
+    .close-zoom {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+  </style>
 </head>
+
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <!-- Logo -->
-    <a class="navbar-brand" href="/">
-      <img src="/images/logo.png" alt="Logo">
-    </a>
-
-    <!-- Nav Links -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="/">HOME</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/men">MEN</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/women">WOMEN</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/kids">KIDS</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/collection">COLLECTION</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/about">ABOUT-US</a>
-        </li>
-      </ul>
-    </div>
-
-   
-    <% if (fullName) { %>
-      <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-        <a href="/logout" class="nav-link logout nav-linklogout">
-          <i class="fas fa-sign-out-alt"></i>
-        </a>
-      </div>
-      <% } else { %>
-      <!-- If user is not logged in, display login/signup -->
-      <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
-      <% } %>
-    <!-- Hamburger Menu Toggle Button -->
-    <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon">&#9776;</span>
-    </button>
-  </nav>
+  <%- include('../layouts/header.ejs') %>
 
   <!-- Breadcrumbs -->
   <nav aria-label="breadcrumb">
@@ -366,28 +386,26 @@ html {
 
   <div class="container mt-5">
     <div class="row">
-      <!-- Carousel -->
-      <div id="productCarousel" class="carousel slide col-md-6" data-ride="carousel">
-        <ol class="carousel-indicators">
-          <% for(let i = 0; i < product.image.length; i++) { %>
-          <li data-target="#productCarousel" data-slide-to="<%= i %>" <% if(i === 0) { %>class="active"<% } %>></li>
-          <% } %>
-        </ol>
-        <div class="carousel-inner">
-          <% product.image.forEach((image, index) => { %>
-          <div class="carousel-item <% if(index === 0) { %>active<% } %>">
-            <img src="<%= image.path %>" class="product-image" alt="Product Image <%= index + 1 %>">
+      <!-- Product Images Section -->
+      <div class="col-md-6">
+        <div class="product-images-container">
+          <!-- Main Image -->
+          <div class="main-image-container mb-4">
+            <img id="mainImage" src="<%= product.image[0].path %>" 
+                 class="w-full rounded-lg shadow-lg main-product-image" 
+                 alt="<%= product.product %>">
           </div>
-          <% }) %>
+          
+          <!-- Thumbnail Images -->
+          <div class="thumbnail-container flex space-x-2 overflow-x-auto">
+            <% product.image.forEach((image, index) => { %>
+              <img src="<%= image.path %>" 
+                   class="thumbnail-image cursor-pointer w-20 h-20 rounded-md <%= index === 0 ? 'border-2 border-[#bca374]' : '' %>"
+                   alt="Product thumbnail <%= index + 1 %>"
+                   onclick="changeMainImage(this.src, this)">
+            <% }) %>
+          </div>
         </div>
-        <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="sr-only">Next</span>
-        </a>
       </div>
 
       <!-- Product Info -->
@@ -398,51 +416,41 @@ html {
         </div>
         <p><strong>Price:</strong> <% if (product.offerPrice && product.offerPrice <
           product.price) { %>
-          <h6 class="original-price" style="color: red">
-            <s><%= product.price %></s>
-          </h6>
-          <h6 class="offer-price" style="color: green">
-            Offer Price: <%= product.offerPrice%>
-          </h6>
-          <% } else { %>
-          <h6><%= product.price %></h6>
-          <% } %></p>
-        <p><strong>Discounts/Coupons:</strong> <%= product.discounts %> <!-- Add logic to display applied discounts or coupons --></p>
+        <h6 class="original-price" style="color: red">
+          <s><%= product.price %></s>
+        </h6>
+        <h6 class="offer-price" style="color: green">
+          Offer Price: <%= product.offerPrice%>
+        </h6>
+        <% } else { %>
+        <h6><%= product.price %></h6>
+        <% } %></p>
+        <p><strong>Discounts/Coupons:</strong> <%= product.discounts %>
+          <!-- Add logic to display applied discounts or coupons -->
+        </p>
         <p><strong>Description:</strong> <%= product.description %></p>
         <p><strong>Category:</strong> <%= product.category %></p>
-        <p><strong>Stock:</strong> <%= product.stock %> <!-- Display stock information --></p>
+        <p><strong>Stock:</strong> <%= product.stock %>
+          <!-- Display stock information -->
+        </p>
         <div class="reviews">
           <!-- Reviews display -->
         </div>
         <div class="action-buttons">
-        <form
-        action="/add-to-cart/<%= product._id %>"
-        method="POST"
-        class="add-to-cart-form"
-      >
-        <button
-          type="submit"
-          class="add-to-cart cart-icon"
-        >Add To Cart
-          <i class="fas fa-shopping-cart"></i>
-        </button>
-      </form>
-      <form
-        action="/add-to-wishlist/<%= product._id %>"
-        method="POST"
-        class="wishlist-form"
-      >
-        <button
-          type="submit"
-          class="wishlist-icon"
-        >Wishlist
-          <i class="fas fa-heart"></i>
-        </button>
-      </form>
-    </div>
-      </div>
+          <form action="/add-to-cart/<%= product._id %>" method="POST" class="add-to-cart-form">
+            <button type="submit" class="add-to-cart cart-icon">Add To Cart
+              <i class="fas fa-shopping-cart"></i>
+            </button>
+          </form>
+          <form action="/add-to-wishlist/<%= product._id %>" method="POST" class="wishlist-form">
+            <button type="submit" class="wishlist-icon">
+              <i class="fas fa-heart"></i>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- Similar Products Section -->
@@ -450,7 +458,8 @@ html {
     <h3>Similar Products</h3>
     <div class="row">
       <% similarProducts.forEach(similarProduct => { %>
-      <div class="col-md-3 mb-4"> <!-- Adjusted column size -->
+      <div class="col-md-3 mb-4">
+        <!-- Adjusted column size -->
         <div class="card similar-product-card">
           <img src="<%= similarProduct.image[0].path %>" class="card-img-top" alt="Product Image">
           <div class="card-body">
@@ -465,69 +474,121 @@ html {
     </div>
   </div>
 
-  <!-- Small separation between footers -->
-  <div class="footer-separation"></div>
-
-  <!-- Main Footer -->
-  <footer class="main-footer">
-    <div class="row">
-      <div class="col-md-4">
-        <div class="footer-section">
-          <h5>POLICIES AND ORDER</h5>
-          <ul>
-            <li>Authenticity Guarantee</li>
-            <li>Privacy Policy</li>
-            <li>Return, Exchange & Refund Policy</li>
-            <li>Terms and Conditions</li>
-            <li>Warranty Information</li>
-          </ul>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="footer-section">
-          <h5>HELP</h5>
-          <ul>
-            <li>FAQ's</li>
-            <li>My Account</li>
-            <li>Track my order</li>
-            <li>Sitemap</li>
-          </ul>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="footer-section">
-          <h5>FOLLOW US ON</h5>
-          <div class="social-media-icons">
-            <a href="#">INSTAGRAM</a>
-            <a href="#">FACEBOOK</a>
-            <a href="#">TWITTER</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <%- include('../layouts/footer.ejs') %>
 
   <!-- Bootstrap JS and jQuery -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
- 
+
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.0.6/medium-zoom.min.js"></script>
 
   <script>
-    function initializeMediumZoom() {
-      mediumZoom('.product-image', {
-        margin: 24,
-        background: 'rgba(85, 47, 168, 0.9)',
-        scrollOffset: 0,
-        container: null,
-        template: null,
-        metaClick: false,
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize main image zoom functionality
+      const mainImage = document.getElementById('mainImage');
+      const zoomContainer = document.getElementById('zoomContainer');
+      const zoomedImage = document.getElementById('zoomedImage');
+
+      mainImage.addEventListener('click', function() {
+        zoomContainer.style.display = 'flex';
+        zoomedImage.src = this.src;
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when zoomed
       });
+
+      // Handle mouse move for zoom effect on main image
+      mainImage.addEventListener('mousemove', function(e) {
+        const bounds = this.getBoundingClientRect();
+        const x = e.clientX - bounds.left;
+        const y = e.clientY - bounds.top;
+        const xPercent = (x / bounds.width) * 100;
+        const yPercent = (y / bounds.height) * 100;
+        
+        this.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+      });
+
+      mainImage.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.5)';
+      });
+
+      mainImage.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+      });
+
+      // Add smooth scrolling
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+          });
+        });
+      });
+
+      // Add animation to price on page load
+      const priceElement = document.querySelector('.offer-price');
+      if (priceElement) {
+        priceElement.style.opacity = '0';
+        priceElement.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          priceElement.style.transition = 'all 0.5s ease';
+          priceElement.style.opacity = '1';
+          priceElement.style.transform = 'translateY(0)';
+        }, 300);
+      }
+
+      // Add hover effect to similar products
+      document.querySelectorAll('.similar-product-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-10px)';
+        });
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0)';
+        });
+      });
+
+      // Add to cart animation
+      document.querySelector('.add-to-cart').addEventListener('click', function(e) {
+        const button = this;
+        button.classList.add('shine-effect');
+        setTimeout(() => {
+          button.classList.remove('shine-effect');
+        }, 1000);
+      });
+    });
+
+    // Function to change main image
+    function changeMainImage(src, thumbnail) {
+      const mainImage = document.getElementById('mainImage');
+      mainImage.src = src;
+      
+      // Update thumbnail active state
+      document.querySelectorAll('.thumbnail-image').forEach(thumb => {
+        thumb.classList.remove('active', 'border-2', 'border-[#bca374]');
+      });
+      thumbnail.classList.add('active', 'border-2', 'border-[#bca374]');
     }
-  
-    document.addEventListener('DOMContentLoaded', initializeMediumZoom);
+
+    // Function to close zoom view
+    function closeZoom() {
+      const zoomContainer = document.getElementById('zoomContainer');
+      zoomContainer.style.display = 'none';
+      document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+
+    // Close zoom on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeZoom();
+      }
+    });
   </script>
-  
+
+  <div id="zoomContainer" class="zoom-container" onclick="closeZoom()">
+    <span class="close-zoom">&times;</span>
+    <img id="zoomedImage" class="zoomed-image" src="" alt="Zoomed product image">
+  </div>
+
 </body>
+
 </html>

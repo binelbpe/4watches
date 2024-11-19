@@ -1,227 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>4Watch Store</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
 
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/css/style.css" />
-    <style>
-      .cardwishlist {
-        height: max-content;
-      }
-      /* Style for the remove button */
-      .remove-button {
-        background-color: #dc3545; /* Red color for danger */
-        color: white; /* White text color */
-        border: none; /* Remove border */
-        padding: 8px 16px; /* Padding for button */
-        cursor: pointer; /* Add cursor pointer */
-        transition: background-color 0.3s; /* Smooth transition on hover */
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4Watch Store - My Wishlist</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .golden-gradient {
+      background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+    }
+    .product-card {
+      transition: all 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    .remove-button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .remove-button:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
 
-      /* Hover effect for the remove button */
-      .remove-button:hover {
-        background-color: #c82333; /* Darker red color on hover */
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/"
-        ><img src="/images/logo.png" alt="Logo"
-      /></a>
+<body class="bg-gray-50">
+  <%- include('../layouts/header.ejs', { fullName: fullName }) %>
 
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
-      </div>
+  <main class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Wishlist Header -->
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-gray-800">My Wishlist</h1>
+      <p class="text-gray-600 mt-2">Items you've saved for later</p>
+    </div>
 
-      <!-- Add-to-Cart Icon with Link -->
-      <a href="/add-to-cart" class="cart-icon">
-        <i class="fas fa-shopping-cart"></i>
-      </a>
-
-      <% if (fullName) { %>
-      <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-        <a href="/logout" class="nav-link logout nav-linklogout">
-          <i class="fas fa-sign-out-alt"></i>
+    <% if (wishlist.length === 0) { %>
+      <!-- Empty Wishlist State -->
+      <div class="text-center py-16">
+        <div class="golden-gradient w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <i class="fas fa-heart text-white text-2xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Your wishlist is empty</h2>
+        <p class="text-gray-600 mb-4">Start adding items you love to your wishlist</p>
+        <a href="/" class="inline-flex items-center px-4 py-2 border border-amber-300 text-amber-700 rounded-md hover:bg-amber-50 transition-colors">
+          <i class="fas fa-shopping-bag mr-2"></i>
+          Continue Shopping
         </a>
       </div>
-      <% } else { %>
-      <!-- If user is not logged in, display login/signup -->
-      <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
-      <% } %>
-
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
-    <div class="container mt-5">
-      <div class="row">
+    <% } else { %>
+      <!-- Product Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% wishlist.forEach(product => { %>
-        <div class="col-md-4 mb-4">
-          <div class="card cardwishlist" data-stock="<%= product.stock %>">
-            <a href="/product/<%= product._id %>">
-              <% if (product.image && product.image.length > 0) { %>
-                <img
-                  class="img-fluid"
-                  src="<%= product.image[0].path %>"
-                  alt="product image"
-                />
-              <% } %>
-            </a>
+          <div class="product-card bg-white rounded-xl shadow-lg overflow-hidden relative" 
+               data-product-id="<%= product._id %>"
+               data-stock="<%= product.stock %>">
+            <!-- Product Image -->
+            <div class="aspect-w-1 aspect-h-1 relative">
+              <a href="/product/<%= product._id %>">
+                <% if (product.image && product.image.length > 0) { %>
+                  <img src="<%= product.image[0].path %>" 
+                       alt="<%= product.name %>" 
+                       class="w-full h-64 object-cover">
+                <% } %>
+              </a>
+            </div>
 
-            <div class="card-body">
-              <h5 class="card-title"><%= product.name %></h5>
-              <p class="card-text"><%= product.description %></p>
+            <!-- Product Details -->
+            <div class="p-6">
+              <h3 class="text-lg font-semibold mb-2 text-gray-800"><%= product.name %></h3>
+              <p class="text-gray-600 text-sm mb-4 line-clamp-2"><%= product.description %></p>
 
-              <p class="card-text"><% if (product.offerPrice && product.offerPrice <
- product.price) { %>
-                <h6 class="original-price" style="color: red">
-                  <s><%= product.price %></s>
-                </h6>
-                <h6 class="offer-price" style="color: green">
-                  offer price: <%= product.offerPrice%>
-                </h6>
+              <!-- Price Section -->
+              <div class="mb-4">
+                <% if (product.offerPrice && product.offerPrice < product.price) { %>
+                  <div class="flex items-center gap-2">
+                    <span class="text-gray-400 line-through">₹<%= product.price %></span>
+                    <span class="text-green-600 font-semibold">₹<%= product.offerPrice %></span>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                      <%= Math.round((product.price - product.offerPrice) / product.price * 100) %>% OFF
+                    </span>
+                  </div>
                 <% } else { %>
-                <h6><%= product.price %></h6>
-                <% } %></p>
-              <div class="row">
-                <div class="col">
-                  <!-- Example form to add a product to the cart -->
-                  <form
-                    action="/add-to-cart/<%= product._id %>"
-                    method="POST"
-                    class="add-to-cart"
-                  >
-                    <button type="submit" class="btn btn-primary btn-block">
-                      <i class="fas fa-cart-plus"></i> Add to Cart
-                    </button>
-                  </form>
-                </div>
+                  <span class="text-gray-900 font-semibold">₹<%= product.price %></span>
+                <% } %>
+              </div>
 
-                <!-- Example form to remove a product from the wishlist -->
-                <!-- Example form to remove a product from the wishlist -->
-                <form
-                  id="removeFromWishlistForm"
-                  action="/remove-from-wishlist/<%= product._id %>"
-                  method="DELETE"
-                >
+              <div class="flex flex-col space-y-3">
+                <!-- Add to Cart Button -->
+                <form action="/add-to-cart/<%= product._id %>" method="POST" class="add-to-cart">
+                  <button type="submit" 
+                          class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-lg transition-colors <%= product.stock <= 0 ? 'opacity-50 cursor-not-allowed' : '' %>"
+                          <%= product.stock <= 0 ? 'disabled' : '' %>>
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    <%= product.stock <= 0 ? 'Out of Stock' : 'Add to Cart' %>
+                  </button>
+                </form>
+
+                <!-- Remove from Wishlist Form -->
+                <form id="removeFromWishlistForm" action="/remove-from-wishlist/<%= product._id %>" method="POST">
                   <input type="hidden" name="_method" value="DELETE" />
-                  <button
-                    class="remove-button"
-                    onclick="removeFromWishlist('<%= product._id %>')"
-                  >
-                    Remove
+                  <button type="button" 
+                          onclick="confirmRemove('<%= product._id %>')"
+                          class="w-full remove-button rounded-lg">
+                    <i class="fas fa-trash-alt mr-2"></i>Remove
                   </button>
                 </form>
               </div>
-              <span class="stock-status"></span>
+
+              <!-- Stock Status -->
+              <div class="stock-status mt-3 text-sm text-center">
+                <% if (product.stock <= 0) { %>
+                  <span class="text-red-600">Out of Stock</span>
+                <% } else if (product.stock < 5) { %>
+                  <span class="text-orange-600">Only <%= product.stock %> left</span>
+                <% } else { %>
+                  <span class="text-green-600">In Stock</span>
+                <% } %>
+              </div>
             </div>
           </div>
-        </div>
-        <% }) %>
+        <% }); %>
       </div>
-    </div>
-    <!-- Small separation between footers -->
-    <div class="footer-separation"></div>
+    <% } %>
+  </main>
 
-    <!-- Bootstrap JS and jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="/js/main.js"></script>
+  <%- include('../layouts/footer.ejs', { fullName: fullName }) %>
 
-    <script>
-      function removeFromWishlist(productId) {
-        fetch(`/remove-from-wishlist/${productId}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.ok) {
-              // Product removed successfully, you can handle the UI update here
-              console.log("Product removed from wishlist");
-              // Optionally, you can redirect to the wishlist page after removal
-              window.location.href = "/wishlist";
-            } else {
-              // Handle error response
-              console.error("Failed to remove product from wishlist");
-            }
-          })
-          .catch((error) => {
-            console.error("Error removing product from wishlist:", error);
-          });
-      }
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const productCards = document.querySelectorAll(".card"); // Select all product cards
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function confirmRemove(productId) {
+      Swal.fire({
+        title: 'Remove from Wishlist?',
+        text: "Are you sure you want to remove this item?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, remove it!',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          removeFromWishlist(productId);
+        }
+      });
+    }
 
-        productCards.forEach((card) => {
-          const stockStatus = card.querySelector(".stock-status"); // Find the stock status element within the card
-          const addToCartButton = card.querySelector(".add-to-cart");
-          const stock = parseInt(card.dataset.stock); // Get the stock quantity from the data attribute
+    function removeFromWishlist(productId) {
+      fetch(`/remove-from-wishlist/${productId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+      })
+      .then(async (response) => {
+        if (response.ok) {
+          const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+          if (productCard) {
+            productCard.style.opacity = '0';
+            productCard.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+              productCard.remove();
+              
+              // Check if there are any products left
+              const remainingProducts = document.querySelectorAll('.product-card');
+              if (remainingProducts.length === 0) {
+                // If no products left, show empty state
+                const mainContainer = document.querySelector('main');
+                mainContainer.innerHTML = `
+                  <div class="text-center py-16">
+                    <div class="golden-gradient w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <i class="fas fa-heart text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Your wishlist is empty</h2>
+                    <p class="text-gray-600 mb-4">Start adding items you love to your wishlist</p>
+                    <a href="/" class="inline-flex items-center px-4 py-2 border border-amber-300 text-amber-700 rounded-md hover:bg-amber-50 transition-colors">
+                      <i class="fas fa-shopping-bag mr-2"></i>
+                      Continue Shopping
+                    </a>
+                  </div>
+                `;
+              }
+            }, 300);
 
-          if (stock <= 0) {
-            stockStatus.textContent = "Out of Stock";
-            stockStatus.style.color = "red";
-            addToCartButton.disabled = true; // Disable add to cart button
-            addToCartButton.style.display = "none";
-          } else if (stock < 5) {
-            stockStatus.textContent = `Limited Stock (${stock} left)`;
-            stockStatus.style.color = "orange";
-          } else {
-            stockStatus.textContent = "In Stock";
-            stockStatus.style.color = "green";
+            Swal.fire({
+              title: 'Removed!',
+              text: 'Item has been removed from your wishlist.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            });
           }
+        } else {
+          throw new Error('Failed to remove item');
+        }
+      })
+      .catch((error) => {
+        console.error("Error removing product from wishlist:", error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to remove item from wishlist.',
+          icon: 'error',
+          confirmButtonColor: '#dc3545'
         });
       });
-    </script>
-  </body>
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const productCards = document.querySelectorAll('.product-card');
+      productCards.forEach(card => {
+        const stock = parseInt(card.dataset.stock);
+        const addToCartBtn = card.querySelector('.add-to-cart button');
+        
+        if (stock <= 0) {
+          addToCartBtn.disabled = true;
+          addToCartBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      });
+    });
+  </script>
+</body>
+
 </html>

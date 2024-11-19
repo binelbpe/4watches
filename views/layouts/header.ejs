@@ -1,0 +1,116 @@
+<nav class="bg-white border-b border-[#bca374] shadow-sm relative">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+      <!-- Logo -->
+      <a href="/" class="flex-shrink-0">
+        <img src="/images/logo.png" alt="Logo" class="h-12 w-auto" />
+      </a>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden lg:flex lg:items-center lg:space-x-8">
+        <a href="/" style="color: #bca374;" class="nav-link">HOME</a>
+        <a href="/men" style="color: #bca374;" class="nav-link">MEN</a>
+        <a href="/women" style="color: #bca374;" class="nav-link">WOMEN</a>
+        <a href="/kids" style="color: #bca374;" class="nav-link">KIDS</a>
+        <a href="/collection" style="color: #bca374;" class="nav-link">COLLECTION</a>
+        <a href="/about" style="color: #bca374;" class="nav-link">ABOUT US</a>
+      </div>
+
+      <!-- Right Section -->
+      <div class="hidden lg:flex items-center space-x-6">
+        <!-- Search Bar -->
+        <form action="/search" method="POST" class="relative">
+          <input 
+            type="search" 
+            name="search" 
+            placeholder="Search products..." 
+            class="w-64 pl-4 pr-10 py-2 rounded-full border border-[#bca374] focus:outline-none focus:ring-2 focus:ring-[#bca374]"
+            required
+            minlength="1"
+          />
+          <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <i class="fas fa-search" style="color: #bca374;"></i>
+          </button>
+        </form>
+
+        <!-- Icons -->
+        <div class="flex items-center space-x-4">
+          <a href="/wishlist" class="icon-link">
+            <i class="fas fa-heart text-xl" style="color: #bca374;"></i>
+          </a>
+          <a href="/add-to-cart" class="icon-link">
+            <i class="fas fa-shopping-cart text-xl" style="color: #bca374;"></i>
+          </a>
+
+          <!-- User Section -->
+          <% if (fullName) { %>
+          <div class="flex items-center space-x-4">
+            <a href="/profile" class="flex items-center transition-colors" style="color: #bca374;">
+              <i class="fas fa-user mr-2" style="color: #bca374;"></i>
+              <span style="color: #bca374;"><%= fullName %></span>
+            </a>
+            <a href="/logout" class="icon-link">
+              <i class="fas fa-sign-out-alt text-xl" style="color: #bca374;"></i>
+            </a>
+          </div>
+          <% } else { %>
+          <a href="/login" class="flex items-center font-medium transition-colors" style="color: #bca374;">
+            <i class="fas fa-user mr-2" style="color: #bca374;"></i>
+            <span style="color: #bca374;">LOGIN/SIGNUP</span>
+          </a>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button class="lg:hidden mobile-menu-button">
+        <i class="fas fa-bars text-xl" style="color: #bca374;"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="lg:hidden mobile-menu hidden">
+    <div class="px-2 pt-2 pb-3 space-y-1 bg-white">
+      <a href="/" class="block px-3 py-2" style="color: #bca374;">HOME</a>
+      <a href="/men" class="block px-3 py-2" style="color: #bca374;">MEN</a>
+      <a href="/women" class="block px-3 py-2" style="color: #bca374;">WOMEN</a>
+      <a href="/kids" class="block px-3 py-2" style="color: #bca374;">KIDS</a>
+      <a href="/collection" class="block px-3 py-2" style="color: #bca374;">COLLECTION</a>
+      <a href="/about" class="block px-3 py-2" style="color: #bca374;">ABOUT US</a>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .nav-link:hover, 
+  .icon-link:hover, 
+  .mobile-nav-link:hover,
+  .fas:hover,
+  a:hover {
+    color: #8c7654 !important;
+  }
+
+  input[type="search"]:focus {
+    border-color: #bca374;
+    box-shadow: 0 0 0 2px rgba(188, 163, 116, 0.2);
+  }
+
+  .nav-link.active {
+    color: #8c7654 !important;
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>

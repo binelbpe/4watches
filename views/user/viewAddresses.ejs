@@ -3,155 +3,99 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>4Watch Store</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
+    <title>4Watch Store - View Addresses</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      .golden-gradient {
+        background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+      }
+      .address-card {
+        transition: all 0.3s ease;
+      }
+      .address-card:hover {
+        border-color: #b38728;
+      }
+    </style>
   </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/">
-        <img src="/images/logo.png" alt="Logo" />
-      </a>
 
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
-      </div>
+  <body class="bg-gray-50">
+    <%- include('../layouts/header.ejs', { fullName: fullName }) %>
 
-      <% if (fullName) { %>
-      <div class="user-info">
-        <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-        <a href="/logout" class="nav-link logout nav-linklogout">
-          <i class="fas fa-sign-out-alt"></i>
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">My Addresses</h1>
+        <a href="/add-address" class="bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 transition-colors">
+          <i class="fas fa-plus mr-2"></i>Add New Address
         </a>
       </div>
-      <% } %>
 
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
-    <div class="container">
-      <h1 class="mb-4">View Addresses</h1>
-      <% if (addresses.length > 0) { %> <% addresses.forEach((address) => { %>
-      <!-- Inside the address card loop -->
-      <div class="address-card <%= address.active ? 'active' : '' %>">
-        <div class="row">
-          <div class="col-md-9">
-            <p><strong>Address:</strong> <%= address.address %></p>
-            <p><strong>Street:</strong> <%= address.addressline2 %></p>
-            <p><strong>City:</strong> <%= address.city %></p>
-            <p><strong>State:</strong> <%= address.state %></p>
-            <p><strong>Pincode:</strong> <%= address.pincode %></p>
-          </div>
-          <div class="col-md-3">
-            <div class="btn-group">
-              <a
-                href="/edit-address/<%= address._id %>"
-                class="btn btn-primary"
-              >
-                <i class="fas fa-edit"></i> Edit
-              </a>
-              <a
-                href="#"
-                class="btn btn-danger"
-                onclick="confirmDelete('<%= address._id %>')"
-              >
-                <i class="fas fa-trash-alt"></i> Delete
-              </a>
-              <% if (address.status) { %>
-              <a
-                href="/set-active/<%= address._id %>?status=inactive"
-                class="btn btn-success"
-              >
-                <i class="fas fa-check"></i> Default
-              </a>
-              <% } else { %>
-              <a
-                href="/set-active/<%= address._id %>?status=active"
-                class="btn btn-secondary"
-              >
-                <i class="fas fa-times"></i> Make Default
-              </a>
-              <% } %>
+      <div class="space-y-4">
+        <% if (addresses.length > 0) { %>
+          <% addresses.forEach((address) => { %>
+            <div class="address-card bg-white rounded-xl shadow-lg p-6 border border-amber-200">
+              <div class="flex justify-between">
+                <div class="space-y-2">
+                  <p class="text-gray-700"><%= address.address %></p>
+                  <p class="text-gray-700"><%= address.addressline2 %></p>
+                  <p class="text-gray-700"><%= address.city %>, <%= address.state %></p>
+                  <p class="text-amber-700">PIN: <%= address.pincode %></p>
+                </div>
+                <div class="flex flex-col space-y-2">
+                  <a href="/edit-address/<%= address._id %>" 
+                     class="text-amber-600 hover:text-amber-800 px-3 py-1">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <button onclick="confirmDelete('<%= address._id %>')" 
+                          class="text-red-600 hover:text-red-800 px-3 py-1">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                  <% if (address.status) { %>
+                    <span class="text-green-600 px-3 py-1">
+                      <i class="fas fa-check-circle"></i> Default
+                    </span>
+                  <% } else { %>
+                    <a href="/set-active/<%= address._id %>?status=active" 
+                       class="text-gray-600 hover:text-amber-600 px-3 py-1">
+                      Set as Default
+                    </a>
+                  <% } %>
+                </div>
+              </div>
             </div>
+          <% }); %>
+        <% } else { %>
+          <div class="text-center py-8">
+            <p class="text-gray-600 mb-4">No addresses found</p>
+            <a href="/add-address" class="inline-flex items-center px-4 py-2 border border-amber-300 text-amber-700 rounded-md hover:bg-amber-50 transition-colors">
+              <i class="fas fa-plus-circle mr-2"></i>
+              Add Your First Address
+            </a>
           </div>
-        </div>
+        <% } %>
       </div>
-      <br />
-      <br />
+    </main>
 
-      <% }); %> <% } else { %>
-      <p>No addresses found.</p>
-      <% } %>
-      <!-- Link to add new address -->
-      <a href="/add-address" class="btn btn-success"
-        ><i class="fas fa-plus"></i> Add New Address</a
-      >
-    </div>
+    <%- include('../layouts/footer.ejs', { fullName: fullName }) %>
 
-    <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
       function confirmDelete(addressId) {
         Swal.fire({
-          title: "Are you sure?",
-          text: "You will not be able to recover this address!",
-          icon: "warning",
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#3085d6",
-          confirmButtonText: "Yes, delete it!",
+          confirmButtonColor: '#b38728',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
           if (result.isConfirmed) {
             window.location.href = `/delete-address/${addressId}`;
           }
-        });
+        })
       }
     </script>
   </body>

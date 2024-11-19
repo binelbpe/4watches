@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - 4Watch Store</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .brand-gradient {
+            background: linear-gradient(135deg, #bca374, #d4c4a1, #bca374, #d4c4a1);
+        }
+        .brand-color {
+            color: #bca374;
+        }
+        .brand-border {
+            border-color: #bca374;
+        }
+        .hover-brand:hover {
+            background-color: #bca374;
+            color: white;
+        }
+        .brand-bg {
+            background-color: #bca374;
+        }
+        @keyframes checkmark {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .checkmark {
+            animation: checkmark 0.8s ease-in-out forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <%- include('../layouts/header.ejs', { fullName: locals.fullName || null }) %>
+
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-xl shadow-lg p-8 border brand-border">
+            <!-- Success Animation -->
+            <div class="text-center mb-8">
+                <img src="/images/logo.png" alt="4Watches Logo" class="h-16 mx-auto mb-6">
+                <div class="checkmark text-6xl brand-color mb-4">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Order Confirmed!</h1>
+                <p class="text-gray-600">Thank you for shopping with 4Watch Store</p>
+            </div>
+
+            <!-- Order Details -->
+            <div class="slide-in space-y-6">
+                <!-- Order ID -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-lg font-semibold brand-color mb-2">Order ID</h2>
+                    <p class="text-gray-700">#<%= order._id %></p>
+                </div>
+
+                <!-- Payment Details -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-lg font-semibold brand-color mb-2">Payment Details</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-gray-600">Payment Method</p>
+                            <p class="text-gray-800">
+                                <%= order.paymentMethod === 'pay_by_wallet' ? 'Wallet Payment' :
+                                    order.paymentMethod === 'pay_on_online' ? 'Online Payment' :
+                                    order.paymentMethod === 'cash_on_delivery' ? 'Cash on Delivery' :
+                                    order.paymentMethod %>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600">Total Amount</p>
+                            <p class="text-gray-800">₹<%= order.grandTotalPrice %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-lg font-semibold brand-color mb-2">Shipping Address</h2>
+                    <p class="text-gray-700">
+                        <%= order.address.address %><br>
+                        <%= order.address.city %>, <%= order.address.state %><br>
+                        PIN: <%= order.address.pincode %>
+                    </p>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-lg font-semibold brand-color mb-4">Order Summary</h2>
+                    <div class="space-y-3">
+                        <% order.products.forEach(product => { %>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <img src="<%= product.product.image[0].path %>" 
+                                         alt="<%= product.product.product %>" 
+                                         class="w-16 h-16 object-cover rounded">
+                                    <div>
+                                        <p class="font-medium"><%= product.product.product %></p>
+                                        <p class="text-sm text-gray-600">Quantity: <%= product.quantity %></p>
+                                    </div>
+                                </div>
+                                <p class="font-medium">₹<%= product.product.price * product.quantity %></p>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-center space-x-4 mt-8">
+                <a href="/orders" 
+                   class="px-6 py-3 brand-bg text-white rounded-lg hover-brand transition-colors flex items-center">
+                    <i class="fas fa-shopping-bag mr-2"></i>
+                    View Orders
+                </a>
+                <a href="/" 
+                   class="px-6 py-3 border brand-border brand-color rounded-lg hover-brand transition-colors flex items-center">
+                    <i class="fas fa-home mr-2"></i>
+                    Continue Shopping
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../layouts/footer.ejs', { fullName: locals.fullName || null }) %>
+</body>
+</html> 

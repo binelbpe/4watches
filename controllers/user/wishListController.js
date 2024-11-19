@@ -30,7 +30,7 @@ const addToWishlist = async (req, res) => {
 //function for remove product from wishlist
 const removeFromWishlist = async (req, res) => {
   try {
-    const userId = req.session.userData._id; // Assuming you're using Passport.js for authentication
+    const userId = req.session.userData._id;
     const productId = req.params.productId;
 
     // Find the user by ID
@@ -42,10 +42,21 @@ const removeFromWishlist = async (req, res) => {
     );
     await user.save();
 
+    // Send JSON response for AJAX requests
+    if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+      return res.status(200).json({ success: true });
+    }
+
+    // Redirect for normal form submissions
     return res.redirect("/wishlist");
   } catch (error) {
     console.error("Error removing product from wishlist:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Error removing item from wishlist" });
+    }
+    res.status(500).redirect("/wishlist");
   }
 };
 

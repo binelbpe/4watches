@@ -1,241 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Signup</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/css/signup.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    />
-    <!-- Custom CSS -->
-    <style>
-      .invalid-feedback {
-        color: red;
-        display: none;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up | Your Brand</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #e5ab46;
+      --hover-color: #caa538;
+      --background-gradient: linear-gradient(135deg, #eab566 0%, #a28b4b 100%);
+      --error-color: #ef4444;
+      --success-color: #22c55e;
+    }
+
+    body {
+      min-height: 100vh;
+      background-image: var(--background-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem 0;
+    }
+
+    .signup-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      transform: translateY(0);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .signup-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+    }
+
+    .signup-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+      animation: loading 2s linear infinite;
+    }
+
+    @keyframes loading {
+      0% {
+        left: -100%
       }
 
-      .signup-container {
-        background-color: #bca374;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+      100% {
+        left: 100%
       }
-    </style>
-  </head>
-  <body class="signupbody">
-    <div class="container mt-5">
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <div class="signup-container">
-            <!-- Signup form -->
-            <h2 class="text-center mb-4">Signup</h2>
-            <!-- Display error message if it exists -->
-            <% if(errorMessage) { %>
-            <div class="alert alert-danger" role="alert">
-              <%= errorMessage %>
-            </div>
-            <% } %>
+    }
 
-            <form
-              id="signupForm"
-              action="/signup"
-              method="POST"
-              onsubmit="return validateForm()"
-            >
-              <div class="mb-3">
-                <label for="fullname" class="form-label">Full Name</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="fullname"
-                  name="fullname"
-                  placeholder="Enter your full name"
-                  pattern="[a-zA-Z\s]+"
-                />
-                <div id="fullnameError" class="invalid-feedback"></div>
-              </div>
-              <div class="mb-3">
-                <label for="phone" class="form-label">Phone</label>
-                <input
-                  type="tel"
-                  class="form-control"
-                  id="phone"
-                  name="phone"
-                  placeholder="Enter your phone number"
-                  pattern="\d{10}"
-                />
-                <div id="phoneError" class="invalid-feedback"></div>
-              </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="email"
-                  name="email"
-                  placeholder="Enter your email address"
-                  pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
-                />
-                <div id="emailError" class="invalid-feedback"></div>
-              </div>
-              <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  id="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?!.*\s).{8,}"
-                />
-                <div id="passwordError" class="invalid-feedback"></div>
-              </div>
-              <div class="mb-3">
-                <label for="confirmPassword" class="form-label"
-                  >Confirm Password</label
-                >
-                <input
-                  type="password"
-                  class="form-control"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  placeholder="Confirm your password"
-                />
-                <div id="confirmPasswordError" class="invalid-feedback"></div>
-              </div>
-              <div class="d-grid mb-3">
-                <button class="btn btn-primary btn-lg btn-signup" type="submit">
-                  Signup
-                </button>
-              </div>
-            </form>
-            <p class="text-center mb-0">
-              Already have an account?
-              <a href="/login" class="login-link">Login</a>
-            </p>
-          </div>
-        </div>
-      </div>
+    .signup-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .signup-header h2 {
+      color: #1a1a1a;
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .signup-header p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .form-floating {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-floating input {
+      height: 60px;
+      border-radius: 12px;
+      border: 2px solid #e5e7eb;
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-floating input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-floating.is-invalid input {
+      border-color: var(--error-color);
+    }
+
+    .form-floating.is-valid input {
+      border-color: var(--success-color);
+    }
+
+    .form-floating label {
+      padding: 1rem 1.25rem;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .invalid-feedback {
+      display: none;
+      color: var(--error-color);
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      padding-left: 1rem;
+    }
+
+    .btn-signup {
+      width: 100%;
+      height: 56px;
+      background: var(--primary-color);
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-signup:hover {
+      background: var(--hover-color);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+    }
+
+    .login-text {
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .login-link {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .login-link:hover {
+      color: var(--hover-color);
+      text-decoration: underline;
+    }
+
+    .alert {
+      border-radius: 12px;
+      font-size: 0.9rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .alert i {
+      font-size: 1.1rem;
+    }
+
+    /* Validation icons */
+    .validation-icon {
+      position: absolute;
+      right: 2.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      z-index: 10;
+    }
+
+    .validation-icon.valid {
+      color: var(--success-color);
+    }
+
+    .validation-icon.invalid {
+      color: var(--error-color);
+    }
+
+    /* Animation classes */
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-10px);
+      }
+
+      75% {
+        transform: translateX(10px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="signup-container fade-in">
+    <div class="signup-header">
+      <h2>Create Account</h2>
+      <p>Please fill in your details to sign up</p>
     </div>
-    <script>
-      // Validation functions
-      function validateInput(inputId, regexPattern, errorMessage) {
-        const input = document.getElementById(inputId);
-        const value = input.value.trim();
-        const errorElement = document.getElementById(inputId + "Error");
 
-        if (!regexPattern.test(value)) {
-          input.classList.add("is-invalid");
-          errorElement.textContent = errorMessage;
-          errorElement.style.display = "block";
-          return false;
-        } else {
-          input.classList.remove("is-invalid");
-          errorElement.textContent = "";
-          errorElement.style.display = "none";
-          return true;
-        }
+    <% if(errorMessage) { %>
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-circle"></i>
+      <%= errorMessage %>
+    </div>
+    <% } %>
+
+    <form id="signupForm" action="/signup" method="POST">
+      <div class="form-floating">
+        <input type="text" class="form-control" id="fullname" name="fullname" placeholder="John Doe" required />
+        <label for="fullname">Full Name</label>
+        <i class="validation-icon fas"></i>
+        <div id="fullnameError" class="invalid-feedback"></div>
+      </div>
+
+      <div class="form-floating">
+        <input type="tel" class="form-control" id="phone" name="phone" placeholder="1234567890" required />
+        <label for="phone">Phone Number</label>
+        <i class="validation-icon fas"></i>
+        <div id="phoneError" class="invalid-feedback"></div>
+      </div>
+
+      <div class="form-floating">
+        <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required />
+        <label for="email">Email Address</label>
+        <i class="validation-icon fas"></i>
+        <div id="emailError" class="invalid-feedback"></div>
+      </div>
+
+      <div class="form-floating">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required />
+        <label for="password">Password</label>
+        <i class="password-toggle fas fa-eye-slash"></i>
+        <i class="validation-icon fas"></i>
+        <div id="passwordError" class="invalid-feedback"></div>
+      </div>
+
+      <div class="form-floating">
+        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required />
+        <label for="confirmPassword">Confirm Password</label>
+        <i class="validation-icon fas"></i>
+        <div id="confirmPasswordError" class="invalid-feedback"></div>
+      </div>
+
+      <button class="btn btn-signup" type="submit">
+        Create Account
+      </button>
+
+      <p class="login-text">
+        Already have an account? <a href="/login" class="login-link">Sign in</a>
+      </p>
+    </form>
+  </div>
+
+  <script>
+    // Password visibility toggle
+    document.querySelector('.password-toggle').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const icon = this;
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
       }
+    });
 
-      function validateForm() {
-        const fullNameRegex = /^[^\s][a-zA-Z]{3,}(?:\s[a-zA-Z]*)?$/; // Allows letters, spaces, apostrophes, hyphens
-        const phoneRegex = /^\d{10}$/; // Allows exactly 10 digits
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const passwordRegex =
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Password validation as described
+    // Enhanced validation functions
+    function validateInput(inputId, regexPattern, errorMessage) {
+      const input = document.getElementById(inputId);
+      const value = input.value.trim();
+      const errorElement = document.getElementById(inputId + "Error");
+      const validationIcon = input.parentElement.querySelector('.validation-icon');
 
-        const isFullNameValid = validateInput(
-          "fullname",
-          fullNameRegex,
-          "Invalid full name"
-        );
-        const isPhoneValid = validateInput(
-          "phone",
-          phoneRegex,
-          "Invalid phone number"
-        );
-        const isEmailValid = validateInput(
-          "email",
-          emailRegex,
-          "Invalid email address"
-        );
-        const isPasswordValid = validateInput(
-          "password",
-          passwordRegex,
-          "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character"
-        );
-        const isConfirmPasswordValid = validateConfirmPassword();
-
-        return (
-          isFullNameValid &&
-          isPhoneValid &&
-          isEmailValid &&
-          isPasswordValid &&
-          isConfirmPasswordValid
-        );
+      if (!regexPattern.test(value)) {
+        input.classList.add("is-invalid");
+        input.classList.remove("is-valid");
+        errorElement.textContent = errorMessage;
+        errorElement.style.display = "block";
+        validationIcon.classList.remove('fa-check-circle', 'valid');
+        validationIcon.classList.add('fa-times-circle', 'invalid');
+        return false;
+      } else {
+        input.classList.remove("is-invalid");
+        input.classList.add("is-valid");
+        errorElement.textContent = "";
+        errorElement.style.display = "none";
+        validationIcon.classList.remove('fa-times-circle', 'invalid');
+        validationIcon.classList.add('fa-check-circle', 'valid');
+        return true;
       }
+    }
 
-      function validateConfirmPassword() {
-        const password = document.getElementById("password").value.trim();
-        const confirmPassword = document
-          .getElementById("confirmPassword")
-          .value.trim();
-        const errorElement = document.getElementById("confirmPasswordError");
+    function validateForm() {
+      const fullNameRegex = /^[^\s][a-zA-Z\s]{3,}$/;
+      const phoneRegex = /^\d{10}$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-        if (password !== confirmPassword) {
-          document.getElementById("password").classList.add("is-invalid");
-          document
-            .getElementById("confirmPassword")
-            .classList.add("is-invalid");
-          errorElement.textContent = "Passwords do not match";
-          errorElement.style.display = "block";
-          return false;
-        } else {
-          document.getElementById("password").classList.remove("is-invalid");
-          document
-            .getElementById("confirmPassword")
-            .classList.remove("is-invalid");
-          errorElement.textContent = "";
-          errorElement.style.display = "none";
-          return true;
-        }
+      const isFullNameValid = validateInput(
+        "fullname",
+        fullNameRegex,
+        "Please enter a valid full name (minimum 3 letters)"
+      );
+      const isPhoneValid = validateInput(
+        "phone",
+        phoneRegex,
+        "Please enter a valid 10-digit phone number"
+      );
+      const isEmailValid = validateInput(
+        "email",
+        emailRegex,
+        "Please enter a valid email address"
+      );
+      const isPasswordValid = validateInput(
+        "password",
+        passwordRegex,
+        "Password must contain at least 8 characters, including uppercase, lowercase, number and special character"
+      );
+      const isConfirmPasswordValid = validateConfirmPassword();
+
+      return (
+        isFullNameValid &&
+        isPhoneValid &&
+        isEmailValid &&
+        isPasswordValid &&
+        isConfirmPasswordValid
+      );
+    }
+
+    function validateConfirmPassword() {
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword");
+      const errorElement = document.getElementById("confirmPasswordError");
+      const validationIcon = confirmPassword.parentElement.querySelector('.validation-icon');
+
+      if (password !== confirmPassword.value) {
+        confirmPassword.classList.add("is-invalid");
+        confirmPassword.classList.remove("is-valid");
+        errorElement.textContent = "Passwords do not match";
+        errorElement.style.display = "block";
+        validationIcon.classList.remove('fa-check-circle', 'valid');
+        validationIcon.classList.add('fa-times-circle', 'invalid');
+        return false;
+      } else {
+        confirmPassword.classList.remove("is-invalid");
+        confirmPassword.classList.add("is-valid");
+        errorElement.textContent = "";
+        errorElement.style.display = "none";
+        validationIcon.classList.remove('fa-times-circle', 'invalid');
+        validationIcon.classList.add('fa-check-circle', 'valid');
+        return true;
       }
+    }
 
-      // Add event listeners for input fields to validate on input change
-      document
-        .getElementById("fullname")
-        .addEventListener("input", function () {
-          validateInput(
-            "fullname",
-            /^[^\s][a-zA-Z]{3,}(?:\s[a-zA-Z]*)?$/,
-            "Invalid full name"
-          );
-        });
-      document.getElementById("phone").addEventListener("input", function () {
-        validateInput("phone", /^\d{10}$/, "Invalid phone number");
-      });
-      document.getElementById("email").addEventListener("input", function () {
-        validateInput(
-          "email",
-          /^[a-zA-Z0-9._-]+@[a-z]+\.[a-z]{2,}$/,
-          "Invalid email address"
-        );
-      });
-      document
-        .getElementById("password")
-        .addEventListener("input", function () {
-          validateInput(
-            "password",
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-            "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character"
-          );
-        });
-      document
-        .getElementById("confirmPassword")
-        .addEventListener("input", validateConfirmPassword);
-    </script>
-  </body>
+    // Add real-time validation
+    document.getElementById("fullname").addEventListener("input", function() {
+      validateInput(
+        "fullname",
+        /^[^\s][a-zA-Z\s]{3,}$/,
+        "Please enter a valid full name (minimum 3 letters)"
+      );
+    });
+
+    document.getElementById("phone").addEventListener("input", function() {
+      validateInput(
+        "phone",
+        /^\d{10}$/,
+        "Please enter a valid 10-digit phone number"
+      );
+    });
+
+    document.getElementById("email").addEventListener("input", function() {
+      validateInput(
+        "email",
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        "Please enter a valid email address"
+      );
+    });
+
+    document.getElementById("password").addEventListener("input", function() {
+      validateInput(
+        "password",
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        "Password must contain at least 8 characters, including uppercase, lowercase, number and special character"
+      );
+      if (document.getElementById("confirmPassword").value) {
+        validateConfirmPassword();
+      }
+    });
+
+    document.getElementById("confirmPassword").addEventListener("input", validateConfirmPassword);
+
+    // Form submission
+    document.getElementById("signupForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      if (validateForm()) {
+        this.submit();
+      }
+    });
+  </script>
+</body>
+
 </html>

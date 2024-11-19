@@ -1,178 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Men's Collection</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome CSS -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      /* Filter Sidebar Styles */
-      .filter-sidebar {
-        background-color: #f8f9fa; /* Set background color */
-        padding: 20px; /* Add padding */
-        border-radius: 10px; /* Add border radius */
-        border: 1px solid #bca374; /* Add border */
-        margin-bottom: 20px; /* Add margin bottom */
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Men's Collection</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold-primary: #BCA374;
+      --gold-secondary: #A38F5F;
+      --gold-light: #D4C5A3;
+      --white: #FFFFFF;
+      --off-white: #F8F9FA;
+      --dark: #333333;
+    }
+
+    body {
+      background-color: var(--white);
+      font-family: 'Arial', sans-serif;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      background-color: var(--white) !important;
+      box-shadow: 0 2px 4px rgba(188, 163, 116, 0.1);
+      padding: 1rem 2rem;
+    }
+
+    .navbar-nav .nav-link {
+      color: var(--dark) !important;
+      font-weight: 500;
+      margin: 0 1rem;
+      transition: color 0.3s;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: var(--gold-primary) !important;
+    }
+
+    .search-input {
+      border: 1px solid var(--gold-light);
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+    }
+
+    .search-icon,
+    .wishlist-icon,
+    .cart-icon {
+      color: var(--gold-primary);
+      margin: 0 1rem;
+      font-size: 1.2rem;
+      transition: color 0.3s;
+    }
+
+    .search-icon:hover,
+    .wishlist-icon:hover,
+    .cart-icon:hover {
+      color: var(--gold-secondary);
+    }
+
+    /* Filter Section */
+    .filter-section {
+      background-color: var(--off-white);
+      padding: 1.5rem;
+      margin: 2rem 0;
+      border-radius: 10px;
+      border: 1px solid var(--gold-light);
+    }
+
+    select,
+    .filter-submit-btn {
+      border: 1px solid var(--gold-primary);
+      border-radius: 20px;
+      padding: 0.5rem 1.5rem;
+      margin: 0 1rem;
+      background-color: var(--white);
+      color: var(--dark);
+      transition: all 0.3s;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--gold-secondary);
+      box-shadow: 0 0 0 0.2rem rgba(188, 163, 116, 0.25);
+    }
+
+    .filter-submit-btn {
+      background-color: var(--gold-primary);
+      color: var(--white);
+    }
+
+    .filter-submit-btn:hover {
+      background-color: var(--gold-secondary);
+    }
+
+    /* Product Cards */
+    .section-title h1 {
+      color: var(--dark);
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+
+    .section-title h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background-color: var(--gold-primary);
+    }
+
+    .card {
+      border: none;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      margin-bottom: 2rem;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(188, 163, 116, 0.2);
+    }
+
+    .icons-container {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover .icons-container {
+      opacity: 1;
+    }
+
+    .icons-container button {
+      background-color: var(--white);
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .icons-container button i {
+      color: var(--gold-primary);
+    }
+
+    .product-details {
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .product-details h5 {
+      color: var(--dark);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-details h6 {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .price {
+      margin-top: 1rem;
+    }
+
+    .original-price {
+      color: #999 !important;
+      text-decoration: line-through;
+      margin-right: 0.5rem;
+    }
+
+    .offer-price {
+      color: var(--gold-primary) !important;
+      font-weight: 600;
+    }
+
+    .stock-status {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    /* Footer */
+    .main-footer {
+      background-color: var(--off-white);
+      padding: 4rem 0;
+      margin-top: 4rem;
+      border-top: 1px solid var(--gold-light);
+    }
+
+    .footer-section h5 {
+      color: var(--dark);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+
+    .footer-section h5::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 2px;
+      background-color: var(--gold-primary);
+    }
+
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 0.8rem;
+      color: #666;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    .footer-section ul li:hover {
+      color: var(--gold-primary);
+    }
+
+    .social-media-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .social-media-icons a {
+      color: var(--dark);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .social-media-icons a:hover {
+      color: var(--gold-primary);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
       }
-    
-      .filter-title {
-        color: #333; /* Set title color */
-        font-size: 20px; /* Set title font size */
-        font-weight: bold; /* Set title font weight */
-        margin-bottom: 10px; /* Add margin bottom */
+
+      .filter-section {
+        flex-direction: column;
+        gap: 1rem;
       }
-    
-      .filter-options {
-        list-style: none; /* Remove default list style */
-        padding: 0; /* Remove default padding */
-      }
-    
-      .filter-options li {
-        margin-bottom: 15px; /* Add margin bottom */
-      }
-    
-      /* Styling for dropdowns and input fields */
+
       select,
-      input[type="range"] {
-        width: 10%; /* Set width to 100% */
-        padding: 10px; /* Add padding */
-        border: 1px solid #bca374; /* Add border */
-        border-radius: 5px; /* Add border radius */
-        background-color: #fff; /* Set background color */
-        color: #333; /* Set text color */
-        font-size: 16px; /* Set font size */
-      }
-    
-      /* Styling for submit button */
       .filter-submit-btn {
-        background-color: #bca374; /* Set background color */
-        color: #fff; /* Set text color */
-        padding: 10px 20px; /* Add padding */
-        border: none; /* Remove border */
-        border-radius: 5px; /* Add border radius */
-        cursor: pointer; /* Add cursor pointer */
-        font-size: 16px; /* Set font size */
+        width: 100%;
+        margin: 0.5rem 0;
       }
-    
-      /* Hover effect for submit button */
-      .filter-submit-btn:hover {
-        background-color: #a38f5f; /* Change background color on hover */
-      }
-    </style>
-    
-  </head>
+    }
+  </style>
+
+</head>
+
+<body>
+  <!-- Navbar -->
+  <%- include('../layouts/header.ejs') %>
+
   <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Logo -->
-      <a class="navbar-brand" href="/"
-        ><img src="/images/logo.png" alt="Logo"
-      /></a>
-      <!-- Nav Links -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/">HOME</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/men">MEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/women">WOMEN</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/kids">KIDS</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/collection">COLLECTION</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">ABOUT US</a>
-          </li>
-        </ul>
-      </div>
-      <!-- Search Bar with Link -->
-      <form class="form-inline my-2 my-lg-0 search-form" action="/search" method="POST">
-        <input
-          class="form-control mr-sm-2 search-input"
-          type="search"
-          placeholder="Search"
-          aria-label="Search"
-          name="search"
-        />
-        <button class="search-icon" type="submit">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
-      <!-- Wishlist Icon with Link -->
-      <a href="/wishlist" class="wishlist-icon"><i class="fas fa-heart"></i></a>
-      <!-- Add-to-Cart Icon with Link -->
-      <a href="/add-to-cart" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
-         <!-- Filter Toggle Icon -->
-        
-      <% if (fullName) { %>
-        <div class="user-info">
-          <a href="/profile" class="nav-link nav-linklogout"><%= fullName %></a>
-          <a href="/logout" class="nav-link logout nav-linklogout">
-            <i class="fas fa-sign-out-alt"></i>
-          </a>
-        </div>
-        <% } else { %>
-        <!-- If user is not logged in, display login/signup -->
-        <a href="/login" class="nav-link login">LOGIN/SIGNUP</a>
-        <% } %>
-      <!-- Hamburger Menu Toggle Button -->
-      <button
-        class="navbar-toggler ml-auto"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon">&#9776;</span>
-      </button>
-    </nav>
-    <body>
-      <form class="form-inline ml-2" action="/menfilter" method="GET">
-       
-        <label for="price">Price Range:</label>
-        <select class="mr-2" name="price" id="price" aria-placeholder="">
-          <option value="">Any Price</option> <!-- Empty option -->
-          <option value="0-500">0 - 500 Rs</option>
-          <option value="500-1000">500 - 1000 Rs</option>
-          <option value="1000-2000">1000 - 2000 Rs</option>
-          <option value="2000-4000">2000 - 4000 Rs</option>
-          <option value="4000-15000">4000 - 15000</option>
-            <!-- Add more options as needed -->
-        </select>
-        <!-- Add sorting dropdown -->
-        <label for="sort">Sort By:</label>
-        <select class="mr-2" name="sort" id="sort">
-          <option value="">Any Sort</option>
-            <option value="priceAsc">Price: Low to High</option>
-            <option value="priceDesc">Price: High to Low</option>
-            <option value="ratings">Average Ratings</option>
-            <option value="featured">Featured</option>
-            <option value="newArrivals">New Arrivals</option>
-            <option value="aToZ">A-Z</option>
-            <option value="zToA">Z-A</option>
-        </select>
-      
-        <button class="filter-submit-btn" type="submit">Apply Filter</button>
-      </form>
-    
+    <form class="form-inline ml-5 mt-5 mb-5" action="/menfilter" method="GET">
+
+      <label for="price">Price Range:</label>
+      <select class="mr-2" name="price" id="price" aria-placeholder="">
+        <option value="">Any Price</option> <!-- Empty option -->
+        <option value="0-500">0 - 500 Rs</option>
+        <option value="500-1000">500 - 1000 Rs</option>
+        <option value="1000-2000">1000 - 2000 Rs</option>
+        <option value="2000-4000">2000 - 4000 Rs</option>
+        <option value="4000-15000">4000 - 15000</option>
+        <!-- Add more options as needed -->
+      </select>
+      <!-- Add sorting dropdown -->
+      <label for="sort">Sort By:</label>
+      <select class="mr-2" name="sort" id="sort">
+        <option value="">Any Sort</option>
+        <option value="priceAsc">Price: Low to High</option>
+        <option value="priceDesc">Price: High to Low</option>
+        <option value="ratings">Average Ratings</option>
+        <option value="featured">Featured</option>
+        <option value="newArrivals">New Arrivals</option>
+        <option value="aToZ">A-Z</option>
+        <option value="zToA">Z-A</option>
+      </select>
+
+      <button class="filter-submit-btn" type="submit">Apply Filter</button>
+    </form>
+
     <!-- Item Cards -->
     <div>
       <div class="container">
@@ -184,101 +324,68 @@
           </div>
         </div>
 
+
         <div class="row">
-          <% for(let i=0 ; i< products.length ;i++) { %>
-          <div class="col-md-3 mb-3">
-            <div class="card " data-stock="<%= products[i].stock %>">
+          <% for(let j = 0; j < products.length; j++) { %> <% if (j % 4 === 0) {
+              %>
+        </div>
+        <div class="row">
+          <!-- Close and reopen row every 4 cards -->
+          <% } %>
+          <div class="col-md-3 mb-4 col-lg-3">
+            <div class="card card-new" data-stock="<%= products[j].stock %>">
               <!-- Add-to-Cart and Wishlist Icons -->
               <div class="icons-container">
-                <form action="/add-to-cart/<%= products[i]._id %>" method="POST" class="add-to-cart-form" style="border-color: none;">
-                  <button type="submit" class="add-to-cart icon" style="border: none;background-color: transparent;">
+                <form action="/add-to-cart/<%= products[j]._id %>" method="POST" class="add-to-cart-form" style="border-color: none">
+                  <button type="submit" class="add-to-cart icon" style="border: none; background-color: transparent">
                     <i class="fas fa-shopping-cart"></i>
                   </button>
                 </form>
-                <form action="/add-to-wishlist/<%= products[i]._id %>" method="POST" class="wishlist-form" style="border-color: none;">
-                  <button type="submit" class="wishlist-icon"  style="border: none;background-color: transparent;" >
+                <form action="/add-to-wishlist/<%= products[j]._id %>" method="POST" class="wishlist-form" style="border-color: none">
+                  <button type="submit" class="wishlist-icon" style="border: none; background-color: transparent">
                     <i class="fas fa-heart"></i>
                   </button>
                 </form>
               </div>
               <!-- Wrap product card with anchor tag -->
-              <a href="/product/<%= products[i]._id %>">
-                <img
-                  class="img-fluid"
-                  src="<%= products[i].image[0].path %>"
-                  alt="product image"
-                />
+              <a href="/product/<%= products[j]._id %>">
+                <img class="img-fluid" src="<%= products[j].image[0].path %>" alt="product image" />
                 <div class="product-details">
-                  <h5><%= products[i].product %></h5>
-                  <h6><%= products[i].description %></h6>
+                  <h5><%= products[j].product %></h5>
+                  <h6><%= products[j].description %></h6>
                   <div class="price">
-                    <% if (products[i].offerPrice && products[i].offerPrice <
-                    products[i].price) { %>
+                    <% if (products[j].offerPrice && products[j].offerPrice <
+                        products[j].price) { %>
                     <h6 class="original-price" style="color: red">
-                      <s><%= products[i].price %></s>
+                      <s><%= products[j].price %></s>
                     </h6>
                     <h6 class="offer-price" style="color: green">
-                      offer price: <%= products[i].offerPrice%>
+                      offer price: <%= products[j].offerPrice%>
                     </h6>
                     <% } else { %>
-                    <h6><%= products[i].price %></h6>
+                    <h6><%= products[j].price %></h6>
                     <% } %>
                   </div>
-                  <span class="stock-status"></span>
+                  <span class="stock-status-latest"></span>
                 </div>
               </a>
             </div>
           </div>
           <% } %>
         </div>
+
       </div>
     </div>
 
-    <!-- Main Footer -->
-    <footer class="main-footer">
-      <div class="row">
-        <div class="col-md-4">
-          <div class="footer-section">
-            <h5>POLICIES AND ORDER</h5>
-            <ul>
-              <li>Authenticity Guarantee</li>
-              <li>Privacy Policy</li>
-              <li>Return, Exchange & Refund Policy</li>
-              <li>Terms and Conditions</li>
-              <li>Warranty Information</li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="footer-section">
-            <h5>HELP</h5>
-            <ul>
-              <li>FAQ's</li>
-              <li>My Account</li>
-              <li>Track my order</li>
-              <li>Sitemap</li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="footer-section">
-            <h5>FOLLOW US ON</h5>
-            <div class="social-media-icons">
-              <a href="#">INSTAGRAM</a>
-              <a href="#">FACEBOOK</a>
-              <a href="#">TWITTER</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <%- include('../layouts/footer.ejs') %>
+
     <!-- Bootstrap JS and jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/js/main.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", function() {
         const productCards = document.querySelectorAll(".card"); // Select all product cards
 
         productCards.forEach((card) => {
@@ -286,11 +393,35 @@
           const addToCartButton = card.querySelector(".add-to-cart"); // Find the add-to-cart button within the card
 
           const stock = parseInt(card.dataset.stock); // Get the stock quantity from the data attribute
-console.log(stock);
+          console.log(stock);
           if (stock <= 0) {
             stockStatus.textContent = "Out of Stock";
             stockStatus.style.color = "red";
-            addToCartButton.disabled = true; // Disable add to cart button
+            addToCartButton.disabled = true;
+            addToCartButton.style.display = "none";
+          } else if (stock < 5) {
+            stockStatus.textContent = `Limited Stock (${stock} left)`;
+            stockStatus.style.color = "orange";
+          } else {
+            stockStatus.textContent = "In Stock";
+            stockStatus.style.color = "green";
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function() {
+        const productCards = document.querySelectorAll(".card-new"); // Select all product cards
+
+        productCards.forEach((card) => {
+          const stockStatus = card.querySelector(".stock-status-latest"); // Find the stock status element within the card
+          const addToCartButton = card.querySelector(".add-to-cart"); // Find the add-to-cart button within the card
+
+          const stock = parseInt(card.dataset.stock); // Get the stock quantity from the data attribute
+          console.log(stock);
+          if (stock <= 0) {
+            stockStatus.textContent = "Out of Stock";
+            stockStatus.style.color = "red";
+            addToCartButton.disabled = true;
             addToCartButton.style.display = "none";
           } else if (stock < 5) {
             stockStatus.textContent = `Limited Stock (${stock} left)`;
@@ -302,5 +433,100 @@ console.log(stock);
         });
       });
     </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        let isMenuOpen = false;
+
+        // Toggle mobile menu
+        mobileMenuButton.addEventListener('click', () => {
+          isMenuOpen = !isMenuOpen;
+          if (isMenuOpen) {
+            mobileMenu.classList.remove('hidden');
+            // Add slide-down animation
+            mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+          } else {
+            // Add slide-up animation
+            mobileMenu.style.maxHeight = '0';
+            setTimeout(() => {
+              mobileMenu.classList.add('hidden');
+            }, 300);
+          }
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+              behavior: 'smooth'
+            });
+          });
+        });
+
+        // Add shadow to header on scroll
+        window.addEventListener('scroll', () => {
+          const header = document.querySelector('nav');
+          if (window.scrollY > 0) {
+            header.classList.add('shadow-md');
+          } else {
+            header.classList.remove('shadow-md');
+          }
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        // Update stock status badges
+        document.querySelectorAll('.card').forEach(card => {
+          const stock = parseInt(card.dataset.stock);
+          const statusSpan = card.querySelector('.stock-status');
+
+          if (stock === 0) {
+            statusSpan.textContent = 'Out of Stock';
+            statusSpan.classList.add('out-of-stock');
+            card.style.opacity = '0.7';
+          } else if (stock <= 5) {
+            statusSpan.textContent = 'Low Stock';
+            statusSpan.classList.add('low-stock');
+          } else {
+            statusSpan.textContent = 'In Stock';
+            statusSpan.classList.add('in-stock');
+          }
+        });
+
+        // Smooth scroll for new arrivals container
+        const container = document.querySelector('.new-arrivals-container');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        container.addEventListener('mousedown', (e) => {
+          isDown = true;
+          container.style.cursor = 'grabbing';
+          startX = e.pageX - container.offsetLeft;
+          scrollLeft = container.scrollLeft;
+        });
+
+        container.addEventListener('mouseleave', () => {
+          isDown = false;
+          container.style.cursor = 'default';
+        });
+
+        container.addEventListener('mouseup', () => {
+          isDown = false;
+          container.style.cursor = 'default';
+        });
+
+        container.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          const x = e.pageX - container.offsetLeft;
+          const walk = (x - startX) * 2;
+          container.scrollLeft = scrollLeft - walk;
+        });
+      });
+    </script>
   </body>
+
 </html>
