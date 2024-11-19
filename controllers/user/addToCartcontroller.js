@@ -6,12 +6,9 @@ const createError = require('http-errors');
 // Function to add or update product in the cart
 const addToCart = async (req, res) => {
   try {
-  
-
     const productId = req.params.productId;
     const userId = req.session.userData._id;
 
-    
     // Find the product
     const product = await Product.findById(productId);
     if (!product) {
@@ -20,44 +17,53 @@ const addToCart = async (req, res) => {
 
     // Check product stock
     if (product.stock <= 0) {
-      // return res.status(400).json({ message: "Product out of stock" });
       return res.redirect("/add-to-cart");
     }
+
+    // Calculate effective price
+    const effectivePrice = (product.offerPrice && 
+                          product.offerPrice > 0 && 
+                          product.offerPrice < product.price) 
+                          ? product.offerPrice 
+                          : product.price;
 
     let cart = await Cart.findOne({ userId: userId });
 
     if (!cart) {
-      cart = new Cart({ userId, cartItems: [] });
+      cart = new Cart({ 
+        userId, 
+        cartItems: [] 
+      });
     }
 
-
-    const cartItemIndex = cart.cartItems.findIndex(item => item.product.toString() === productId);
+    const cartItemIndex = cart.cartItems.findIndex(item => 
+      item.product.toString() === productId
+    );
 
     if (cartItemIndex > -1) {
       if (cart.cartItems[cartItemIndex].quantity >= 5) {
-        // return res.status(400).json({ message: "Cannot add more than 5 of this product to the cart" });
         return res.redirect("/add-to-cart");
       }
 
-      // Check if adding one more item would exceed stock
       if (product.stock < cart.cartItems[cartItemIndex].quantity + 1) {
-        // return res.status(400).json({ message: "Not enough stock available" });
         return res.redirect("/add-to-cart");
       }
 
       cart.cartItems[cartItemIndex].quantity += 1;
+      cart.cartItems[cartItemIndex].price = effectivePrice; // Update price
     } else {
       if (product.stock < 1) {
-        // return res.status(400).json({ message: "Not enough stock available" });
         return res.redirect("/add-to-cart");
       }
 
-      cart.cartItems.push({ product: productId, quantity: 1 });
+      cart.cartItems.push({ 
+        product: productId, 
+        quantity: 1,
+        price: effectivePrice // Store effective price
+      });
     }
 
     await cart.save();
-
-    
     return res.redirect("/add-to-cart");
   } catch (error) {
     console.error("Error adding product to cart:", error);
@@ -98,7 +104,7 @@ const renderCartPage = async (req, res, next) => {
     const cart = await Cart.findOne({ userId: userId })
       .populate({
         path: "cartItems.product",
-        select: "product price image status stock"
+        select: "product price offerPrice image status stock"
       });
 
     if (!cart || !cart.cartItems.length) {
@@ -108,20 +114,30 @@ const renderCartPage = async (req, res, next) => {
       });
     }
 
-    // Filter out products that are either null or have status false
+    // Filter out products and calculate effective prices
     const filteredProducts = cart.cartItems.filter(item => 
       item.product && item.product.status === true
-    );
+    ).map(item => {
+      // Calculate effective price
+      const effectivePrice = (item.product.offerPrice && 
+                            item.product.offerPrice > 0 && 
+                            item.product.offerPrice < item.product.price) 
+                            ? item.product.offerPrice 
+                            : item.product.price;
 
-    const cartData = filteredProducts.map((item) => ({
-      product: item.product,
-      quantity: item.quantity
-    }));
+      return {
+        product: {
+          ...item.product.toObject(),
+          effectivePrice: effectivePrice // Add effective price to product object
+        },
+        quantity: item.quantity
+      };
+    });
 
     req.session.checkout = true;
     res.render("addtocart", { 
       fullName, 
-      products: cartData 
+      products: filteredProducts 
     });
   } catch (error) {
     console.error('Error rendering cart page:', error);
@@ -151,34 +167,45 @@ const checkout = (req, res) => {
 const updateCartQuantity = async (req, res) => {
   try {
     const productId = req.params.productId;
-    const { quantity } = req.body; // Get new quantity from request body
+    const { quantity } = req.body;
     const userId = req.session.userData._id;
-   
 
-    // Find the user's cart
     let cart = await Cart.findOne({ userId: userId });
-
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
 
-   
-
-    // Find the index of the product in the cart
-    const cartItemIndex = cart.cartItems.findIndex(item => item.product.toString() === productId.trimStart());
- 
+    const cartItemIndex = cart.cartItems.findIndex(item => 
+      item.product.toString() === productId.trimStart()
+    );
 
     if (cartItemIndex === -1) {
       return res.status(404).json({ message: "Product not found in cart" });
     }
 
-    // Update the quantity
-    cart.cartItems[cartItemIndex].quantity = quantity;
+    // Get the product to check current price/offer price
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
 
-    // Save the updated cart
+    // Calculate effective price
+    const effectivePrice = (product.offerPrice && 
+                          product.offerPrice > 0 && 
+                          product.offerPrice < product.price) 
+                          ? product.offerPrice 
+                          : product.price;
+
+    // Update quantity and price
+    cart.cartItems[cartItemIndex].quantity = quantity;
+    cart.cartItems[cartItemIndex].price = effectivePrice;
+
     await cart.save();
 
-    res.json({ message: "Quantity updated successfully" });
+    res.json({ 
+      message: "Quantity updated successfully",
+      effectivePrice: effectivePrice
+    });
   } catch (error) {
     console.error("Error updating quantity:", error);
     res.status(500).json({ message: "Internal Server Error" });

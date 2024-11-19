@@ -22,6 +22,10 @@ const mongoose = require("mongoose");
 
 const { sendOTP } = require("./helpers/otpService");
 
+// Add this near the top of app.js
+const EventEmitter = require('events');
+EventEmitter.defaultMaxListeners = 15; // or any higher number as needed
+
 // Define PORT with fallback
 const PORT = process.env.PORT || 3000;
 

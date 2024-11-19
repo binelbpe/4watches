@@ -33,9 +33,7 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <%- include('../layouts/header.ejs', { fullName: locals.fullName || null }) %>
-
-    <main class="container mx-auto px-4 py-8 max-w-4xl">
+    <main class="container mx-auto px-4 py-8 max-w-4xl min-h-screen flex items-center justify-center">
         <div class="bg-white rounded-xl shadow-lg p-8 border border-[#bca374]">
             <div class="text-center mb-8">
                 <img src="/images/logo.png" alt="4Watches Logo" class="h-16 mx-auto mb-6">
@@ -51,27 +49,12 @@
 
                 <% if (autoRedirect) { %>
                 <div class="countdown text-center mt-4" id="countdownContainer">
-                    Redirecting to orders in <span id="countdown" class="countdown-number">5</span> seconds...
+                    Redirecting in <span id="countdown" class="countdown-number">5</span> seconds...
                 </div>
                 <% } %>
-
-                <div class="flex justify-center space-x-4 mt-6">
-                    <a href="/checkout" 
-                       class="px-6 py-3 bg-[#bca374] text-white rounded-lg hover:bg-[#a38d64] transition-colors flex items-center">
-                        <i class="fas fa-redo mr-2"></i>
-                        Try Again
-                    </a>
-                    <a href="/add-to-cart" 
-                       class="px-6 py-3 border border-[#bca374] text-[#bca374] rounded-lg hover:bg-[#bca374] hover:text-white transition-colors flex items-center">
-                        <i class="fas fa-shopping-cart mr-2"></i>
-                        Return to Cart
-                    </a>
-                </div>
             </div>
         </div>
     </main>
-
-    <%- include('../layouts/footer.ejs', { fullName: locals.fullName || null }) %>
 
     <% if (autoRedirect) { %>
     <script>

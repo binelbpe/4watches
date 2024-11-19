@@ -5,24 +5,27 @@ const User = require("../../models/userModel");
 const Coupon = require("../../models/couponModel");
 
 const calculatePrices = (totalPrice, discountAmount = 0, walletAmount = 0) => {
-  // Convert all inputs to numbers and handle null/undefined cases
-  const baseAmount = parseFloat(totalPrice) || 0;
-  const discount = parseFloat(discountAmount) || 0;
-  const wallet = parseFloat(walletAmount) || 0;
-
-  // Calculate tax (5% of base amount)
+  // First, remove shipping from total price
+  const withoutShipping = parseFloat(totalPrice) - 45;
+  
+  // Then calculate base amount (removing 5% tax)
+  const baseAmount = withoutShipping / 1.05;
+  
+  // Calculate tax on base amount
   const tax = baseAmount * 0.05;
-
+  
   // Fixed shipping charge
   const shipping = 45;
 
-  // Apply discount
+  // Apply discount to base amount
+  const discount = parseFloat(discountAmount) || 0;
   const afterDiscount = baseAmount - discount;
 
-  // Add tax and shipping
+  // Calculate total after discount, then add tax and shipping
   const withTaxAndShipping = afterDiscount + tax + shipping;
 
-  // Apply wallet if used
+  // Handle wallet payment
+  const wallet = parseFloat(walletAmount) || 0;
   let walletUsed = 0;
   let finalAmount = withTaxAndShipping;
 
@@ -36,15 +39,14 @@ const calculatePrices = (totalPrice, discountAmount = 0, walletAmount = 0) => {
     }
   }
 
-  // Return all amounts formatted to 2 decimal places
   return {
-    baseAmount: baseAmount.toFixed(2),
-    tax: tax.toFixed(2),
-    shipping: shipping.toFixed(2),
-    discountAmount: discount.toFixed(2),
-    walletUsed: walletUsed.toFixed(2),
-    finalAmount: finalAmount.toFixed(2),
-    total: withTaxAndShipping.toFixed(2),
+    baseAmount: parseFloat(baseAmount.toFixed(2)),
+    tax: parseFloat(tax.toFixed(2)),
+    shipping,
+    discountAmount: parseFloat(discount.toFixed(2)),
+    walletUsed: parseFloat(walletUsed.toFixed(2)),
+    finalAmount: parseFloat(finalAmount.toFixed(2)),
+    total: parseFloat(withTaxAndShipping.toFixed(2))
   };
 };
 
@@ -58,15 +60,17 @@ const renderCheckoutPage = async (req, res) => {
       })
       .populate("wallet");
 
-    // Ensure totalPrice is a number
-    const totalPrice = parseFloat(req.session.totalPrice) || 0;
-    const prices = calculatePrices(totalPrice);
+    // Get cart total
+    const cartTotal = parseFloat(req.session.totalPrice) || 0;
+    
+    // Calculate prices correctly
+    const prices = calculatePrices(cartTotal);
 
     res.render("checkout", {
       addresses: user.addresses,
       tax: prices.tax,
       shipping: prices.shipping,
-      totalPrice: totalPrice,
+      totalPrice: cartTotal,
       baseAmount: prices.baseAmount,
       finalAmount: prices.finalAmount,
       fullName: req.session.userData.fullname,

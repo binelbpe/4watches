@@ -558,24 +558,19 @@
                   <td>-₹<%= prices.discountAmount %></td>
                 </tr>
               <% } %>
-              <% if(order[i].paymentMethod === "pay_by_wallet") { %>
-                <tr>
-                  <th>Paid from Wallet:</th>
-                  <td>₹<%= prices.walletAmount %></td>
-                </tr>
-              <% } else if(parseFloat(prices.walletAmount) > 0) { %>
+              <% if(order[i].paymentMethod === "pay_by_wallet" || order[i].paymentMethod === "wallet_and_online") { %>
                 <tr>
                   <th>Wallet Amount Used:</th>
                   <td>₹<%= prices.walletAmount %></td>
                 </tr>
               <% } %>
-              <% if(parseFloat(prices.reducedAmount) > 0 || parseFloat(prices.returnedAmount) > 0) { %>
+              <% if(order[i].paymentMethod === "pay_on_online" || order[i].paymentMethod === "wallet_and_online") { %>
                 <tr>
-                  <th>Refunded Amount:</th>
-                  <td>₹<%= (parseFloat(prices.reducedAmount) + parseFloat(prices.returnedAmount)).toFixed(2) %></td>
+                  <th>Online Payment:</th>
+                  <td>₹<%= prices.onlineAmount %></td>
                 </tr>
               <% } %>
-              <tr>
+              <tr class="font-weight-bold">
                 <th>Final Amount:</th>
                 <td>₹<%= prices.finalAmount %></td>
               </tr>
@@ -611,12 +606,12 @@
               confirmButtonText: 'Yes, change it!'
             }).then((result) => {
               if (result.isConfirmed) {
-                fetch('/admin/changeOrderStatus', {
+                fetch('/admin/order/change-status', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({ orderId: orderId, newStatus: newStatus })
+                  body: JSON.stringify({ orderId, newStatus })
                 })
                   .then(response => response.json())
                   .then(data => {
@@ -665,7 +660,7 @@
 
             if (result.isConfirmed) {
               try {
-                const response = await fetch(`/admin/cancelOrder/${orderId}`, {
+                const response = await fetch(`/admin/order/cancel/${orderId}`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'
@@ -713,7 +708,7 @@
 
             if (result.isConfirmed) {
               try {
-                const response = await fetch(`/admin/orders/cancel-product/${orderId}/${productId}`, {
+                const response = await fetch(`/admin/order/cancel-product/${orderId}/${productId}`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'
@@ -760,7 +755,7 @@
 
             if (result.isConfirmed) {
               try {
-                const response = await fetch(`/admin/orders/return-order/${orderId}`, {
+                const response = await fetch(`/admin/order/return/${orderId}`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'
@@ -808,7 +803,7 @@
 
             if (result.isConfirmed) {
               try {
-                const response = await fetch(`/admin/orders/return-product/${orderId}/${productId}`, {
+                const response = await fetch(`/admin/order/return-product/${orderId}/${productId}`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'

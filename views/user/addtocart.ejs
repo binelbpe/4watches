@@ -105,10 +105,10 @@
 
           <div class="product-price font-medium">
             <% if (item.product.offerPrice && item.product.offerPrice > 0 && item.product.offerPrice < item.product.price) { %>
-            <span class="block text-gray-400 line-through text-sm">₹<%= item.product.price.toFixed(2) %></span>
-            <span class="offer-price text-[#D4AF37]">₹<%= item.product.offerPrice.toFixed(2) %></span>
+              <span class="block text-gray-400 line-through text-sm original-price">₹<%= item.product.price.toFixed(2) %></span>
+              <span class="text-[#D4AF37] effective-price">₹<%= item.product.offerPrice.toFixed(2) %></span>
             <% } else { %>
-            ₹<%= item.product.price.toFixed(2) %>
+              <span class="effective-price">₹<%= item.product.price.toFixed(2) %></span>
             <% } %>
           </div>
 
@@ -119,7 +119,10 @@
           </div>
 
           <div class="product-line-price font-medium text-[#D4AF37]">
-            ₹<%= ((item.product.offerPrice || item.product.price) * item.quantity).toFixed(2) %>
+            <% const effectivePrice = (item.product.offerPrice && item.product.offerPrice > 0 && item.product.offerPrice < item.product.price) 
+                ? item.product.offerPrice 
+                : item.product.price %>
+            ₹<%= (effectivePrice * item.quantity).toFixed(2) %>
           </div>
 
           <div>
@@ -215,15 +218,17 @@
         $(".grid.grid-cols-7.gap-4.items-center").each(function() {
           var stock = parseInt($(this).data("stock"));
           if (stock > 0) {
-            let price;
-            if ($(this).find(".offer-price").length > 0) {
-              price = parseFloat($(this).find(".offer-price").text().replace('₹', ''));
-            } else {
-              price = parseFloat($(this).find(".product-price").text().replace('₹', ''));
-            }
-
+            // Get the effective price based on offer price logic
+            let effectivePrice;
+            const originalPrice = parseFloat($(this).find(".original-price").text().replace('₹', '')) || 0;
+            const offerPriceElement = $(this).find(".effective-price");
+            const offerPrice = parseFloat(offerPriceElement.text().replace('₹', ''));
+            
+            // Use offer price if it exists and is valid
+            effectivePrice = (offerPrice && offerPrice > 0 && offerPrice < originalPrice) ? offerPrice : originalPrice || offerPrice;
+            
             var quantity = parseInt($(this).find(".product-quantity input").val());
-            var linePrice = price * quantity;
+            var linePrice = effectivePrice * quantity;
             subtotal += linePrice;
           }
         });
@@ -238,6 +243,11 @@
         $("#cart-tax").html('₹' + tax.toFixed(2));
         $("#cart-shipping").html('₹' + shipping.toFixed(2));
         $("#cart-total").html('₹' + total.toFixed(2));
+
+        // Update hidden fields for checkout
+        $("#totalPrice").val(total);
+        $("#shipping").val(shipping);
+        $("#tax").val(tax);
 
         if (total == 0) {
           $(".checkout-btn").fadeOut(fadeTime);
@@ -430,35 +440,45 @@
 
       function updateQuantity(quantityInput) {
         const productRow = $(quantityInput).closest(".grid.grid-cols-7");
-        let price;
-        if (productRow.find(".offer-price").length > 0) {
-          price = parseFloat(productRow.find(".offer-price").text().replace('₹', ''));
-        } else {
-          price = parseFloat(productRow.find(".product-price").text().replace('₹', ''));
-        }
-        const quantity = $(quantityInput).val();
-        const linePrice = price * quantity;
+        
+        // Get the effective price based on offer price logic
+        let effectivePrice;
+        const originalPrice = parseFloat(productRow.find(".original-price").text().replace('₹', '')) || 0;
+        const offerPriceElement = productRow.find(".effective-price");
+        const offerPrice = parseFloat(offerPriceElement.text().replace('₹', ''));
+        
+        // Use offer price if it exists and is valid
+        effectivePrice = (offerPrice && offerPrice > 0 && offerPrice < originalPrice) ? offerPrice : originalPrice || offerPrice;
+        
+        const quantity = parseInt($(quantityInput).val());
+        const linePrice = effectivePrice * quantity;
 
+        // Update the line price display
         productRow.find(".product-line-price").fadeOut(fadeTime, function() {
           $(this).html('₹' + linePrice.toFixed(2));
           recalculateCart();
           $(this).fadeIn(fadeTime);
         });
 
-        // Get product ID and update backend
+        // Update backend
         const productId = productRow.find(".product-id").text().trim();
         fetch(`/update-cart-quantity/${productId}`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              quantity: quantity
-            })
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            quantity: quantity,
+            price: effectivePrice // Send the effective price to backend
           })
-          .then(response => response.json())
-          .then(data => console.log("Quantity updated successfully:", data))
-          .catch(error => console.error("Error updating quantity:", error));
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Quantity updated successfully:", data);
+          // Refresh the cart totals
+          recalculateCart();
+        })
+        .catch(error => console.error("Error updating quantity:", error));
       }
 
       // Quantity increment/decrement handlers
@@ -506,6 +526,9 @@
             });
           }
         });
+
+        // Initial calculation of cart totals
+        recalculateCart();
       });
     </script>
 

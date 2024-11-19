@@ -2,197 +2,194 @@ const Order = require("../../models/orderModel");
 const Product = require("../../models/productModel");
 const User = require("../../models/userModel");
 const mongoose = require("mongoose");
+const WalletHelper = require("../../utils/walletHelper");
 
 // Add this function at the top of the file
 function calculateOrderPrices(order) {
-  // Base subtotal (before tax and shipping)
-  const subtotal = order.grandTotalPrice - 45;
-  const baseAmount = subtotal / 1.05; // Remove 5% tax to get base amount
-  const tax = subtotal * 0.05; // 5% tax
-  const shipping = 45; // Fixed shipping
+  try {
+    // Calculate subtotal from products
+    const subtotal = order.products.reduce((sum, item) => {
+      return sum + (parseFloat(item.price) * parseInt(item.quantity));
+    }, 0);
 
-  // Discounts and wallet
-  const discountAmount = order.discountedAmount || 0;
-  const walletAmount = order.walletAmount || 0;
-  const reducedAmount = order.reducedPrice || 0;
-  const returnedAmount = order.returnedPrice || 0;
+    // Calculate tax
+    const tax = subtotal * 0.05; // 5% tax
+    
+    // Fixed shipping
+    const shipping = 45;
 
-  // Calculate final amount based on order status
-  let finalAmount = order.grandTotalPrice;
-  if (order.status === "cancelled" || order.status === "returned") {
-    finalAmount = 0;
-  } else {
-    finalAmount = finalAmount - discountAmount - reducedAmount - returnedAmount;
+    // Get other amounts
+    const discountAmount = parseFloat(order.couponDiscount || 0);
+    const walletAmount = parseFloat(order.walletAmountUsed || 0);
+    const onlineAmount = parseFloat(order.onlinePaymentAmount || 0);
+
+    // Calculate final amount based on order status
+    let finalAmount = 0;
+    if (order.status === "cancelled" || order.status === "returned") {
+      finalAmount = 0;
+    } else {
+      // Calculate total after discount
+      const afterDiscount = subtotal - discountAmount;
+      finalAmount = afterDiscount + tax + shipping;
+    }
+
+    return {
+      baseAmount: subtotal.toFixed(2),
+      tax: tax.toFixed(2),
+      shipping: shipping.toFixed(2),
+      discountAmount: discountAmount.toFixed(2),
+      walletAmount: walletAmount.toFixed(2),
+      onlineAmount: onlineAmount.toFixed(2),
+      finalAmount: finalAmount.toFixed(2)
+    };
+  } catch (error) {
+    console.error('Error calculating order prices:', error);
+    // Return default values in case of error
+    return {
+      baseAmount: "0.00",
+      tax: "0.00",
+      shipping: "45.00",
+      discountAmount: "0.00",
+      walletAmount: "0.00",
+      onlineAmount: "0.00",
+      finalAmount: "0.00"
+    };
   }
-
-  return {
-    baseAmount: baseAmount.toFixed(2),
-    tax: tax.toFixed(2),
-    shipping: shipping.toFixed(2),
-    discountAmount: discountAmount.toFixed(2),
-    walletAmount: walletAmount.toFixed(2),
-    reducedAmount: reducedAmount.toFixed(2),
-    returnedAmount: returnedAmount.toFixed(2),
-    finalAmount: finalAmount.toFixed(2),
-  };
 }
 
 //function to change order status
 const changeOrderStatus = async (req, res) => {
   try {
-    const { orderId } = req.body;
-    const newStatus = req.body.newStatus; // Admin can only set to completed
+    const { orderId, newStatus } = req.body;
 
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Check if the current order status is 'pending'
-    if (
-      order.status !== "pending" &&
-      order.status !== "Dispatched" &&
-      order.status !== "In Transit"
-    ) {
+    if (!["pending", "Dispatched", "In Transit", "completed"].includes(order.status)) {
       return res.status(400).json({
-        message:
-          "Order status can only be changed from 'pending' to 'completed'",
+        message: "Invalid status change requested"
       });
     }
 
-    // Set new status if the validation passes
+    // Update order status
     order.status = newStatus;
-
     order.products.forEach((product) => {
-      if (
-        product.status === "pending" ||
-        product.status === "Dispatched" ||
-        product.status === "In Transit"
-      ) {
+      if (["pending", "Dispatched", "In Transit"].includes(product.status)) {
         product.status = newStatus;
       }
     });
 
     await order.save();
 
-    res
-      .status(200)
-      .json({ message: "Order status updated successfully to completed" });
+    res.status(200).json({ 
+      success: true,
+      message: `Order status updated to ${newStatus}`
+    });
   } catch (err) {
-    console.error("Error updating order status", { error: err, orderId });
-    res.status(500).send("Internal Server Error");
+    console.error("Error updating order status:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to update order status"
+    });
   }
 };
 
 //function for cancel the order
 const cancelOrder = async (req, res) => {
-  const { orderId } = req.params;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
-    const order = await Order.findById(orderId);
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId)
+      .populate('products.product')
+      .populate('user')
+      .session(session);
+
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      throw new Error('Order not found');
     }
 
-    // Check if the order is already cancelled
-    if (order.status === "Cancelled") {
-      return res
-        .status(400)
-        .json({ success: false, message: "Order is already cancelled" });
+    if (order.status === 'cancelled') {
+      throw new Error('Order is already cancelled');
     }
 
-    // Check if the order is completed
-    if (order.status === "completed") {
-      return res.status(400).redirect("/orders");
+    if (order.status === 'completed') {
+      throw new Error('Completed orders cannot be cancelled');
     }
 
-    // Update order status to "Cancelled"
-    order.status = "cancelled";
-
-    order.products.forEach((product) => {
-      if (
-        product.status === "pending" ||
-        product.status === "Dispatched" ||
-        product.status === "In Transit"
-      ) {
-        product.status = "cancelled";
+    // Update order and product status
+    order.status = 'cancelled';
+    order.products.forEach(product => {
+      if (product.status === 'pending' || product.status === 'Dispatched' || product.status === 'In Transit') {
+        product.status = 'cancelled';
       }
     });
-
-    await order.save();
 
     // Restore product quantities
     await Promise.all(
       order.products.map(async (orderItem) => {
-        const product = await Product.findById(orderItem.product);
-        if (product) {
-          product.stock += orderItem.quantity;
-          await product.save();
+        if (orderItem.status === 'cancelled') {
+          await Product.findByIdAndUpdate(
+            orderItem.product._id,
+            { $inc: { stock: orderItem.quantity } },
+            { session }
+          );
         }
       })
     );
 
-    if (
-      order.paymentMethod !== "cash_on_delivery" &&
-      order.paymentMethod !== "pay_by_wallet"
-    ) {
-      const user = await User.findById(order.user).populate("wallet");
+    // Process refund if payment was made
+    if (order.paymentMethod !== 'cash_on_delivery') {
+      let refundAmount = 0;
 
-      if (!user || !user.wallet) {
-        return res.status(404).json({ error: "User or wallet not found" });
+      if (order.paymentMethod === 'pay_by_wallet') {
+        refundAmount = parseFloat(order.walletAmountUsed);
+      } else if (order.paymentMethod === 'pay_on_online') {
+        refundAmount = parseFloat(order.onlinePaymentAmount);
+      } else if (order.paymentMethod === 'wallet_and_online') {
+        refundAmount = parseFloat(order.walletAmountUsed) + parseFloat(order.onlinePaymentAmount);
       }
 
-      user.wallet.balance = (
-        parseFloat(user.wallet.balance) +
-        parseFloat(order.totalPrice) +
-        (order.walletAmount ? parseFloat(order.walletAmount) : 0) -
-        parseFloat(order.reducedPrice)
-      ).toFixed(2);
+      if (refundAmount > 0) {
+        await WalletHelper.processWalletTransaction(
+          order.user._id,
+          refundAmount,
+          'credit',
+          `Refund for cancelled order ${order._id}`,
+          session
+        );
 
-      // Add a new transaction to the wallet
-      user.wallet.transactions.push({
-        type: "credit",
-        amount:
-          parseFloat(order.totalPrice) +
-          (order.walletAmount ? parseFloat(order.walletAmount) : 0) -
-          parseFloat(order.reducedPrice),
-        description: `Order ${order._id} cancelled`,
-      });
-
-      // Save the updated wallet
-      await user.wallet.save();
-    } else if (order.paymentMethod == "pay_by_wallet") {
-      const user = await User.findById(order.user).populate("wallet");
-
-      if (!user || !user.wallet) {
-        return res.status(404).json({ error: "User or wallet not found" });
+        // Update order with refund information
+        order.totalRefunded = refundAmount;
+        order.refundBreakdown.push({
+          amount: refundAmount,
+          type: 'cancel',
+          date: new Date()
+        });
       }
-
-      user.wallet.balance =
-        user.wallet.balance + order.walletAmount - parseFloat(reducedPrice);
-
-      // Add a new transaction to the wallet
-      user.wallet.transactions.push({
-        type: "credit",
-        amount: order.walletAmount - parseFloat(reducedPrice),
-        description: `Order ${order._id} cancelled`,
-      });
-
-      // Save the updated wallet
-      await user.wallet.save();
     }
-    const user = await User.findById(order.user);
-    // const userId = req.session.userData._id;
-    // const fullName = req.session.userData.fullname;
-    const orders = await Order.find({ user: user._id })
-      .populate("address")
-      .populate("products.product")
-      .sort({ createdAt: -1 });
 
-    res.status(200).json({ message: "Order cancelled successfully" });
+    await order.save({ session });
+    await session.commitTransaction();
+
+    res.status(200).json({ 
+      success: true, 
+      message: 'Order cancelled successfully',
+      refundAmount: order.totalRefunded
+    });
+
   } catch (error) {
-    console.error("Error cancelling order:", error);
-    res.status(500).json({ message: "Internal server error" });
+    await session.abortTransaction();
+    console.error('Error cancelling order:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Error cancelling order' 
+    });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -203,52 +200,26 @@ const getOrdersWithPagination = async (req, res) => {
     const pageSize = parseInt(req.query.pageSize) || 10;
     const skip = (page - 1) * pageSize;
 
-    // Fetch orders with populated fields
     const orders = await Order.find()
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageSize)
       .populate({
         path: "user",
-        select: "fullname phone email", // Select only needed fields
+        select: "fullname phone email",
       })
       .populate({
         path: "products.product",
         select: "product price image status",
       })
       .populate("address")
-      .lean(); // Convert to plain JavaScript objects
-
-    // Validate and sanitize order data
-    const validatedOrders = orders.map((order) => ({
-      ...order,
-      user: order.user || {
-        fullname: "User Not Found",
-        phone: "N/A",
-        email: "N/A",
-      },
-      products: order.products.map((product) => ({
-        ...product,
-        product: product.product || {
-          product: "Product Not Available",
-          price: 0,
-          image: [],
-          status: false,
-        },
-      })),
-      address: order.address || {
-        address: "Address Not Available",
-        city: "N/A",
-        state: "N/A",
-        pincode: "N/A",
-      },
-    }));
+      .lean();
 
     const totalOrders = await Order.countDocuments();
     const totalPages = Math.ceil(totalOrders / pageSize);
 
     res.render("adminOrder", {
-      order: validatedOrders,
+      order: orders,
       currentPage: page,
       totalPages,
       calculateOrderPrices,
@@ -267,6 +238,7 @@ const cancelProductAsAdmin = async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId)
       .populate('products.product')
+      .populate('user')
       .session(session);
 
     if (!order) {
@@ -274,14 +246,17 @@ const cancelProductAsAdmin = async (req, res) => {
     }
 
     const productId = req.params.productId;
-    const orderProduct = order.products.find(p => p.product._id.toString() === productId);
+    const orderProduct = order.products.find(p => 
+      p.product._id.toString() === productId && 
+      (p.status === 'pending' || p.status === 'Dispatched' || p.status === 'In Transit')
+    );
 
-    if (!orderProduct || orderProduct.status !== 'pending') {
+    if (!orderProduct) {
       throw new Error('Product cannot be cancelled');
     }
 
-    // Calculate refund amount
-    const refundAmount = calculateRefundAmount(order, orderProduct);
+    // Calculate refund amount for this product
+    const refundAmount = await WalletHelper.calculateRefundAmount(order, orderProduct);
 
     // Update product stock
     await Product.findByIdAndUpdate(
@@ -293,50 +268,50 @@ const cancelProductAsAdmin = async (req, res) => {
     // Update product status
     orderProduct.status = 'cancelled';
 
-    // Check if this is the last active product
-    const remainingActiveProducts = order.products.filter(
-      p => p.status !== 'cancelled' && p.status !== 'returned'
-    );
-
-    // If this was the last active product, cancel the entire order
-    if (remainingActiveProducts.length === 0) {
-      order.status = 'cancelled';
-    }
-
     // Process refund if payment was made
     if (order.paymentMethod !== 'cash_on_delivery') {
-      const user = await User.findById(order.user)
-        .populate('wallet')
-        .session(session);
+      await WalletHelper.processWalletTransaction(
+        order.user._id,
+        refundAmount,
+        'credit',
+        `Refund for cancelled product in order ${order._id}`,
+        session
+      );
 
-      if (!user.wallet) {
-        throw new Error('User wallet not found');
-      }
-
-      // Update wallet balance with proper number formatting
-      const currentBalance = parseFloat(user.wallet.balance);
-      const newBalance = (currentBalance + parseFloat(refundAmount)).toFixed(2);
-      user.wallet.balance = newBalance;
-
-      // Add transaction record
-      user.wallet.transactions.push({
-        type: 'credit',
-        amount: parseFloat(refundAmount),
-        description: `Refund for cancelled product in order ${order._id} (by admin)`
+      // Update order refund information
+      order.totalRefunded = (parseFloat(order.totalRefunded || 0) + refundAmount).toFixed(2);
+      order.refundBreakdown.push({
+        amount: refundAmount,
+        type: 'cancel',
+        productId: orderProduct.product._id,
+        date: new Date()
       });
+    }
 
-      await user.wallet.save({ session });
+    // Check if all products are cancelled
+    const allCancelled = order.products.every(p => 
+      p.status === 'cancelled' || p.status === 'returned'
+    );
+    if (allCancelled) {
+      order.status = 'cancelled';
     }
 
     await order.save({ session });
     await session.commitTransaction();
 
-    res.redirect('/admin/orders');
+    res.status(200).json({
+      success: true,
+      message: 'Product cancelled successfully',
+      refundAmount
+    });
 
   } catch (error) {
     await session.abortTransaction();
     console.error('Error cancelling product:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Error cancelling product' 
+    });
   } finally {
     session.endSession();
   }
@@ -449,31 +424,30 @@ const returnProductAsAdmin = async (req, res) => {
 };
 
 // Helper function to calculate refund amount
-function calculateRefundAmount(order, orderProduct) {
-  // Get product price and quantity
-  const productTotal = orderProduct.product.price * orderProduct.quantity;
+function calculateRefundAmount(order, product = null) {
+  if (product) {
+    // For single product refund
+    const productTotal = product.price * product.quantity;
+    const productShare = productTotal / order.subtotal;
+    
+    // Calculate proportional amounts
+    const discountShare = order.couponDiscount * productShare;
+    const taxShare = (productTotal - discountShare) * 0.05;
+    
+    // Add shipping only if it's the last active product
+    const activeProducts = order.products.filter(p => 
+      p.status !== 'cancelled' && p.status !== 'returned'
+    ).length;
+    const shippingShare = activeProducts === 1 ? order.shipping : 0;
 
-  // Calculate proportional discount if any
-  let discountAmount = 0;
-  if (order.discountedAmount > 0) {
-    const orderSubtotal = order.products.reduce(
-      (total, p) => total + p.product.price * p.quantity,
-      0
-    );
-    discountAmount = order.discountedAmount * (productTotal / orderSubtotal);
+    return parseFloat((productTotal - discountShare + taxShare + shippingShare).toFixed(2));
   }
 
-  // Calculate tax on discounted amount
-  const afterDiscount = productTotal - discountAmount;
-  const tax = afterDiscount * 0.05;
-
-  // Add shipping fee only if it's the last/only product
-  const remainingProducts = order.products.filter(
-    (p) => p.status !== "cancelled" && p.status !== "returned"
-  ).length;
-  const shippingFee = remainingProducts === 1 ? 45 : 0;
-
-  return (afterDiscount + tax + shippingFee).toFixed(2);
+  // For full order refund
+  const subtotal = order.subtotal;
+  const tax = order.tax;
+  const shipping = order.shipping;
+  return parseFloat((subtotal + tax + shipping).toFixed(2));
 }
 
 // Function to handle full order return
@@ -581,11 +555,11 @@ function calculateReducedPrice(price, discountedAmount, totalPrice) {
 }
 
 module.exports = {
+  getOrdersWithPagination,
+  changeOrderStatus,
+  cancelOrder,
   returnOrder,
   returnProductAsAdmin,
   cancelProductAsAdmin,
-  cancelOrder,
-  getOrdersWithPagination,
-  changeOrderStatus,
-  calculateOrderPrices, // Add to exports
+  calculateOrderPrices,
 };

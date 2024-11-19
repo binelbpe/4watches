@@ -9,55 +9,22 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
     <style>
-        .brand-gradient {
-            background: linear-gradient(135deg, #bca374, #d4c4a1, #bca374, #d4c4a1);
-        }
-        .brand-color {
-            color: #bca374;
-        }
-        .brand-border {
-            border-color: #bca374;
-        }
-        .hover-brand:hover {
-            background-color: #bca374;
-            color: white;
-        }
-        .brand-bg {
-            background-color: #bca374;
-        }
+        .brand-color { color: #bca374; }
+        .brand-border { border-color: #bca374; }
+        .brand-bg { background-color: #bca374; }
     </style>
 </head>
 <body class="bg-gray-50">
-    <%- include('../layouts/header.ejs', { fullName: locals.fullName || null }) %>
-
     <main class="container mx-auto px-4 py-8 max-w-6xl min-h-screen flex items-center justify-center">
         <div class="bg-white rounded-xl shadow-lg p-8 border brand-border text-center max-w-2xl w-full">
-            <!-- Logo -->
             <div class="mb-6">
                 <img src="/images/logo.png" alt="4Watches Logo" class="h-16 mx-auto mb-4">
             </div>
 
-            <!-- 404 Message -->
             <h1 class="text-9xl font-bold brand-color mb-4">404</h1>
             <h2 class="text-4xl font-semibold text-gray-700 mb-4">Page Not Found</h2>
             <p class="text-gray-600 mb-8">The page you're looking for doesn't exist or has been moved.</p>
-
-            <!-- Action Buttons -->
-            <div class="flex justify-center space-x-4">
-                <a href="/" 
-                   class="px-6 py-3 brand-bg text-white rounded-lg hover-brand transition-colors flex items-center">
-                    <i class="fas fa-home mr-2"></i>
-                    Go Home
-                </a>
-                <button onclick="history.back()" 
-                        class="px-6 py-3 border brand-border brand-color rounded-lg hover-brand transition-colors flex items-center">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    Go Back
-                </button>
-            </div>
         </div>
     </main>
-
-    <%- include('../layouts/footer.ejs', { fullName: locals.fullName || null }) %>
 </body>
 </html> 

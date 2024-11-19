@@ -110,33 +110,31 @@
       <div class="row mt-4">
         <div class="col-md-6">
           <h2 class="section-title">Order Summary</h2>
+          <input type="hidden" id="originalTotalPrice" value="<%= totalPrice %>">
+          
           <div class="summary-item">
             <span>Wallet Balance:</span>
-            <span id="walletBalance">
-              <%= walletBalance.toFixed(0) %>
-            </span>
+            <span id="walletBalance"><%= walletBalance.toFixed(0) %></span>
           </div>
           <div class="summary-item">
-            <span>Discounted Amount:</span>
+            <span>Subtotal:</span>
+            <span id="subtotal"><%= ((totalPrice - 45) / 1.05).toFixed(2) %></span>
+          </div>
+          <div class="summary-item">
+            <span>Discount:</span>
             <span id="discountedAmount">0.00</span>
           </div>
           <div class="summary-item">
-            <span>Tax:</span>
-            <span>
-              <%= tax %>
-            </span>
+            <span>Tax (5%):</span>
+            <span id="tax"><%= (((totalPrice - 45) / 1.05) * 0.05).toFixed(2) %></span>
           </div>
           <div class="summary-item">
             <span>Shipping:</span>
-            <span>
-              <%= shipping %>
-            </span>
+            <span id="shipping">45.00</span>
           </div>
           <div class="summary-item font-weight-bold">
             <span>Total Price:</span>
-            <span id="totalPrice">
-              <%= totalPrice %>
-            </span>
+            <span id="totalPrice"><%= totalPrice %></span>
           </div>
         </div>
 
@@ -272,55 +270,50 @@
 
       useWalletCheckbox.addEventListener('change', function () {
         const totalPrice = parseFloat(totalPriceElement.textContent);
+        const walletBalanceElement = document.getElementById('walletBalance');
+        const paymentMethodSelect = document.getElementById('paymentMethod');
 
         if (this.checked) {
-          const remainingAmount = Math.max(0, totalPrice - currentWalletBalance);
+          // Calculate how much of the wallet balance will be used
+          const walletAmountToUse = Math.min(currentWalletBalance, totalPrice);
+          const remainingAmount = totalPrice - walletAmountToUse;
+          
+          // Update displays
           totalPriceElement.textContent = remainingAmount.toFixed(2);
-          walletBalanceElement.textContent = currentWalletBalance - (totalPrice - remainingAmount);
+          const remainingWalletBalance = currentWalletBalance - walletAmountToUse;
+          walletBalanceElement.textContent = remainingWalletBalance.toFixed(2);
 
+          // Handle payment method selection
           if (remainingAmount === 0) {
+            // If wallet covers entire amount
             paymentMethodSelect.value = 'pay_by_wallet';
             paymentMethodSelect.disabled = true;
             checkoutButton.disabled = false;
           } else {
+            // If partial wallet payment
+            paymentMethodSelect.value = 'pay_on_online'; // Default to online payment
             paymentMethodSelect.disabled = false;
+            
+            // Hide cash on delivery option for partial wallet payments
+            const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
+            cashOnDeliveryOption.style.display = 'none';
           }
 
-          const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
-          const onlinePaymentOption = paymentMethodSelect.querySelector('option[value="pay_on_online"]');
-
-          if (shouldHideCashOnDelivery()) {
-            cashOnDeliveryOption.style.display = 'none';
-            if (currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
-              onlinePaymentOption.style.display = 'block';
-            }
-          } else {
-            cashOnDeliveryOption.style.display = 'none';
-            onlinePaymentOption.style.display = 'block';
-          }
         } else {
-          paymentMethodSelect.value = ''; // Reset the payment method value
+          // Reset everything when unchecking wallet usage
+          paymentMethodSelect.value = '';
           totalPriceElement.textContent = '<%= totalPrice %>';
           walletBalanceElement.textContent = initialWalletBalance;
           paymentMethodSelect.disabled = false;
-          if (shouldHideCashOnDelivery()) {
-            cashOnDeliveryOption.style.display = 'none';
-            if (currentWalletBalance !== 0 && discountedAmount > currentWalletBalance) {
-              onlinePaymentOption.style.display = 'block';
-            }
-          } else {
-            cashOnDeliveryOption.style.display = 'none';
-            onlinePaymentOption.style.display = 'block';
-          }
-          if (parseFloat(totalPriceElement.textContent) > 0) {
-            checkoutButton.disabled = false;
-          }
           currentWalletBalance = parseFloat(initialWalletBalance);
 
+          // Show all payment options again
           const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
           const onlinePaymentOption = paymentMethodSelect.querySelector('option[value="pay_on_online"]');
-
-          cashOnDeliveryOption.style.display = 'block';
+          
+          if (parseFloat(totalPriceElement.textContent) <= 1000) {
+            cashOnDeliveryOption.style.display = 'block';
+          }
           onlinePaymentOption.style.display = 'block';
         }
       });
@@ -373,41 +366,10 @@
         const clearCouponBtn = document.getElementById("clearCouponBtn");
         const couponInput = document.getElementById("coupon");
         const couponMessage = document.getElementById("couponMessage");
-        const discountedAmount = document.getElementById("discountedAmount");
-        const totalPrice = document.getElementById("totalPrice");
 
-        applyCouponBtn.addEventListener("click", applyCoupon);
-        clearCouponBtn.addEventListener("click", clearCoupon);
-
-        // Listen for changes in the coupon input field
-        couponInput.addEventListener("input", function () {
-          // If the coupon input field is empty, reset the product price details and show the "Apply Coupon" button
-          if (!couponInput.value.trim()) {
-            resetProductPriceDetails();
-            showApplyCouponBtn();
-          }
-        });
-
-        function clearCoupon() {
-          couponInput.value = "";
-          resetProductPriceDetails();
-          showApplyCouponBtn();
-          couponMessage.style.display = "none"; // Hide the coupon message
-        }
-
-        function showApplyCouponBtn() {
-          applyCouponBtn.style.display = "inline-block";
-          clearCouponBtn.style.display = "none";
-        }
-
-        function showClearCouponBtn() {
-          applyCouponBtn.style.display = "none";
-          clearCouponBtn.style.display = "inline-block";
-        }
-
+        // Apply Coupon Function
         async function applyCoupon() {
-          const couponCode = document.getElementById("coupon").value.trim();
-          const couponMessage = document.getElementById("couponMessage");
+          const couponCode = couponInput.value.trim();
 
           if (!couponCode) {
             showMessage("Please enter a coupon code", "error");
@@ -432,95 +394,75 @@
               showMessage(data.message, "success");
 
               // Update UI
-              document.getElementById("coupon").disabled = true;
-              document.getElementById("applyCouponBtn").style.display = "none";
-              document.getElementById("clearCouponBtn").style.display = "inline-block";
+              couponInput.disabled = true;
+              applyCouponBtn.style.display = "none";
+              clearCouponBtn.style.display = "inline-block";
 
               // Update hidden inputs
               document.getElementById("discountedAmountInput").value = data.discountAmount;
               document.getElementById("totalPriceInput").value = data.discountedTotalPrice;
 
-              // Hide any previous error messages
-              couponMessage.style.display = "none";
-
               // Update payment options
               updatePaymentOptions();
             } else {
-              showMessage(data.message, "error");
-              resetCoupon();
+              showMessage(data.message || "Invalid coupon code", "error");
+              // Reset coupon input but keep the entered code
+              couponInput.disabled = false;
+              applyCouponBtn.style.display = "inline-block";
+              clearCouponBtn.style.display = "none";
             }
           } catch (error) {
             console.error("Error:", error);
-            showMessage("Error applying coupon", "error");
-            resetCoupon();
+            showMessage("Error applying coupon. Please try again.", "error");
+            // Reset coupon input but keep the entered code
+            couponInput.disabled = false;
+            applyCouponBtn.style.display = "inline-block";
+            clearCouponBtn.style.display = "none";
           }
         }
 
-        function updatePriceDisplay(discountAmount, discountedTotalPrice) {
-          const elements = {
-            discountedAmount: document.getElementById("discountedAmount"),
-            totalPrice: document.getElementById("totalPrice"),
-            tax: document.getElementById("tax"),
-            shipping: document.getElementById("shipping")
-          };
-
-          // Update displayed values
-          elements.discountedAmount.textContent = discountAmount.toFixed(2);
-          elements.totalPrice.textContent = discountedTotalPrice.toFixed(2);
-
-          // Calculate new tax based on discounted price
-          const newTax = discountedTotalPrice * 0.05;
-          elements.tax.textContent = newTax.toFixed(2);
-
-          // Update final total
-          const finalTotal = discountedTotalPrice + newTax + parseFloat(elements.shipping.textContent);
-          document.getElementById("finalTotal").textContent = finalTotal.toFixed(2);
-        }
-
+        // Show Message Function with improved styling
         function showMessage(message, type) {
-          const couponMessage = document.getElementById("couponMessage");
-
-          // Clear any existing messages
-          couponMessage.textContent = "";
-
-          // Set new message
           couponMessage.textContent = message;
           couponMessage.style.display = "block";
-
-          // Update message style based on type
-          if (type === 'success') {
-            couponMessage.className = 'alert alert-success';
-            // Hide message after 3 seconds for success messages
+          couponMessage.style.padding = "10px";
+          couponMessage.style.marginTop = "10px";
+          couponMessage.style.borderRadius = "4px";
+          
+          if (type === "success") {
+            couponMessage.style.backgroundColor = "#d4edda";
+            couponMessage.style.color = "#155724";
+            couponMessage.style.border = "1px solid #c3e6cb";
             setTimeout(() => {
               couponMessage.style.display = "none";
             }, 3000);
           } else {
-            couponMessage.className = 'alert alert-danger';
+            couponMessage.style.backgroundColor = "#f8d7da";
+            couponMessage.style.color = "#721c24";
+            couponMessage.style.border = "1px solid #f5c6cb";
           }
         }
 
-        function resetCoupon() {
-          const couponInput = document.getElementById("coupon");
-          const applyCouponBtn = document.getElementById("applyCouponBtn");
-          const clearCouponBtn = document.getElementById("clearCouponBtn");
-          const couponMessage = document.getElementById("couponMessage");
+        // Add event listeners
+        applyCouponBtn.addEventListener("click", applyCoupon);
+        clearCouponBtn.addEventListener("click", clearCoupon);
 
-          // Reset input and buttons
-          couponInput.value = "";
-          couponInput.disabled = false;
-          applyCouponBtn.style.display = "inline-block";
-          clearCouponBtn.style.display = "none";
-
-          // Clear any messages
-          couponMessage.style.display = "none";
-          couponMessage.textContent = "";
-
-          // Reset prices to original values
-          const originalPrice = parseFloat(document.getElementById("originalTotalPrice").value);
-          updatePriceDisplay(0, originalPrice);
-        }
+        // Listen for changes in the coupon input field
+        couponInput.addEventListener("input", function () {
+          couponMessage.style.display = "none"; // Hide any previous messages
+          if (!this.value.trim()) {
+            applyCouponBtn.style.display = "inline-block";
+            clearCouponBtn.style.display = "none";
+            
+            // Reset to original price if input is cleared
+            const originalTotalPrice = document.getElementById("originalTotalPrice").value;
+            updatePriceDisplay(0, parseFloat(originalTotalPrice));
+          }
+        });
       });
+    </script>
 
+    <script>
       function updateProductPriceDetails(discountAmount, discountedTotalPrice) {
         const discountedAmountElement = document.getElementById("discountedAmount");
         const totalPriceElement = document.getElementById("totalPrice");
@@ -555,56 +497,44 @@
 
 
       function submitForm() {
-        const totalPriceInput = document.getElementById("totalPriceInput");
-        const discountedAmountInput = document.getElementById("discountedAmountInput");
-        const totalPrice = document.getElementById("totalPrice").textContent;
-        const discountedAmount = document.getElementById("discountedAmount").textContent;
-        const paymentMethod = document.getElementById("paymentMethod").value;
-        const coupon = document.getElementById("coupon").value;
+        const totalPrice = parseFloat(document.getElementById("totalPrice").textContent);
         const useWallet = document.getElementById("useWalletCheckbox").checked;
-
-        // Check if the payment method is selected
+        const walletBalance = parseFloat(document.getElementById("walletBalance").textContent);
+        const paymentMethod = document.getElementById("paymentMethod").value;
+        
+        // Validate payment method selection
         if (paymentMethod === "") {
           swal("Please select a payment method.", "", "warning");
           return;
         }
 
         // Validate cash on delivery limit
-        if (paymentMethod === 'cash_on_delivery' && parseFloat(totalPrice) > 1000) {
+        if (paymentMethod === 'cash_on_delivery' && totalPrice > 1000) {
           swal("Cash on delivery not available for orders above ₹1000", "", "warning");
           return;
         }
 
-        // Create form data
         const form = document.querySelector("form[action='/checkout/place-order']");
         if (!form) {
           console.error('Form not found');
           return;
         }
 
-        // Add payment method
-        const paymentMethodInput = document.createElement("input");
-        paymentMethodInput.setAttribute("type", "hidden");
-        paymentMethodInput.setAttribute("name", "paymentMethod");
-        paymentMethodInput.setAttribute("value", paymentMethod);
-        form.appendChild(paymentMethodInput);
+        // Add payment details to form
+        const formData = new FormData(form);
+        formData.append("paymentMethod", paymentMethod);
+        formData.append("useWallet", useWallet);
+        formData.append("walletAmountUsed", useWallet ? Math.min(walletBalance, parseFloat('<%= totalPrice %>')) : 0);
+        formData.append("remainingAmount", totalPrice);
 
-        // Add wallet usage
-        const useWalletInput = document.createElement("input");
-        useWalletInput.setAttribute("type", "hidden");
-        useWalletInput.setAttribute("name", "useWallet");
-        useWalletInput.setAttribute("value", useWallet);
-        form.appendChild(useWalletInput);
-
-        // Add other details
-        totalPriceInput.value = totalPrice;
-        discountedAmountInput.value = discountedAmount;
-
-        const couponInput = document.createElement("input");
-        couponInput.setAttribute("type", "hidden");
-        couponInput.setAttribute("name", "coupon");
-        couponInput.setAttribute("value", coupon);
-        form.appendChild(couponInput);
+        // Convert FormData to hidden inputs
+        for (let [key, value] of formData.entries()) {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        }
 
         // Submit the form
         form.submit();
@@ -619,12 +549,14 @@
         const coupon = document.getElementById("coupon").value;
         const amount = document.getElementById('totalPrice').textContent;
         const discountedAmount = document.getElementById("discountedAmount").textContent;
+        const useWallet = document.getElementById("useWalletCheckbox").checked;
 
         // Create the orderRazerpay object
         const orderRazerpay = {
           amount,
           coupon,
           discountedAmount,
+          useWallet: useWallet.toString()
         };
 
 
@@ -762,8 +694,154 @@
       }
     </script>
 
+    <script>
+      // Add the missing updatePaymentOptions function
+      function updatePaymentOptions() {
+        const totalPrice = parseFloat(document.getElementById("totalPrice").textContent);
+        const paymentMethodSelect = document.getElementById("paymentMethod");
+        const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
+        const cashOnDeliveryError = document.getElementById("cashOnDeliveryError");
+        const useWalletCheckbox = document.getElementById("useWalletCheckbox");
+        const walletBalance = parseFloat(document.getElementById("walletBalance").textContent);
+        const walletOption = paymentMethodSelect.querySelector('option[value="pay_by_wallet"]');
+
+        // Handle cash on delivery option
+        if (totalPrice > 1000 || useWalletCheckbox.checked) {
+          cashOnDeliveryOption.disabled = true;
+          cashOnDeliveryOption.style.display = 'none';
+          if (totalPrice > 1000) {
+            cashOnDeliveryError.style.display = 'block';
+          }
+          
+          // Reset to online payment if COD was selected
+          if (paymentMethodSelect.value === 'cash_on_delivery') {
+            paymentMethodSelect.value = 'pay_on_online';
+          }
+        } else {
+          cashOnDeliveryOption.disabled = false;
+          cashOnDeliveryOption.style.display = 'block';
+          cashOnDeliveryError.style.display = 'none';
+        }
+
+        // Handle wallet payment option
+        if (useWalletCheckbox.checked) {
+          if (walletBalance >= totalPrice) {
+            // Full wallet payment
+            walletOption.hidden = false;
+            paymentMethodSelect.value = 'pay_by_wallet';
+            paymentMethodSelect.disabled = true;
+          } else if (walletBalance > 0) {
+            // Partial wallet payment
+            walletOption.hidden = true;
+            paymentMethodSelect.value = 'pay_on_online';
+            paymentMethodSelect.disabled = false;
+            cashOnDeliveryOption.style.display = 'none';
+          }
+        } else {
+          // No wallet payment
+          walletOption.hidden = true;
+          paymentMethodSelect.disabled = false;
+        }
+      }
     </script>
 
+    <script>
+      // Add this function to handle clearing the coupon
+      function clearCoupon() {
+        // Get elements
+        const couponInput = document.getElementById("coupon");
+        const applyCouponBtn = document.getElementById("applyCouponBtn");
+        const clearCouponBtn = document.getElementById("clearCouponBtn");
+        const couponMessage = document.getElementById("couponMessage");
+        const originalTotalPrice = document.getElementById("originalTotalPrice").value;
+
+        // Reset coupon input
+        couponInput.value = "";
+        couponInput.disabled = false;
+
+        // Show apply button, hide clear button
+        applyCouponBtn.style.display = "inline-block";
+        clearCouponBtn.style.display = "none";
+
+        // Clear any messages
+        couponMessage.style.display = "none";
+        couponMessage.textContent = "";
+
+        // Reset prices to original values
+        updatePriceDisplay(0, parseFloat(originalTotalPrice));
+
+        // Reset hidden inputs
+        document.getElementById("discountedAmountInput").value = "0";
+        document.getElementById("totalPriceInput").value = originalTotalPrice;
+
+        // Update payment options
+        updatePaymentOptions();
+      }
+
+      // Update the DOMContentLoaded event listener to add the clear coupon button handler
+      document.addEventListener("DOMContentLoaded", function () {
+        const applyCouponBtn = document.getElementById("applyCouponBtn");
+        const clearCouponBtn = document.getElementById("clearCouponBtn");
+        const couponInput = document.getElementById("coupon");
+
+        applyCouponBtn.addEventListener("click", applyCoupon);
+        clearCouponBtn.addEventListener("click", clearCoupon);
+
+        // Listen for changes in the coupon input field
+        couponInput.addEventListener("input", function () {
+          if (!couponInput.value.trim()) {
+            resetProductPriceDetails();
+            applyCouponBtn.style.display = "inline-block";
+            clearCouponBtn.style.display = "none";
+          }
+        });
+      });
+    </script>
+
+    <script>
+      // Add this function to update price display
+      function updatePriceDisplay(discountAmount, discountedTotalPrice) {
+        // Get all the price elements
+        const subtotalElement = document.getElementById("subtotal");
+        const discountedAmountElement = document.getElementById("discountedAmount");
+        const taxElement = document.getElementById("tax");
+        const totalPriceElement = document.getElementById("totalPrice");
+        
+        // Convert discountedTotalPrice to number if it's a string
+        const newTotal = parseFloat(discountedTotalPrice);
+        
+        // Calculate new subtotal (reverse engineer from total)
+        const newSubtotal = ((newTotal - 45) / 1.05).toFixed(2);
+        
+        // Calculate new tax
+        const newTax = (newSubtotal * 0.05).toFixed(2);
+        
+        // Update the display elements
+        subtotalElement.textContent = newSubtotal;
+        discountedAmountElement.textContent = discountAmount.toFixed(2);
+        taxElement.textContent = newTax;
+        totalPriceElement.textContent = newTotal.toFixed(2);
+        
+        // Update hidden inputs
+        document.getElementById("discountedAmountInput").value = discountAmount;
+        document.getElementById("totalPriceInput").value = newTotal;
+        
+        // Update payment options based on new total
+        updatePaymentOptions();
+        
+        // If using wallet, update the wallet display
+        const useWalletCheckbox = document.getElementById("useWalletCheckbox");
+        if (useWalletCheckbox.checked) {
+          const walletBalance = parseFloat(document.getElementById("walletBalance").textContent);
+          const remainingAmount = Math.max(0, newTotal - walletBalance);
+          if (remainingAmount === 0) {
+            document.getElementById("paymentMethod").value = 'pay_by_wallet';
+            document.getElementById("paymentMethod").disabled = true;
+          }
+          document.getElementById("totalPrice").textContent = remainingAmount.toFixed(2);
+        }
+      }
+    </script>
 
 </body>
 

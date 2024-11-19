@@ -74,28 +74,29 @@ router.get(
   orderManagement.getOrdersWithPagination
 );
 router.post(
-  "/changeOrderStatus",
+  "/order/change-status",
   adminAuth.isLogin,
   orderManagement.changeOrderStatus
 );
 router.get("/logout", adminController.adminLogout);
 router.post(
-  "/cancelOrder/:orderId",
+  "/order/cancel/:orderId",
   adminAuth.isLogin,
   orderManagement.cancelOrder
 );
 router.post(
-  "/orders/return-order/:orderId",
+  "/order/return/:orderId",
   adminAuth.isLogin,
   orderManagement.returnOrder
 );
 router.post(
-  "/orders/return-product/:orderId/:productId",
+  "/order/return-product/:orderId/:productId",
   adminAuth.isLogin,
   orderManagement.returnProductAsAdmin
 );
 router.post(
-  "/orders/cancel-product/:orderId/:productId",
+  "/order/cancel-product/:orderId/:productId",
+  adminAuth.isLogin,
   orderManagement.cancelProductAsAdmin
 );
 

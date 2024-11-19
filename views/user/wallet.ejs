@@ -49,10 +49,10 @@
         <div>
           <p class="text-sm opacity-80">Available Balance</p>
           <h2 class="text-4xl font-bold">
-            ₹ <% if (wallet && wallet.balance !== undefined) { %>
-            <%= wallet.balance.toFixed(2) %>
+            ₹ <% if (wallet && typeof wallet.balance !== 'undefined') { %>
+              <%= parseFloat(wallet.balance).toFixed(2) %>
             <% } else { %>
-            0.00
+              0.00
             <% } %>
           </h2>
         </div>
@@ -119,7 +119,7 @@
             </div>
             <div class="text-right">
               <p class="font-medium <%= transaction.type === 'credit' ? 'text-green-600' : 'text-red-600' %>">
-                <%= transaction.type === 'credit' ? '+' : '-' %>₹<%= transaction.amount %>
+                <%= transaction.type === 'credit' ? '+' : '-' %>₹<%= parseFloat(transaction.amount).toFixed(2) %>
               </p>
             </div>
           </div>
