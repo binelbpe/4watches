@@ -1,539 +1,588 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>4WATCHES Admin - User Management</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    
-    <style>
-      :root {
-        --primary-color: #bca374;
-        --primary-dark: #a68b5b;
-        --secondary-color: #2c3e50;
-        --light-bg: #f8f9fa;
-      }
 
-      body {
-        background-color: var(--light-bg);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      }
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4WATCHES Admin - User Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-      /* Sidebar Styling */
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SweetAlert2 -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #bca374;
+      --primary-dark: #a68b5b;
+      --secondary-color: #2c3e50;
+      --light-bg: #f8f9fa;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Sidebar Styling */
+    #sidebar {
+      background: var(--secondary-color);
+      min-width: 250px;
+      max-width: 250px;
+      min-height: 100vh;
+      transition: all 0.3s;
+    }
+
+    #sidebar .sidebar-header {
+      padding: 15px;
+      background: var(--primary-color);
+      display: flex;
+      align-items: center;
+    }
+
+    #sidebar ul li a {
+      padding: 10px 20px;
+      display: block;
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    #sidebar ul li a:hover {
+      background: var(--primary-color);
+    }
+
+    #sidebar ul li.active>a {
+      background: var(--primary-color);
+    }
+
+    /* Navbar Styling */
+    .admin-navbar {
+      background-color: var(--primary-color);
+      padding: 15px 0;
+    }
+
+    .navbar-logo {
+      height: 40px;
+      width: auto;
+      border-radius: 5px;
+    }
+
+    .sidebar-logo {
+      height: 45px;
+      width: auto;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    /* Table Styling */
+    .table-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin: 20px;
+    }
+
+    .table {
+      margin-bottom: 0;
+    }
+
+    .table thead th {
+      background-color: var(--light-bg);
+      border-bottom: 2px solid var(--primary-color);
+      color: var(--secondary-color);
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(188, 163, 116, 0.1);
+    }
+
+    /* Button Styling */
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      border-color: #dc3545;
+    }
+
+    /* Pagination Styling */
+    .pagination .page-link {
+      color: var(--primary-color);
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    /* Status Styling */
+    .status-blocked {
+      color: #dc3545;
+      font-weight: 500;
+    }
+
+    .status-active {
+      color: #28a745;
+      font-weight: 500;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
       #sidebar {
-        background: var(--secondary-color);
-        min-width: 250px;
-        max-width: 250px;
-        min-height: 100vh;
-        transition: all 0.3s;
+        margin-left: -250px;
       }
 
-      #sidebar .sidebar-header {
-        padding: 15px;
-        background: var(--primary-color);
-        display: flex;
-        align-items: center;
+      #sidebar.active {
+        margin-left: 0;
       }
 
-      #sidebar ul li a {
-        padding: 10px 20px;
-        display: block;
-        color: #fff;
-        text-decoration: none;
-        transition: all 0.3s;
-      }
-
-      #sidebar ul li a:hover {
-        background: var(--primary-color);
-      }
-
-      #sidebar ul li.active > a {
-        background: var(--primary-color);
-      }
-
-      /* Navbar Styling */
-      .admin-navbar {
-        background-color: var(--primary-color);
-        padding: 15px 0;
-      }
-
-      .navbar-logo {
-        height: 40px;
-        width: auto;
-        border-radius: 5px;
-      }
-
-      .sidebar-logo {
-        height: 45px;
-        width: auto;
-        border-radius: 5px;
-        margin-right: 10px;
-      }
-
-      /* Table Styling */
       .table-container {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        padding: 20px;
-        margin: 20px;
+        margin: 10px;
+        padding: 10px;
       }
+    }
 
-      .table {
-        margin-bottom: 0;
-      }
+    /* Add these to your existing styles */
+    .info-section {
+      background: var(--light-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
 
-      .table thead th {
-        background-color: var(--light-bg);
-        border-bottom: 2px solid var(--primary-color);
-        color: var(--secondary-color);
-      }
+    .section-title {
+      color: var(--secondary-color);
+      font-weight: 600;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
 
-      .table tbody tr:hover {
-        background-color: rgba(188, 163, 116, 0.1);
-      }
+    .address-card {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      height: 100%;
+    }
 
-      /* Button Styling */
-      .btn-success {
-        background-color: #28a745;
-        border-color: #28a745;
-      }
+    .transaction-table th {
+      background-color: var(--light-bg);
+      color: var(--secondary-color);
+      font-weight: 600;
+    }
 
-      .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-      }
+    .badge {
+      padding: 0.5em 1em;
+      border-radius: 50px;
+    }
 
-      /* Pagination Styling */
-      .pagination .page-link {
-        color: var(--primary-color);
-      }
+    .modal-dialog-scrollable .modal-body {
+      max-height: 70vh;
+      overflow-y: auto;
+    }
 
-      .pagination .page-item.active .page-link {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        color: white;
-      }
-
-      /* Status Styling */
-      .status-blocked {
-        color: #dc3545;
-        font-weight: 500;
-      }
-
-      .status-active {
-        color: #28a745;
-        font-weight: 500;
-      }
-
-      /* Responsive Adjustments */
-      @media (max-width: 768px) {
-        #sidebar {
-          margin-left: -250px;
-        }
-        #sidebar.active {
-          margin-left: 0;
-        }
-        .table-container {
-          margin: 10px;
-          padding: 10px;
-        }
-      }
-
-      /* Add these to your existing styles */
+    @media (max-width: 768px) {
       .info-section {
-        background: var(--light-bg);
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-      }
-
-      .section-title {
-        color: var(--secondary-color);
-        font-weight: 600;
-        border-bottom: 2px solid var(--primary-color);
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-      }
-
-      .address-card {
-        background: white;
-        border: 1px solid rgba(0,0,0,0.1);
-        border-radius: 8px;
         padding: 1rem;
-        height: 100%;
       }
 
-      .transaction-table th {
-        background-color: var(--light-bg);
-        color: var(--secondary-color);
-        font-weight: 600;
+      .transaction-table {
+        font-size: 0.875rem;
       }
+    }
+  </style>
+</head>
 
-      .badge {
-        padding: 0.5em 1em;
-        border-radius: 50px;
-      }
-
-      .modal-dialog-scrollable .modal-body {
-        max-height: 70vh;
-        overflow-y: auto;
-      }
-
-      @media (max-width: 768px) {
-        .info-section {
-          padding: 1rem;
-        }
-        
-        .transaction-table {
-          font-size: 0.875rem;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar admin-navbar">
-      <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="#">
-          <img src="/images/logo.png" alt="4WATCHES Logo" class="navbar-logo me-2">
-          <span class="text-white">4WATCHES</span>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar admin-navbar">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="/images/logo.png" alt="4WATCHES Logo" class="navbar-logo me-2">
+        <span class="text-white">4WATCHES</span>
+      </a>
+      <div class="d-flex">
+        <a href="/admin/logout" class="btn btn-outline-light">
+          <i class="fas fa-sign-out-alt me-2"></i>Logout
         </a>
-        <div class="d-flex">
-          <a href="/admin/logout" class="btn btn-outline-light">
-            <i class="fas fa-sign-out-alt me-2"></i>Logout
-          </a>
-        </div>
       </div>
+    </div>
+  </nav>
+
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-header">
+        <img src="/images/logo.png" alt="4WATCHES Logo" class="sidebar-logo">
+        <h3 class="text-white mb-0">4WATCHES</h3>
+      </div>
+      <ul class="list-unstyled components">
+        <li>
+          <a href="/admin/adminHome">
+            <i class="fas fa-home me-2"></i>Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="/admin/Product">
+            <i class="fas fa-box me-2"></i>Products
+          </a>
+        </li>
+        <li class="active">
+          <a href="/admin/User">
+            <i class="fas fa-users me-2"></i>Users
+          </a>
+        </li>
+        <li>
+          <a href="/admin/Category">
+            <i class="fas fa-tags me-2"></i>Categories
+          </a>
+        </li>
+        <li>
+          <a href="/admin/order">
+            <i class="fas fa-shopping-cart me-2"></i>Orders
+          </a>
+        </li>
+        <li>
+          <a href="/admin/coupons">
+            <i class="fas fa-ticket-alt me-2"></i>Coupons
+          </a>
+        </li>
+        <li>
+          <a href="/admin/sales">
+            <i class="fas fa-chart-line me-2"></i>Sales Report
+          </a>
+        </li>
+      </ul>
     </nav>
 
-    <div class="d-flex">
-      <!-- Sidebar -->
-      <nav id="sidebar">
-        <div class="sidebar-header">
-          <img src="/images/logo.png" alt="4WATCHES Logo" class="sidebar-logo">
-          <h3 class="text-white mb-0">4WATCHES</h3>
-        </div>
-        <ul class="list-unstyled components">
-          <li>
-            <a href="/admin/adminHome">
-              <i class="fas fa-home me-2"></i>Dashboard
-            </a>
-          </li>
-          <li>
-            <a href="/admin/Product">
-              <i class="fas fa-box me-2"></i>Products
-            </a>
-          </li>
-          <li class="active">
-            <a href="/admin/User">
-              <i class="fas fa-users me-2"></i>Users
-            </a>
-          </li>
-          <li>
-            <a href="/admin/Category">
-              <i class="fas fa-tags me-2"></i>Categories
-            </a>
-          </li>
-          <li>
-            <a href="/admin/order">
-              <i class="fas fa-shopping-cart me-2"></i>Orders
-            </a>
-          </li>
-          <li>
-            <a href="/admin/coupons">
-              <i class="fas fa-ticket-alt me-2"></i>Coupons
-            </a>
-          </li>
-          <li>
-            <a href="/admin/sales">
-              <i class="fas fa-chart-line me-2"></i>Sales Report
-            </a>
-          </li>
-        </ul>
-      </nav>
+    <!-- Main Content -->
+    <div class="flex-grow-1">
+      <div class="container-fluid">
+        <div class="table-container">
+          <h2 class="mb-4">User Management</h2>
 
-      <!-- Main Content -->
-      <div class="flex-grow-1">
-        <div class="container-fluid">
-          <div class="table-container">
-            <h2 class="mb-4">User Management</h2>
+          <!-- Pagination -->
+          <div class="d-flex justify-content-center mb-4">
+            <ul class="pagination">
+              <% if (totalPages> 1) { %>
+                <% if (currentPage> 1) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="/admin/User?page=<%= currentPage - 1 %>" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  <% } %>
 
-            <!-- Pagination -->
-            <div class="d-flex justify-content-center mb-4">
-              <ul class="pagination">
-                <% if (totalPages > 1) { %>
-                  <% if (currentPage > 1) { %>
-                    <li class="page-item">
-                      <a class="page-link" href="/admin/User?page=<%= currentPage - 1 %>" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                      </a>
-                    </li>
-                  <% } %>
-                  
-                  <% let startPage = Math.max(1, currentPage - 2); %>
-                  <% let endPage = Math.min(startPage + 3, totalPages); %>
-                  
-                  <% for(let i = startPage; i <= endPage; i++) { %>
-                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                      <a class="page-link" href="/admin/User?page=<%= i %>"><%= i %></a>
-                    </li>
-                  <% } %>
-                  
-                  <% if (currentPage < totalPages) { %>
-                    <li class="page-item">
-                      <a class="page-link" href="/admin/User?page=<%= currentPage + 1 %>" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                      </a>
-                    </li>
-                  <% } %>
-                <% } %>
-              </ul>
-            </div>
+                    <% let startPage=Math.max(1, currentPage - 2); %>
+                      <% let endPage=Math.min(startPage + 3, totalPages); %>
 
-            <!-- User Table -->
-            <div class="table-responsive">
-              <table class="table align-middle">
-                <thead>
+                        <% for(let i=startPage; i <=endPage; i++) { %>
+                          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="/admin/User?page=<%= i %>">
+                              <%= i %>
+                            </a>
+                          </li>
+                          <% } %>
+
+                            <% if (currentPage < totalPages) { %>
+                              <li class="page-item">
+                                <a class="page-link" href="/admin/User?page=<%= currentPage + 1 %>" aria-label="Next">
+                                  <span aria-hidden="true">&raquo;</span>
+                                </a>
+                              </li>
+                              <% } %>
+                                <% } %>
+            </ul>
+          </div>
+
+          <!-- User Table -->
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email Address</th>
+                  <th>Phone Number</th>
+                  <th>Status</th>
+                  <th>View Details</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (let i=0; i < data.length; i++) { %>
                   <tr>
-                    <th>Username</th>
-                    <th>Email Address</th>
-                    <th>Phone Number</th>
-                    <th>Status</th>
-                    <th>View Details</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% for (let i=0; i < data.length; i++) { %>
-                    <tr>
-                      <td><%= data[i].fullname %></td>
-                      <td><%= data[i].email %></td>
-                      <td><%= data[i].phone %></td>
-                      <td>
-                        <% if (data[i].status) { %>
-                          <span class="status-blocked">Blocked</span>
+                    <td>
+                      <%= data[i].fullname %>
+                    </td>
+                    <td>
+                      <%= data[i].email %>
+                    </td>
+                    <td>
+                      <%= data[i].phone %>
+                    </td>
+                    <td>
+                      <% if (data[i].status) { %>
+                        <span class="status-blocked">Blocked</span>
                         <% } else { %>
                           <span class="status-active">Active</span>
-                        <% } %>
-                      </td>
-                      <td>
-                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#userDetailsModal<%= data[i]._id %>">
-                          <i class="fas fa-eye me-1"></i>View Details
+                          <% } %>
+                    </td>
+                    <td>
+                      <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#userDetailsModal<%= data[i]._id %>">
+                        <i class="fas fa-eye me-1"></i>View Details
+                      </button>
+                    </td>
+                    <td>
+                      <% if (data[i].status) { %>
+                        <button class="btn btn-success btn-sm"
+                          onclick="confirmAndRedirect('<%= data[i]._id %>', event)">
+                          <i class="fas fa-unlock me-1"></i>Unblock
                         </button>
-                      </td>
-                      <td>
-                        <% if (data[i].status) { %>
-                          <button class="btn btn-success btn-sm" onclick="confirmAndRedirect('<%= data[i]._id %>', event)">
-                            <i class="fas fa-unlock me-1"></i>Unblock
-                          </button>
                         <% } else { %>
-                          <button class="btn btn-danger btn-sm" onclick="confirmAndRedirect('<%= data[i]._id %>', event)">
+                          <button class="btn btn-danger btn-sm"
+                            onclick="confirmAndRedirect('<%= data[i]._id %>', event)">
                             <i class="fas fa-lock me-1"></i>Block
                           </button>
-                        <% } %>
-                      </td>
-                    </tr>
+                          <% } %>
+                    </td>
+                  </tr>
                   <% } %>
-                </tbody>
-              </table>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <script>
-      // Mobile sidebar toggle
-      document.addEventListener('DOMContentLoaded', function() {
-        const sidebarToggle = document.createElement('button');
-        sidebarToggle.classList.add('btn', 'btn-primary', 'd-md-none', 'position-fixed');
-        sidebarToggle.style.cssText = 'top: 10px; left: 10px; z-index: 1000;';
-        sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-        document.body.appendChild(sidebarToggle);
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        sidebarToggle.addEventListener('click', function() {
-          const sidebar = document.getElementById('sidebar');
-          sidebar.classList.toggle('active');
-        });
+  <script>
+    // Mobile sidebar toggle
+    document.addEventListener('DOMContentLoaded', function () {
+      const sidebarToggle = document.createElement('button');
+      sidebarToggle.classList.add('btn', 'btn-primary', 'd-md-none', 'position-fixed');
+      sidebarToggle.style.cssText = 'top: 10px; left: 10px; z-index: 1000;';
+      sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+      document.body.appendChild(sidebarToggle);
+
+      sidebarToggle.addEventListener('click', function () {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('active');
+      });
+    });
+
+    // User status change confirmation
+    async function confirmAndRedirect(userId, event) {
+      event.preventDefault();
+
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to change the status of this user?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#bca374',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
       });
 
-      // User status change confirmation
-      async function confirmAndRedirect(userId, event) {
-        event.preventDefault();
-        
-        const result = await Swal.fire({
-          title: 'Are you sure?',
-          text: "You want to change the status of this user?",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#bca374',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, change it!'
-        });
-
-        if (result.isConfirmed) {
-          window.location.href = "/admin/changeStatus?id=" + userId;
-        }
+      if (result.isConfirmed) {
+        window.location.href = "/admin/changeStatus?id=" + userId;
       }
-    </script>
+    }
+  </script>
 
-    <!-- User Details Modals -->
-    <% for(let i=0; i < data.length; i++) { %>
-      <div class="modal fade" id="userDetailsModal<%= data[i]._id %>" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">User Details</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <div class="row g-4">
-                <!-- Basic Info -->
-                <div class="col-md-6">
-                  <div class="info-section">
-                    <h6 class="section-title mb-3">Basic Information</h6>
-                    <div class="info-item">
-                      <p><strong>Full Name:</strong> <%= data[i].fullname %></p>
-                      <p><strong>Email:</strong> <%= data[i].email %></p>
-                      <p><strong>Phone:</strong> <%= data[i].phone %></p>
-                      <p><strong>Status:</strong> 
-                        <span class="badge <%= data[i].status ? 'bg-danger' : 'bg-success' %>">
-                          <%= data[i].status ? 'Blocked' : 'Active' %>
-                        </span>
-                      </p>
-                      <p><strong>Account Type:</strong> <%= data[i].googleuser ? 'Google Account' : 'Regular Account' %></p>
-                      <p><strong>Joined On:</strong> <%= new Date(data[i].createdAt).toLocaleDateString() %></p>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Account Stats -->
-                <div class="col-md-6">
-                  <div class="info-section">
-                    <h6 class="section-title mb-3">Account Statistics</h6>
-                    <div class="info-item">
-                      <p><strong>Wallet Balance:</strong> ₹<%= data[i].wallet.balance %></p>
-                      <p><strong>Wishlist Items:</strong> <%= data[i].wishlistCount %></p>
-                      <p><strong>Cart Items:</strong> <%= data[i].cartCount %></p>
-                      <p><strong>Total Orders:</strong> <%= data[i].orderCount %></p>
-                      <p><strong>Used Coupons:</strong> <%= data[i].usedCouponsCount %></p>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Addresses -->
-                <div class="col-12">
-                  <div class="info-section">
-                    <h6 class="section-title mb-3">Addresses</h6>
-                    <% if (data[i].addresses && data[i].addresses.length > 0) { %>
-                      <div class="row">
-                        <% data[i].addresses.forEach(addr => { %>
-                          <div class="col-md-6 mb-3">
-                            <div class="address-card">
-                              <p class="mb-1"><%= addr.address %></p>
-                              <% if (addr.addressline2) { %>
-                                <p class="mb-1"><%= addr.addressline2 %></p>
-                              <% } %>
-                              <p class="mb-1"><%= addr.city %>, <%= addr.state %></p>
-                              <p class="mb-1">PIN: <%= addr.pincode %></p>
-                            </div>
-                          </div>
-                        <% }); %>
-                      </div>
-                    <% } else { %>
-                      <p class="text-muted">No addresses added</p>
-                    <% } %>
-                  </div>
-                </div>
-
-                <!-- Wallet Transactions -->
-                <div class="col-12">
-                  <div class="info-section">
-                    <h6 class="section-title mb-3">Recent Wallet Transactions</h6>
-                    <% if (data[i].wallet.transactions && data[i].wallet.transactions.length > 0) { %>
-                      <div class="table-responsive">
-                        <table class="table table-sm transaction-table">
-                          <thead>
-                            <tr>
-                              <th>Date</th>
-                              <th>Type</th>
-                              <th>Amount</th>
-                              <th>Description</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <% data[i].wallet.transactions.forEach(trans => { %>
-                              <tr>
-                                <td><%= new Date(trans.date).toLocaleDateString() %></td>
-                                <td>
-                                  <span class="badge <%= trans.type === 'credit' ? 'bg-success' : 'bg-danger' %>">
-                                    <%= trans.type %>
-                                  </span>
-                                </td>
-                                <td>₹<%= trans.amount %></td>
-                                <td><%= trans.description %></td>
-                              </tr>
-                            <% }); %>
-                          </tbody>
-                        </table>
-                      </div>
-                    <% } else { %>
-                      <p class="text-muted">No transactions found</p>
-                    <% } %>
+  <!-- User Details Modals -->
+  <% for(let i=0; i < data.length; i++) { %>
+    <div class="modal fade" id="userDetailsModal<%= data[i]._id %>" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">User Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-4">
+              <!-- Basic Info -->
+              <div class="col-md-6">
+                <div class="info-section">
+                  <h6 class="section-title mb-3">Basic Information</h6>
+                  <div class="info-item">
+                    <p><strong>Full Name:</strong>
+                      <%= data[i].fullname %>
+                    </p>
+                    <p><strong>Email:</strong>
+                      <%= data[i].email %>
+                    </p>
+                    <p><strong>Phone:</strong>
+                      <%= data[i].phone %>
+                    </p>
+                    <p><strong>Status:</strong>
+                      <span class="badge <%= data[i].status ? 'bg-danger' : 'bg-success' %>">
+                        <%= data[i].status ? 'Blocked' : 'Active' %>
+                      </span>
+                    </p>
+                    <p><strong>Account Type:</strong>
+                      <%= data[i].googleuser ? 'Google Account' : 'Regular Account' %>
+                    </p>
+                    <p><strong>Joined On:</strong>
+                      <%= new Date(data[i].createdAt).toLocaleDateString() %>
+                    </p>
                   </div>
                 </div>
               </div>
+
+              <!-- Account Stats -->
+              <div class="col-md-6">
+                <div class="info-section">
+                  <h6 class="section-title mb-3">Account Statistics</h6>
+                  <div class="info-item">
+                    <p><strong>Wallet Balance:</strong> ₹<%= data[i].wallet.balance %>
+                    </p>
+                    <p><strong>Wishlist Items:</strong>
+                      <%= data[i].wishlistCount %>
+                    </p>
+                    <p><strong>Cart Items:</strong>
+                      <%= data[i].cartCount %>
+                    </p>
+                    <p><strong>Total Orders:</strong>
+                      <%= data[i].orderCount %>
+                    </p>
+                    <p><strong>Used Coupons:</strong>
+                      <%= data[i].usedCouponsCount %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Addresses -->
+              <div class="col-12">
+                <div class="info-section">
+                  <h6 class="section-title mb-3">Addresses</h6>
+                  <% if (data[i].addresses && data[i].addresses.length> 0) { %>
+                    <div class="row">
+                      <% data[i].addresses.forEach(addr=> { %>
+                        <div class="col-md-6 mb-3">
+                          <div class="address-card">
+                            <p class="mb-1">
+                              <%= addr.address %>
+                            </p>
+                            <% if (addr.addressline2) { %>
+                              <p class="mb-1">
+                                <%= addr.addressline2 %>
+                              </p>
+                              <% } %>
+                                <p class="mb-1">
+                                  <%= addr.city %>, <%= addr.state %>
+                                </p>
+                                <p class="mb-1">PIN: <%= addr.pincode %>
+                                </p>
+                          </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                    <% } else { %>
+                      <p class="text-muted">No addresses added</p>
+                      <% } %>
+                </div>
+              </div>
+
+              <!-- Wallet Transactions -->
+              <div class="col-12">
+                <div class="info-section">
+                  <h6 class="section-title mb-3">Recent Wallet Transactions</h6>
+                  <% if (data[i].wallet.transactions && data[i].wallet.transactions.length> 0) { %>
+                    <div class="table-responsive">
+                      <table class="table table-sm transaction-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% data[i].wallet.transactions.forEach(trans=> { %>
+                            <tr>
+                              <td>
+                                <%= new Date(trans.date).toLocaleDateString() %>
+                              </td>
+                              <td>
+                                <span class="badge <%= trans.type === 'credit' ? 'bg-success' : 'bg-danger' %>">
+                                  <%= trans.type %>
+                                </span>
+                              </td>
+                              <td>₹<%= trans.amount %>
+                              </td>
+                              <td>
+                                <%= trans.description %>
+                              </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                      </table>
+                    </div>
+                    <% } else { %>
+                      <p class="text-muted">No transactions found</p>
+                      <% } %>
+                </div>
+              </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
+    </div>
     <% } %>
 
-    <!-- Add this after the table for pagination -->
-    <div class="d-flex justify-content-center mt-4">
-      <ul class="pagination">
-        <% if (totalPages > 1) { %>
-          <% if (currentPage > 1) { %>
-            <li class="page-item">
-              <a class="page-link" href="/admin/User?page=<%= currentPage - 1 %>" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-          <% } %>
-          
-          <% let startPage = Math.max(1, currentPage - 2); %>
-          <% let endPage = Math.min(startPage + 3, totalPages); %>
-          
-          <% for(let i = startPage; i <= endPage; i++) { %>
-            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-              <a class="page-link" href="/admin/User?page=<%= i %>"><%= i %></a>
-            </li>
-          <% } %>
-          
-          <% if (currentPage < totalPages) { %>
-            <li class="page-item">
-              <a class="page-link" href="/admin/User?page=<%= currentPage + 1 %>" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          <% } %>
-        <% } %>
-      </ul>
-    </div>
-  </body>
+      <!-- Add this after the table for pagination -->
+      <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+          <% if (totalPages> 1) { %>
+            <% if (currentPage> 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/User?page=<%= currentPage - 1 %>" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <% } %>
+
+                <% let startPage=Math.max(1, currentPage - 2); %>
+                  <% let endPage=Math.min(startPage + 3, totalPages); %>
+
+                    <% for(let i=startPage; i <=endPage; i++) { %>
+                      <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                        <a class="page-link" href="/admin/User?page=<%= i %>">
+                          <%= i %>
+                        </a>
+                      </li>
+                      <% } %>
+
+                        <% if (currentPage < totalPages) { %>
+                          <li class="page-item">
+                            <a class="page-link" href="/admin/User?page=<%= currentPage + 1 %>" aria-label="Next">
+                              <span aria-hidden="true">&raquo;</span>
+                            </a>
+                          </li>
+                          <% } %>
+                            <% } %>
+        </ul>
+      </div>
+</body>
+
 </html>

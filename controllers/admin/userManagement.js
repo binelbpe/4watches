@@ -1,6 +1,8 @@
 const userDetails = require("../../models/userModel");
 const Address = require("../../models/addressModel");
 const Wallet = require("../../models/walletModel");
+const Cart = require("../../models/addtocartModel");
+const Order = require("../../models/orderModel");
 
 const ITEMS_PER_PAGE = 10;
 
@@ -33,72 +35,71 @@ const userManagementPage = async (req, res) => {
         select: "balance transactions",
       })
       .populate("wishlistItems")
-      .populate("cart")
-      .populate({
-        path: "order",
-        select: "orderNumber totalAmount status createdAt",
-      })
-      .populate("usedCoupons")
       .skip((page - 1) * ITEMS_PER_PAGE)
       .limit(ITEMS_PER_PAGE)
       .sort({ createdAt: -1 });
 
     // Format user data according to models
-    const formattedUsers = users.map((user) => ({
-      _id: user._id,
-      fullname: user.fullname,
-      email: user.email,
-      phone: user.phone,
-      status: user.status,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      googleuser: user.googleuser,
+    const formattedUsers = await Promise.all(users.map(async (user) => {
+      // Get cart items count from Cart model
+      const cart = await Cart.findOne({ userId: user._id });
+      const cartCount = cart ? cart.cartItems.length : 0;
 
-      // Format addresses according to addressModel
-      addresses: user.addresses
-        ? user.addresses.map((addr) => ({
-            address: addr.address,
-            addressline2: addr.addressline2 || "",
-            city: addr.city,
-            state: addr.state,
-            pincode: addr.pincode,
-            status: addr.status,
-            userid: user._id,
-          }))
-        : [],
+      // Get orders for this user
+      const orders = await Order.find({ user: user._id });
+      const completedOrders = orders.filter(order => order.status === 'completed');
+      
+      // Get orders with coupons
+      const ordersWithCoupons = orders.filter(order => order.coupon != null);
 
-      // Format wallet according to walletModel
-      wallet: {
-        balance: user.wallet ? user.wallet.balance : 0,
-        transactions: user.wallet
-          ? user.wallet.transactions
-              .map((trans) => ({
-                type: trans.type,
-                amount: trans.amount,
-                description: trans.description,
-                date: trans.date,
-              }))
-              .sort((a, b) => b.date - a.date)
-          : [],
-      },
+      return {
+        _id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        phone: user.phone,
+        status: user.status,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        googleuser: user.googleuser,
 
-      // Additional user statistics
-      wishlistCount: user.wishlistItems ? user.wishlistItems.length : 0,
-      cartCount: user.cart ? user.cart.length : 0,
-      orderCount: user.order ? user.order.length : 0,
-      orders: user.order
-        ? user.order.map((order) => ({
-            orderNumber: order.orderNumber,
-            totalAmount: order.totalAmount,
-            status: order.status,
-            date: order.createdAt,
-          }))
-        : [],
-      usedCouponsCount: user.usedCoupons ? user.usedCoupons.length : 0,
+        addresses: user.addresses?.map(addr => ({
+          address: addr.address,
+          addressline2: addr.addressline2 || "",
+          city: addr.city,
+          state: addr.state,
+          pincode: addr.pincode,
+          status: addr.status,
+          userid: user._id,
+        })) || [],
 
-      // Additional user details from userModel
-      isAdmin: user.isAdmin,
-      googleId: user.googleId || null,
+        wallet: {
+          balance: user.wallet?.balance || 0,
+          transactions: user.wallet?.transactions
+            .map(trans => ({
+              type: trans.type,
+              amount: trans.amount,
+              description: trans.description,
+              date: trans.date,
+            }))
+            .sort((a, b) => b.date - a.date) || [],
+        },
+
+        wishlistCount: user.wishlistItems?.length || 0,
+        cartCount: cartCount,
+        orderCount: completedOrders.length,
+        orders: orders.map(order => ({
+          orderNumber: order._id,
+          totalAmount: order.totalPaid,
+          status: order.status,
+          date: order.createdAt,
+          paymentMethod: order.paymentMethod,
+          products: order.products
+        })),
+        usedCouponsCount: ordersWithCoupons.length,
+        
+        isAdmin: user.isAdmin,
+        googleId: user.googleId || null,
+      };
     }));
 
     res.render("adminUser", {
