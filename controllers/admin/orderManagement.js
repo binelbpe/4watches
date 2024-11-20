@@ -413,7 +413,7 @@ const returnProductAsAdmin = async (req, res) => {
     await order.save({ session });
     await session.commitTransaction();
 
-    res.redirect('/admin/orders');
+    res.redirect('/admin/order');
   } catch (error) {
     await session.abortTransaction();
     console.error('Error processing return:', error);

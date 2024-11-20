@@ -48,8 +48,13 @@ const calculateOrderPrices = (order) => {
 };
 
 // Keep this at the top with other helper functions
-const calculateOrderAmounts = (items, discountAmount = 0, walletAmount = 0) => {
+const calculateOrderAmounts = (items, discountAmount = 0, walletAmount = 0, hasAddress = true) => {
   try {
+    // If no address, throw error
+    if (!hasAddress) {
+      throw new Error('Please add a shipping address before applying coupon');
+    }
+
     // Parse inputs to ensure they are numbers
     const parsedDiscountAmount = parseFloat(discountAmount || 0);
     const parsedWalletAmount = parseFloat(walletAmount || 0);
@@ -95,7 +100,7 @@ const calculateOrderAmounts = (items, discountAmount = 0, walletAmount = 0) => {
     };
   } catch (error) {
     console.error('Error in calculateOrderAmounts:', error);
-    throw new Error('Error calculating order amounts');
+    throw error;
   }
 };
 

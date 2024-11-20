@@ -272,6 +272,8 @@
         const totalPrice = parseFloat(totalPriceElement.textContent);
         const walletBalanceElement = document.getElementById('walletBalance');
         const paymentMethodSelect = document.getElementById('paymentMethod');
+        const discountAmount = parseFloat(document.getElementById("discountedAmount").textContent);
+        const originalTotal = parseFloat(document.getElementById("originalTotalPrice").value);
 
         if (this.checked) {
           // Calculate how much of the wallet balance will be used
@@ -291,7 +293,7 @@
             checkoutButton.disabled = false;
           } else {
             // If partial wallet payment
-            paymentMethodSelect.value = 'pay_on_online'; // Default to online payment
+            paymentMethodSelect.value = 'pay_on_online';
             paymentMethodSelect.disabled = false;
             
             // Hide cash on delivery option for partial wallet payments
@@ -300,22 +302,28 @@
           }
 
         } else {
-          // Reset everything when unchecking wallet usage
+          // Reset wallet-related values
           paymentMethodSelect.value = '';
-          totalPriceElement.textContent = '<%= totalPrice %>';
           walletBalanceElement.textContent = initialWalletBalance;
           paymentMethodSelect.disabled = false;
           currentWalletBalance = parseFloat(initialWalletBalance);
+
+          // Calculate total with coupon discount but without wallet
+          const totalWithDiscount = originalTotal - discountAmount;
+          totalPriceElement.textContent = totalWithDiscount.toFixed(2);
 
           // Show all payment options again
           const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
           const onlinePaymentOption = paymentMethodSelect.querySelector('option[value="pay_on_online"]');
           
-          if (parseFloat(totalPriceElement.textContent) <= 1000) {
+          if (totalWithDiscount <= 1000) {
             cashOnDeliveryOption.style.display = 'block';
           }
           onlinePaymentOption.style.display = 'block';
         }
+
+        // Update payment options based on new total
+        updatePaymentOptions();
       });
 
       const cashOnDeliveryOption = paymentMethodSelect.querySelector('option[value="cash_on_delivery"]');
@@ -366,9 +374,17 @@
         const clearCouponBtn = document.getElementById("clearCouponBtn");
         const couponInput = document.getElementById("coupon");
         const couponMessage = document.getElementById("couponMessage");
+        const addressSelect = document.getElementById("address");
 
         // Apply Coupon Function
         async function applyCoupon() {
+          // First check if address exists
+          if (!addressSelect || !addressSelect.value) {
+            showMessage("Please add a shipping address before applying coupon", "error");
+            couponInput.disabled = true;
+            return;
+          }
+
           const couponCode = couponInput.value.trim();
 
           if (!couponCode) {
@@ -382,31 +398,37 @@
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ coupon: couponCode }),
+              body: JSON.stringify({ 
+                coupon: couponCode,
+                hasAddress: Boolean(addressSelect?.value)
+              }),
             });
 
             const data = await response.json();
-            console.log('Coupon Response:', data);
 
             if (data.success) {
-              // Update price display
+              // Uncheck wallet checkbox silently
+              const useWalletCheckbox = document.getElementById("useWalletCheckbox");
+              if (useWalletCheckbox.checked) {
+                useWalletCheckbox.checked = false;
+                // Trigger change event to update UI
+                const event = new Event('change');
+                useWalletCheckbox.dispatchEvent(event);
+              }
+
               updatePriceDisplay(data.discountAmount, data.discountedTotalPrice);
               showMessage(data.message, "success");
-
-              // Update UI
+              
               couponInput.disabled = true;
               applyCouponBtn.style.display = "none";
               clearCouponBtn.style.display = "inline-block";
-
-              // Update hidden inputs
+              
               document.getElementById("discountedAmountInput").value = data.discountAmount;
               document.getElementById("totalPriceInput").value = data.discountedTotalPrice;
-
-              // Update payment options
+              
               updatePaymentOptions();
             } else {
               showMessage(data.message || "Invalid coupon code", "error");
-              // Reset coupon input but keep the entered code
               couponInput.disabled = false;
               applyCouponBtn.style.display = "inline-block";
               clearCouponBtn.style.display = "none";
@@ -414,10 +436,28 @@
           } catch (error) {
             console.error("Error:", error);
             showMessage("Error applying coupon. Please try again.", "error");
-            // Reset coupon input but keep the entered code
             couponInput.disabled = false;
             applyCouponBtn.style.display = "inline-block";
             clearCouponBtn.style.display = "none";
+          }
+        }
+
+        // Add address change listener
+        if (addressSelect) {
+          addressSelect.addEventListener('change', function() {
+            if (this.value) {
+              couponInput.disabled = false;
+              couponMessage.style.display = "none";
+            } else {
+              couponInput.disabled = true;
+              showMessage("Please add a shipping address before applying coupon", "error");
+            }
+          });
+
+          // Initial check for address
+          if (!addressSelect.value) {
+            couponInput.disabled = true;
+            showMessage("Please add a shipping address before applying coupon", "error");
           }
         }
 
@@ -449,12 +489,17 @@
 
         // Listen for changes in the coupon input field
         couponInput.addEventListener("input", function () {
-          couponMessage.style.display = "none"; // Hide any previous messages
+          if (!addressSelect || !addressSelect.value) {
+            this.disabled = true;
+            showMessage("Please add a shipping address before applying coupon", "error");
+            return;
+          }
+          
+          couponMessage.style.display = "none";
           if (!this.value.trim()) {
             applyCouponBtn.style.display = "inline-block";
             clearCouponBtn.style.display = "none";
             
-            // Reset to original price if input is cleared
             const originalTotalPrice = document.getElementById("originalTotalPrice").value;
             updatePriceDisplay(0, parseFloat(originalTotalPrice));
           }
