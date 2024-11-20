@@ -8,6 +8,33 @@ const ExcelJS = require("exceljs");
 const bcrypt = require("bcrypt");
 const path = require("path");
 
+// Add this helper function at the top of the file
+const formatCurrency = (amount) => {
+  // Handle undefined, null, or invalid values
+  if (amount === undefined || amount === null) {
+    return '₹0.00';
+  }
+
+  // Convert to number if it's a string
+  const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+
+  // Check if it's a valid number
+  if (isNaN(numericAmount)) {
+    return '₹0.00';
+  }
+
+  // Format the number with 2 decimal places
+  try {
+    return `₹${numericAmount.toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+  } catch (error) {
+    console.error('Error formatting currency:', error);
+    return `₹${numericAmount.toFixed(2)}`;
+  }
+};
+
 //rendering admin login page
 const admin = (req, res) => {
   try {
@@ -297,253 +324,89 @@ const getSalesReportData = async (req, res) => {
 //function for download sales report as pdf
 const downloadSalesReportPDF = async (req, res) => {
   try {
-    const startDate = new Date(req.query.startDate);
-    const endDate = new Date(req.query.endDate);
-    endDate.setDate(endDate.getDate() + 1);
-
-    const orders = await Order.find({
-      createdAt: { $gte: startDate, $lte: endDate },
-      status: "completed",
-    })
-      .populate({
-        path: "products.product",
-        select: "product price category",
-        model: "Product",
-      })
-      .populate({
-        path: "user",
-        select: "fullname email phone",
-        model: "User",
-      })
-      .populate("coupon")
-      .populate("address")
-      .lean();
-
-    const doc = new PDFDocument({
-      size: "A4",
-      margin: 50,
-      bufferPages: true,
-      autoFirstPage: false,
-    });
-
-    // Add first page
-    doc.addPage();
-
-    const formatCurrency = (amount) => {
-      return `Rs. ${amount.toLocaleString("en-IN", {
-        minimumFractionDigits: 2,
-      })}`;
-    };
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=sales_report.pdf"
-    );
-    doc.pipe(res);
-
-    doc
-      .image("public/images/logo.png", 50, 45, { width: 50 })
-      .fontSize(22)
-      .font("Helvetica-Bold")
-      .text("4WATCHES", 110, 50)
-      .fontSize(16)
-      .font("Helvetica")
-      .text("Sales Report", 110, 75)
-      .moveDown();
-
-    doc
-      .fontSize(12)
-      .text("Report Period:", 50, 120)
-      .font("Helvetica-Bold")
-      .text(
-        `${startDate.toLocaleDateString(
-          "en-IN"
-        )} to ${endDate.toLocaleDateString("en-IN")}`,
-        150,
-        120
-      )
-      .moveDown(2);
-
-    const totalRevenue = orders.reduce(
-      (sum, order) => sum + (order.totalPrice || 0),
-      0
-    );
-    const totalDiscount = orders.reduce(
-      (sum, order) => sum + (order.discountedAmount || 0),
-      0
-    );
-    const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
-
-    const summaryY = doc.y + 20;
-
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(16)
-      .text("Summary", 50, summaryY)
-      .moveDown();
-
-    const summaryBoxes = [
-      { label: "Total Orders", value: orders.length },
-      { label: "Total Revenue", value: formatCurrency(totalRevenue) },
-      { label: "Total Discount", value: formatCurrency(totalDiscount) },
-      { label: "Average Order Value", value: formatCurrency(avgOrderValue) },
-    ];
-
-    let boxY = doc.y;
-    summaryBoxes.forEach((box, index) => {
-      const boxX = 50 + (index % 2) * 250;
-      if (index % 2 === 0 && index > 0) boxY += 80;
-
-      doc
-        .rect(boxX, boxY, 200, 60)
-        .stroke()
-        .fontSize(12)
-        .font("Helvetica")
-        .text(box.label, boxX + 10, boxY + 10)
-        .font("Helvetica-Bold")
-        .fontSize(14)
-        .text(box.value, boxX + 10, boxY + 30);
-    });
-
-    // Calculate space needed for order details
-    const remainingSpace = doc.page.height - (boxY + 150); // Increased margin for safety
-
-    let currentY;
-    if (remainingSpace >= 200) {
-      doc.moveDown(2);
-      currentY = doc.y;
-    } else {
-      doc.addPage();
-      currentY = 50;
+    const { startDate, endDate } = req.query;
+    
+    // Validate dates
+    if (!startDate || !endDate) {
+      throw new Error('Start date and end date are required');
     }
 
-    // Add order details header
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(16)
-      .text("Order Details", 50, currentY)
-      .moveDown();
+    const orders = await Order.find({
+      createdAt: {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      },
+      status: { $in: ['completed', 'returned'] }
+    }).populate('products.product');
 
-    // Table headers
-    const tableHeaders = ["Order ID", "Customer", "Products", "Amount", "Date"];
-    const columnWidths = [80, 120, 160, 80, 80];
+    const doc = new PDFDocument();
+    const filename = `sales_report_${startDate}_to_${endDate}.pdf`;
 
-    // Draw header background
-    doc.rect(50, doc.y, 520, 20).fill("#f4f4f4");
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    doc.pipe(res);
 
-    // Add headers
-    let xPos = 50;
-    doc.fontSize(10).fill("#000000");
-    tableHeaders.forEach((header, i) => {
-      doc.text(header, xPos + 5, doc.y - 15, { width: columnWidths[i] });
-      xPos += columnWidths[i];
-    });
-
+    // Add report header
+    doc.fontSize(20).text('Sales Report', { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(12).text(`Period: ${new Date(startDate).toLocaleDateString()} to ${new Date(endDate).toLocaleDateString()}`, { align: 'center' });
     doc.moveDown();
 
-    // Track the last used Y position
-    let lastUsedY = doc.y;
-    let currentPage = 0;
+    // Initialize totals
+    let totalRevenue = 0;
+    let totalOrders = orders.length;
+    let totalProducts = 0;
 
-    // Process orders
+    // Add orders table
+    doc.fontSize(12).text('Order Details:', { underline: true });
+    doc.moveDown();
+
     orders.forEach((order, index) => {
-      const productsText = order.products
-        .map((p) => {
-          if (p.product && p.product.product) {
-            return `${p.product.product} (${p.quantity || 1})`;
+      try {
+        // Safely calculate order totals
+        const orderTotal = parseFloat(order.grandTotal) || 0;
+        totalRevenue += orderTotal;
+        totalProducts += order.products.length;
+
+        // Add order information
+        doc.text(`Order #${index + 1}`);
+        doc.text(`Date: ${order.createdAt.toLocaleDateString()}`);
+        doc.text(`Status: ${order.status}`);
+        doc.text(`Total Amount: ${formatCurrency(orderTotal)}`);
+
+        // Add products table
+        order.products.forEach(product => {
+          if (product.product) {
+            const productTotal = parseFloat(product.price) * parseInt(product.quantity);
+            doc.text(`  - ${product.product.product || 'Unknown Product'}`);
+            doc.text(`    Quantity: ${product.quantity}`);
+            doc.text(`    Price: ${formatCurrency(productTotal)}`);
           }
-          return "Unknown Product";
-        })
-        .join("\n");
-
-      const productsHeight = doc.heightOfString(productsText, {
-        width: 160,
-        align: "left",
-      });
-
-      const rowHeight = Math.max(30, productsHeight + 10);
-
-      // Check if we need a new page
-      if (lastUsedY + rowHeight > doc.page.height - 100) {
-        doc.addPage();
-        currentPage++;
-
-        // Redraw headers on new page
-        doc.rect(50, 50, 520, 20).fill("#f4f4f4");
-
-        xPos = 50;
-        doc.fontSize(10).fill("#000000");
-        tableHeaders.forEach((header, i) => {
-          doc.text(header, xPos + 5, 55, { width: columnWidths[i] });
-          xPos += columnWidths[i];
         });
 
-        lastUsedY = 80;
+        doc.moveDown();
+      } catch (error) {
+        console.error(`Error processing order ${order._id}:`, error);
       }
-
-      // Draw row
-      if (index % 2 === 0) {
-        doc.rect(50, lastUsedY, 520, rowHeight).fill("#f9f9f9");
-      }
-
-      // Add row content
-      const verticalPadding = (rowHeight - 10) / 2;
-      doc.fill("#000000");
-
-      doc.text(
-        order._id.toString().slice(-8),
-        55,
-        lastUsedY + verticalPadding,
-        { width: 70 }
-      );
-
-      doc.text(
-        order.user?.fullname || "N/A",
-        130,
-        lastUsedY + verticalPadding,
-        { width: 110 }
-      );
-
-      doc.text(productsText, 250, lastUsedY + 5, {
-        width: 160,
-        align: "left",
-        lineGap: 2,
-      });
-
-      doc.text(
-        formatCurrency(order.totalPrice),
-        410,
-        lastUsedY + verticalPadding,
-        { width: 80 }
-      );
-
-      // Date
-      doc.text(
-        new Date(order.createdAt).toLocaleDateString("en-IN"),
-        490,
-        lastUsedY + verticalPadding,
-        { width: 80 }
-      );
-
-      // Draw cell borders
-      doc.rect(50, lastUsedY, 520, rowHeight).stroke("#dddddd");
-      [80, 120, 160, 80, 80].reduce((x, width) => {
-        doc
-          .moveTo(x + width, lastUsedY)
-          .lineTo(x + width, lastUsedY + rowHeight)
-          .stroke("#dddddd");
-        return x + width;
-      }, 50);
-
-      // Update last used Y position
-      lastUsedY += rowHeight;
     });
 
+    // Add summary
+    doc.moveDown();
+    doc.fontSize(14).text('Summary:', { underline: true });
+    doc.fontSize(12);
+    doc.text(`Total Orders: ${totalOrders}`);
+    doc.text(`Total Products Sold: ${totalProducts}`);
+    doc.text(`Total Revenue: ${formatCurrency(totalRevenue)}`);
+
     doc.end();
+
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    res.status(500).send("Error generating PDF report");
+    console.error('Error generating PDF:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error generating sales report',
+      error: error.message 
+    });
   }
 };
 

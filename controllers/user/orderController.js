@@ -808,6 +808,15 @@ const createorder = async (req, res) => {
   }
 };
 
+// Add this helper function at the top of the file
+const formatAmount = (amount) => {
+  if (amount === undefined || amount === null) {
+    return '0.00';
+  }
+  const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  return isNaN(numericAmount) ? '0.00' : numericAmount.toFixed(2);
+};
+
 //function for create invoice as pdf for invoice download
 const invoice = async (req, res) => {
   try {
@@ -816,20 +825,24 @@ const invoice = async (req, res) => {
       .populate("products.product")
       .populate("address")
       .populate("coupon");
-    const user = await User.findOne({ _id: order.user._id });
+    
+    if (!order) {
+      throw new Error('Order not found');
+    }
 
-    if (
-      !order ||
-      (order.status !== "completed" && order.status !== "returned")
-    ) {
-      return res
-        .status(404)
-        .json({ error: "Order not found or not in a valid status" });
+    const user = await User.findOne({ _id: order.user._id });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (order.status !== "completed" && order.status !== "returned") {
+      return res.status(404).json({ error: "Order not in a valid status" });
     }
 
     const doc = new PDFDocument({
       margins: { top: 50, bottom: 50, left: 50, right: 50 },
     });
+    
     const fileName = `invoice_${orderId}.pdf`;
     const filePath = path.join(__dirname, "invoices", fileName);
 
@@ -840,174 +853,106 @@ const invoice = async (req, res) => {
 
     // Set up logo and company name
     doc.image("public/images/logo.png", 50, 50, { width: 50 });
-    doc.moveDown(3); // Add space after the logo
-    doc
-      .fillColor("#bca374")
-      .fontSize(18)
-      .text("4WATCHES", 400, 65, { align: "right" });
-    doc.moveDown(0.5); // Add space before the customer name
-    doc
-      .fillColor("#333333")
-      .fontSize(12)
-      .text(`Ordered Date: ${order.createdAt.toDateString()}`, 300, 130, {
-        align: "right",
-      });
+    doc.moveDown(3);
+    doc.fillColor("#bca374").fontSize(18).text("4WATCHES", 400, 65, { align: "right" });
+    doc.moveDown(0.5);
+    doc.fillColor("#333333").fontSize(12)
+      .text(`Ordered Date: ${order.createdAt.toDateString()}`, 300, 130, { align: "right" });
 
     doc.moveDown(2);
 
     // Add user and address details
-    doc
-      .fillColor("#333333")
-      .fontSize(14)
-      .text(`Customer: ${user.fullname}`, 50, 130); // Adjust vertical position
-    doc.fillColor("#333333").fontSize(12).text(
-      `Address: ${order.address.address}, ${order.address.city}, ${order.address.state} - ${order.address.pincode}`,
-      50,
-      150 // Adjust vertical position
-    );
+    doc.fillColor("#333333").fontSize(14)
+      .text(`Customer: ${user.fullname}`, 50, 130);
+    doc.fillColor("#333333").fontSize(12)
+      .text(`Address: ${order.address.address}, ${order.address.city}, ${order.address.state} - ${order.address.pincode}`,
+        50, 150);
     doc.moveDown(2);
 
     // Draw a box around order details with a heading
-    const boxTop = 200; // Adjust vertical position
+    const boxTop = 200;
     const boxHeight = 250;
 
-    doc
-      .fillColor("#bca374")
-      .fontSize(16)
+    doc.fillColor("#bca374").fontSize(16)
       .text(`Invoice for Order #${order._id}`, { align: "center" });
 
     doc.rect(50, boxTop, 500, boxHeight).stroke("#bca374").moveDown(1);
 
     // Add order details table inside the box
     const completedAndReturnedProducts = order.products.filter(
-      (item) => item.status === "completed"
+      (item) => item.status === "completed" || item.status === "returned"
     );
+
+    let total = 0;
+    completedAndReturnedProducts.forEach((item) => {
+      if (item.product && item.product.price) {
+        total += parseFloat(item.product.price) * parseInt(item.quantity || 1);
+      }
+    });
+
     const table = {
       headers: ["Product", "Quantity", "Price"],
       rows: completedAndReturnedProducts.map((item) => [
-        item.product.product,
-        item.quantity,
-        `Rs.${item.product.price}`,
+        item.product?.product || 'Product Unavailable',
+        item.quantity || 0,
+        `Rs.${formatAmount(item.product?.price || 0)}`,
       ]),
     };
-    generateTable(
-      doc,
-      table,
-      boxTop + 30,
-      [200, 100, 100],
-      [100, 350, 450],
-      "#bca374",
-      { align: "left" }
-    );
+
+    generateTable(doc, table, boxTop + 30, [200, 100, 100], [100, 350, 450], "#bca374", { align: "left" });
 
     // Add payment method
-    doc
-      .fillColor("#333333")
-      .fontSize(12)
-      .text(
-        `Payment Method: ${order.paymentMethod}`,
-        50,
-        boxTop + boxHeight + 20
-      );
+    doc.fillColor("#333333").fontSize(12)
+      .text(`Payment Method: ${order.paymentMethod}`, 50, boxTop + boxHeight + 20);
 
-    let total = completedAndReturnedProducts.reduce(
-      (acc, item) => acc + item.product.price * item.quantity,
-      0
-    );
+    // Calculate totals safely
     const tax = total * 0.05; // 5% tax
+    const shipping = 45;
+    const discount = order.coupon ? (order.discountedAmount || 0) : 0;
+    const walletAmount = order.walletAmount || 0;
 
     // Add order totals
-    doc
-      .fillColor("#bca374")
-      .fontSize(14)
+    doc.fillColor("#bca374").fontSize(14)
       .text("Order Totals:", 350, boxTop + boxHeight + 20);
-    doc
-      .fillColor("#333333")
-      .fontSize(12)
-      .text(`Tax: Rs.${tax.toFixed(2)}`, 350, boxTop + boxHeight + 40);
-    doc
-      .fillColor("#333333")
-      .fontSize(12)
-      .text(`Shipping: Rs.${45}`, 350, boxTop + boxHeight + 60);
+    doc.fillColor("#333333").fontSize(12)
+      .text(`Subtotal: Rs.${formatAmount(total)}`, 350, boxTop + boxHeight + 40)
+      .text(`Tax: Rs.${formatAmount(tax)}`, 350, boxTop + boxHeight + 60)
+      .text(`Shipping: Rs.${formatAmount(shipping)}`, 350, boxTop + boxHeight + 80);
 
     // Add coupon details if applied
     if (order.coupon) {
-      doc
-        .fillColor("#333333")
-        .fontSize(12)
-        .text(
-          `Coupon Code: ${order.coupon.code}`,
-          350,
-          boxTop + boxHeight + 80
-        );
-      const totalTax = (order.grandTotalPrice - 45) / 21;
-      const totalAfterTaxAndShipping = order.grandTotalPrice - 45 - totalTax;
-      var discount =
-        (order.discountedAmount / totalAfterTaxAndShipping) * total;
-      total = total - discount;
-      doc
-        .fillColor("#333333")
-        .fontSize(12)
-        .text(
-          `Discount: Rs.${discount.toFixed(2)}`,
-          350,
-          boxTop + boxHeight + 100
-        );
+      doc.text(`Coupon Code: ${order.coupon.code}`, 350, boxTop + boxHeight + 100)
+         .text(`Discount: Rs.${formatAmount(discount)}`, 350, boxTop + boxHeight + 120);
     }
 
-    // Display wallet balance used
-    if (order.paymentMethod === "pay_by_wallet") {
-      doc
-        .fillColor("#333333")
-        .fontSize(12)
-        .text(
-          `Wallet Balance Used: Rs.${
-            order.walletAmount -
-            order.discountedAmount -
-            order.returnedPrice.toFixed(2)
-          }`,
-          350,
-          boxTop + boxHeight + 120
-        );
-    } else if (order.walletAmount > 0) {
-      doc
-        .fillColor("#333333")
-        .fontSize(12)
-        .text(
-          `Wallet Balance Used: Rs.${order.walletAmount.toFixed(2)}`,
-          350,
-          boxTop + boxHeight + 120
-        );
+    // Display wallet balance used if applicable
+    if (walletAmount > 0) {
+      doc.text(`Wallet Balance Used: Rs.${formatAmount(walletAmount)}`, 
+        350, boxTop + boxHeight + (order.coupon ? 140 : 100));
     }
 
-    doc
-      .fillColor("#333333")
-      .fontSize(12)
-      .text(
-        `Total Price: Rs.${(total + tax + 45).toFixed(2)}`,
-        350,
-        boxTop + boxHeight + 140
-      );
+    // Calculate and display final total
+    const finalTotal = total + tax + shipping - discount - walletAmount;
+    doc.text(`Total Price: Rs.${formatAmount(finalTotal)}`, 
+      350, boxTop + boxHeight + (order.coupon ? 160 : 120));
 
-    doc
-      .fillColor("#333333")
-      .fontSize(12)
-      .text(
-        `This is a computer generated invoice`,
-        50,
-        boxTop + boxHeight + 200
-      );
+    // Footer
+    doc.fillColor("#333333").fontSize(12)
+      .text(`This is a computer generated invoice`, 50, boxTop + boxHeight + 200);
 
     // Add a horizontal line to separate the totals
-    doc
-      .moveTo(50, boxTop + boxHeight + 180)
+    doc.moveTo(50, boxTop + boxHeight + 180)
       .lineTo(550, boxTop + boxHeight + 180)
       .stroke("#bca374");
 
     doc.end();
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error generating invoice:', err);
+    res.status(500).json({ 
+      error: "Internal Server Error",
+      details: err.message 
+    });
   }
 };
 // Function to generate a table in PDFKit
