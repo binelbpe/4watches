@@ -835,157 +835,160 @@ const invoice = async (req, res) => {
       throw new Error('User not found');
     }
 
-    if (order.status !== "completed" && order.status !== "returned") {
-      return res.status(404).json({ error: "Order not in a valid status" });
-    }
-
     const doc = new PDFDocument({
+      size: 'A4',
       margins: { top: 50, bottom: 50, left: 50, right: 50 },
+      bufferPages: true
     });
-    
-    const fileName = `invoice_${orderId}.pdf`;
-    const filePath = path.join(__dirname, "invoices", fileName);
 
-    // Create WriteStream to save the PDF file
-    const writeStream = fs.createWriteStream(filePath);
-    doc.pipe(writeStream);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice_${orderId}.pdf`);
     doc.pipe(res);
 
-    // Set up logo and company name
-    doc.image("public/images/logo.png", 50, 50, { width: 50 });
-    doc.moveDown(3);
-    doc.fillColor("#bca374").fontSize(18).text("4WATCHES", 400, 65, { align: "right" });
-    doc.moveDown(0.5);
-    doc.fillColor("#333333").fontSize(12)
-      .text(`Ordered Date: ${order.createdAt.toDateString()}`, 300, 130, { align: "right" });
+    // Header
+    doc.image("public/images/logo.png", 50, 45, { width: 50 })
+       .font('Helvetica-Bold')
+       .fontSize(20)
+       .text('4WATCHES', 110, 50)
+       .fontSize(10)
+       .text('Premium Watch Store', 110, 75);
 
-    doc.moveDown(2);
+    // Invoice details (right aligned)
+    doc.fontSize(12)
+       .text('INVOICE', 400, 50)
+       .fontSize(10)
+       .text(`Order ID: ${order._id}`, 400, 70)
+       .text(`Date: ${order.createdAt.toLocaleDateString()}`, 400, 85);
 
-    // Add user and address details
-    doc.fillColor("#333333").fontSize(14)
-      .text(`Customer: ${user.fullname}`, 50, 130);
-    doc.fillColor("#333333").fontSize(12)
-      .text(`Address: ${order.address.address}, ${order.address.city}, ${order.address.state} - ${order.address.pincode}`,
-        50, 150);
-    doc.moveDown(2);
+    // Customer details
+    doc.fontSize(10)
+       .text('Bill To:', 50, 120)
+       .text(user.fullname, 50, 135)
+       .text(order.address.address, 50, 150)
+       .text(`${order.address.city}, ${order.address.state} - ${order.address.pincode}`, 50, 165);
 
-    // Draw a box around order details with a heading
-    const boxTop = 200;
-    const boxHeight = 250;
+    // Table header
+    const tableTop = 220;
+    const tableHeaders = ['Product', 'Quantity', 'Price', 'Total'];
+    const columnWidths = [250, 70, 100, 100];
+    
+    // Draw table header
+    doc.font('Helvetica-Bold');
+    drawTableHeader(doc, tableHeaders, tableTop, columnWidths);
 
-    doc.fillColor("#bca374").fontSize(16)
-      .text(`Invoice for Order #${order._id}`, { align: "center" });
+    // Draw table lines
+    doc.lineWidth(1)
+       .moveTo(50, tableTop - 5)
+       .lineTo(545, tableTop - 5)
+       .stroke()
+       .moveTo(50, tableTop + 15)
+       .lineTo(545, tableTop + 15)
+       .stroke();
 
-    doc.rect(50, boxTop, 500, boxHeight).stroke("#bca374").moveDown(1);
+    // Draw products
+    let yPos = tableTop + 30;
+    doc.font('Helvetica');
 
-    // Add order details table inside the box
-    const completedAndReturnedProducts = order.products.filter(
-      (item) => item.status === "completed" || item.status === "returned"
-    );
-
-    let total = 0;
-    completedAndReturnedProducts.forEach((item) => {
-      if (item.product && item.product.price) {
-        total += parseFloat(item.product.price) * parseInt(item.quantity || 1);
+    order.products.forEach((item, index) => {
+      // Check if we need a new page
+      if (yPos > 700) {
+        doc.addPage();
+        yPos = 50;
+        drawTableHeader(doc, tableHeaders, yPos, columnWidths);
+        yPos += 30;
       }
+
+      const productPrice = parseFloat(item.price || item.product?.price || 0);
+      const quantity = parseInt(item.quantity);
+      const total = productPrice * quantity;
+
+      drawTableRow(doc, [
+        item.product?.product || 'Unknown Product',
+        quantity.toString(),
+        formatAmount(productPrice),
+        formatAmount(total)
+      ], yPos, columnWidths);
+
+      yPos += 20;
     });
 
-    const table = {
-      headers: ["Product", "Quantity", "Price"],
-      rows: completedAndReturnedProducts.map((item) => [
-        item.product?.product || 'Product Unavailable',
-        item.quantity || 0,
-        `Rs.${formatAmount(item.product?.price || 0)}`,
-      ]),
-    };
+    // Draw final line
+    doc.lineWidth(1)
+       .moveTo(50, yPos)
+       .lineTo(545, yPos)
+       .stroke();
 
-    generateTable(doc, table, boxTop + 30, [200, 100, 100], [100, 350, 450], "#bca374", { align: "left" });
+    yPos += 20;
 
-    // Add payment method
-    doc.fillColor("#333333").fontSize(12)
-      .text(`Payment Method: ${order.paymentMethod}`, 50, boxTop + boxHeight + 20);
+    // Summary section
+    const summaryX = 350;
+    doc.font('Helvetica');
+    
+    drawSummaryLine(doc, 'Subtotal:', formatAmount(order.subtotal), summaryX, yPos);
+    drawSummaryLine(doc, 'Tax (5%):', formatAmount(order.tax), summaryX, yPos + 20);
+    drawSummaryLine(doc, 'Shipping:', formatAmount(order.shipping), summaryX, yPos + 40);
 
-    // Calculate totals safely
-    const tax = total * 0.05; // 5% tax
-    const shipping = 45;
-    const discount = order.coupon ? (order.discountedAmount || 0) : 0;
-    const walletAmount = order.walletAmount || 0;
-
-    // Add order totals
-    doc.fillColor("#bca374").fontSize(14)
-      .text("Order Totals:", 350, boxTop + boxHeight + 20);
-    doc.fillColor("#333333").fontSize(12)
-      .text(`Subtotal: Rs.${formatAmount(total)}`, 350, boxTop + boxHeight + 40)
-      .text(`Tax: Rs.${formatAmount(tax)}`, 350, boxTop + boxHeight + 60)
-      .text(`Shipping: Rs.${formatAmount(shipping)}`, 350, boxTop + boxHeight + 80);
-
-    // Add coupon details if applied
-    if (order.coupon) {
-      doc.text(`Coupon Code: ${order.coupon.code}`, 350, boxTop + boxHeight + 100)
-         .text(`Discount: Rs.${formatAmount(discount)}`, 350, boxTop + boxHeight + 120);
+    if (order.couponDiscount > 0) {
+      drawSummaryLine(doc, 'Discount:', `-${formatAmount(order.couponDiscount)}`, summaryX, yPos + 60);
+      yPos += 20;
     }
 
-    // Display wallet balance used if applicable
-    if (walletAmount > 0) {
-      doc.text(`Wallet Balance Used: Rs.${formatAmount(walletAmount)}`, 
-        350, boxTop + boxHeight + (order.coupon ? 140 : 100));
+    if (order.walletAmountUsed > 0) {
+      drawSummaryLine(doc, 'Wallet Used:', `-${formatAmount(order.walletAmountUsed)}`, summaryX, yPos + 60);
+      yPos += 20;
     }
 
-    // Calculate and display final total
-    const finalTotal = total + tax + shipping - discount - walletAmount;
-    doc.text(`Total Price: Rs.${formatAmount(finalTotal)}`, 
-      350, boxTop + boxHeight + (order.coupon ? 160 : 120));
+    // Final total
+    doc.lineWidth(1)
+       .moveTo(summaryX, yPos + 70)
+       .lineTo(545, yPos + 70)
+       .stroke();
+
+    doc.font('Helvetica-Bold');
+    drawSummaryLine(doc, 'Total Paid:', formatAmount(order.totalPaid), summaryX, yPos + 80);
 
     // Footer
-    doc.fillColor("#333333").fontSize(12)
-      .text(`This is a computer generated invoice`, 50, boxTop + boxHeight + 200);
-
-    // Add a horizontal line to separate the totals
-    doc.moveTo(50, boxTop + boxHeight + 180)
-      .lineTo(550, boxTop + boxHeight + 180)
-      .stroke("#bca374");
+    doc.font('Helvetica')
+       .fontSize(8)
+       .text('Thank you for shopping with us!', 50, doc.page.height - 50, {
+         align: 'center',
+         width: doc.page.width - 100
+       });
 
     doc.end();
 
   } catch (err) {
     console.error('Error generating invoice:', err);
-    res.status(500).json({ 
-      error: "Internal Server Error",
-      details: err.message 
-    });
+    res.status(500).json({ error: err.message });
   }
 };
-// Function to generate a table in PDFKit
-function generateTable(
-  doc,
-  table,
-  startY,
-  columnWidths,
-  columnPositions,
-  color,
-  options = {}
-) {
-  const initialPosition = 70; // Adjust based on your layout
-  const rowHeight = 20;
-  const padding = 5; // Adjust padding as needed
 
-  doc.font("Helvetica-Bold");
-  table.headers.forEach((header, i) => {
-    doc
-      .fillColor(color)
-      .text(header, columnPositions[i] + padding, startY, options);
-  });
-
-  doc.font("Helvetica");
-  let yPos = startY + rowHeight;
-  table.rows.forEach((row) => {
-    row.forEach((cell, i) => {
-      doc
-        .fillColor(color)
-        .text(cell, columnPositions[i] + padding, yPos, options);
+// Helper functions
+function drawTableHeader(doc, headers, y, widths) {
+  let x = 50;
+  headers.forEach((header, i) => {
+    doc.text(header, x, y, {
+      width: widths[i],
+      align: i === 0 ? 'left' : 'right'
     });
-    yPos += rowHeight;
+    x += widths[i];
   });
+}
+
+function drawTableRow(doc, cells, y, widths) {
+  let x = 50;
+  cells.forEach((cell, i) => {
+    doc.text(cell.toString(), x, y, {
+      width: widths[i],
+      align: i === 0 ? 'left' : 'right'
+    });
+    x += widths[i];
+  });
+}
+
+function drawSummaryLine(doc, label, value, x, y) {
+  doc.text(label, x, y, { width: 100, align: 'right' });
+  doc.text(value, x + 100, y, { width: 95, align: 'right' });
 }
 
 //function for handle payment fail in razor pay

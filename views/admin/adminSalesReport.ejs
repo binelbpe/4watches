@@ -587,7 +587,7 @@
 
     function renderReport(reportData) {
       try {
-        if (!reportData || !reportData.orders) {
+        if (!reportData || !reportData.summary) {
           Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -597,29 +597,47 @@
           return;
         }
 
+        const summary = reportData.summary;
+
         // Render stats cards
         reportContainer.innerHTML = `
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="stats-card">
               <h3>Total Revenue</h3>
-              <div class="stats-value">${formatCurrency(reportData.overallOrderAmount)}</div>
+              <div class="stats-value">${formatCurrency(summary.totalRevenue)}</div>
+              <small class="text-muted">Before discounts: ${formatCurrency(summary.totalSubtotal)}</small>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="stats-card">
               <h3>Total Orders</h3>
-              <div class="stats-value">${reportData.overallSalesCount}</div>
+              <div class="stats-value">${summary.totalOrders}</div>
+              <small class="text-muted">Products sold: ${summary.totalProducts}</small>
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="stats-card">
-              <h3>Total Discount</h3>
-              <div class="stats-value">${formatCurrency(reportData.overallDiscount)}</div>
+              <h3>Total Discounts</h3>
+              <div class="stats-value">${formatCurrency(summary.totalDiscount)}</div>
+              <div class="mt-2">
+                <small class="d-block">Coupon: ${formatCurrency(summary.totalCouponDiscount)}</small>
+                <small class="d-block">Wallet: ${formatCurrency(summary.totalWalletDiscount)}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <h3>Other Details</h3>
+              <div class="mt-2">
+                <small class="d-block">Tax: ${formatCurrency(summary.totalTax)}</small>
+                <small class="d-block">Shipping: ${formatCurrency(summary.totalShipping)}</small>
+                <small class="d-block">Avg. Order: ${formatCurrency(summary.averageOrderValue)}</small>
+              </div>
             </div>
           </div>
         `;
 
-        // Render order details
+        // Update the order details table to show more information
         if (reportData.orders && reportData.orders.length > 0) {
           renderOrderDetails(reportData.orders);
           orderDetailsReport.style.display = 'block';
@@ -670,10 +688,18 @@
             <td>${order.user?.fullname || 'N/A'}</td>
             <td>
               <ul class="list-unstyled mb-0">
-                ${order.products.map(p => `${p.name} (${p.quantity})`).join('<br>')}
+                ${order.products.map(p => `
+                  ${p.name} (${p.quantity}) - ${formatCurrency(p.price * p.quantity)}
+                `).join('<br>')}
               </ul>
             </td>
-            <td>${formatCurrency(order.totalPrice)}</td>
+            <td>
+              <div>Subtotal: ${formatCurrency(order.subtotal)}</div>
+              <div>Tax: ${formatCurrency(order.tax)}</div>
+              ${order.couponDiscount > 0 ? `<div>Coupon: -${formatCurrency(order.couponDiscount)}</div>` : ''}
+              ${order.walletAmountUsed > 0 ? `<div>Wallet: -${formatCurrency(order.walletAmountUsed)}</div>` : ''}
+              <div class="fw-bold">Total: ${formatCurrency(order.totalPaid)}</div>
+            </td>
             <td>${order.paymentMethod}</td>
             <td><span class="badge bg-${getStatusColor(order.status)}">${order.status}</span></td>
             <td>${new Date(order.createdAt).toLocaleDateString()}</td>
